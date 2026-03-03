@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hotel Admin</title>
+
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/modal.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/profile.css" />
+  </head>
+
+  <body>
+    <!-- NAVBAR LOAD -->
+    <div id="navbar-container"></div>
+
+    <!-- WELCOME -->
+    <section class="hero">
+      <div id="main-content" class="welcome-box">
+        <h1>Welcome, Nguyen Van A!</h1>
+        <p>You are logged in as: <span id="navbarRole"></span></p>
+      </div>
+    </section>
+
+    <script src="js/main.js"></script>
+    <script src="js/account.js"></script>
+    <script src="js/dropdown.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/role.js"></script>
+    <!-- Change Password Modal -->
+    <div id="passwordModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+
+        <h2>Change Password</h2>
+
+        <form>
+          <label>Current Password</label>
+          <input type="password" placeholder="Enter current password" />
+
+          <label>New Password</label>
+          <input type="password" placeholder="Enter new password" />
+
+          <label>Confirm New Password</label>
+          <input type="password" placeholder="Confirm new password" />
+
+          <button type="submit">Update Password</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

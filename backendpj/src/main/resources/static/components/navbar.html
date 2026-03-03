@@ -1,0 +1,144 @@
+<nav class="navbar">
+  <div class="nav-left">
+    <a href="/index.html" class="logo-link">🏨 Hotel Admin</a>
+  </div>
+
+  <div class="nav-right">
+    <div class="menu-item">
+      <span>Room Management ▾</span>
+      <div class="menu-dropdown">
+        <a
+          href="/pages/rooms/view-room-status.html"
+          id="viewRoomStatus"
+          >View Room Status</a
+        >
+        <a
+          href="/pages/rooms/check-equipment.html"
+          id="checkEquipment"
+          >Check Equipment</a
+        >
+        <a href="/pages/rooms/book-room.html" id="bookRoom"
+          >Book Room</a
+        >
+        <a href="/pages/rooms/check-in-out.html" id="checkInOut"
+          >Check In / Check Out</a
+        >
+      </div>
+    </div>
+
+    <div class="menu-item">
+      <span>Staff Management ▾</span>
+      <div class="menu-dropdown">
+        <a href="/pages/staff/view-staff.html" id="viewStaff"
+          >View Staff</a
+        >
+        <a href="/pages/staff/manage-staff.html" id="manageStaff"
+          >Manage Staff</a
+        >
+      </div>
+    </div>
+
+    <div class="menu-item">
+      <span>User Management ▾</span>
+      <div class="menu-dropdown">
+        <a href="/pages/users/manage-users.html" id="manageUsers"
+          >Manage Users</a
+        >
+      </div>
+    </div>
+
+    <div class="menu-item">
+      <span>Revenue ▾</span>
+      <div class="menu-dropdown">
+        <a
+          href="/pages/revenue/view-revenue.html"
+          id="viewRevenue"
+          >View Revenue</a
+        >
+      </div>
+    </div>
+
+    <div class="menu-item">
+      <span>Reports ▾</span>
+      <div class="menu-dropdown">
+        <a
+          href="/pages/reports/view-reports.html"
+          id="viewReports"
+          >View Reports</a
+        >
+      </div>
+    </div>
+
+    <!-- ACCOUNT -->
+
+    <div class="account" id="accountMenu">
+      <div class="avatar" id="avatar">NVA</div>
+
+      <div class="account-name" id="username">Nguyen Van A</div>
+
+      <div class="dropdown-icon">▼</div>
+
+      <div class="account-dropdown" id="dropdownMenu">
+        <a id="profileBtn">Profile</a>
+
+        <a id="changePasswordBtn">Change Password</a>
+
+        <form action="/logout" method="post" style="margin: 0">
+          <button
+            type="submit"
+            style="
+              display: block;
+              width: 100%;
+              padding: 12px 15px;
+              text-align: left;
+              background: none;
+              border: none;
+              color: #333;
+              font-size: 14px;
+              cursor: pointer;
+            "
+          >
+            Logout
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= PROFILE MODAL ================= -->
+
+<div id="profileModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close" id="closeProfileModal">&times;</span>
+
+    <h2>Profile</h2>
+
+    <div class="profile-info">
+      <p><strong>Name:</strong> Nguyen Van A</p>
+      <p><strong>Role:</strong> <span id="profileRole"></span></p>
+      <p><strong>Email:</strong> nguyenvana@email.com</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CHANGE PASSWORD MODAL ================= -->
+
+<div id="passwordModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close" id="closeModal">&times;</span>
+
+    <h2>Change Password</h2>
+
+    <label>Current Password</label>
+    <input type="password" placeholder="Enter current password" />
+
+    <label>New Password</label>
+    <input type="password" placeholder="Enter new password" />
+
+    <label>Confirm New Password</label>
+    <input type="password" placeholder="Confirm new password" />
+
+    <button>Update Password</button>
+  </div>
+</div>
