@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hotel Admin</title>
+
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <link rel="stylesheet" th:href="@{/css/modal.css}" />
+    <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/profile.css}" />
+  </head>
+
+  <body>
+    <!-- NAVBAR LOAD -->
+    <div th:replace="~{components/navbar}"></div>
+
+    <!-- WELCOME -->
+    <section class="hero">
+      <div id="main-content" class="welcome-box">
+        <h1>Welcome, Nguyen Van A!</h1>
+        <p>You are logged in as: <span id="navbarRole"></span></p>
+      </div>
+    </section>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/account.js}"></script>
+    <script th:src="@{/js/dropdown.js}"></script>
+    <script th:src="@{/js/navbar.js}"></script>
+    <script th:src="@{/js/role.js}"></script>
+
+    <!-- MODALS -->
+    <div th:replace="~{components/modals :: modals}"></div>
+  </body>
+</html>
