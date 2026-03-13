@@ -1,4 +1,4 @@
-let currentRole = "Admin";
+let currentRole = "Manager";
 
 function applyRolePermissions() {
   const allFeatures = document.querySelectorAll(".menu-dropdown a");
@@ -12,7 +12,6 @@ function applyRolePermissions() {
     Manager: [
       "viewRoomStatus",
       "checkEquipment",
-      "bookRoom",
       "checkInOut",
       "viewStaff",
       "manageStaff",
@@ -21,7 +20,7 @@ function applyRolePermissions() {
       "viewReports",
     ],
 
-    Receptionist: ["viewRoomStatus", "bookRoom", "checkInOut"],
+    Receptionist: ["viewRoomStatus", "checkInOut"],
 
     Admin: [
       "viewRoomStatus",

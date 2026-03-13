@@ -1,0 +1,38 @@
+<div th:fragment="modals">
+
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close" id="closeProfileModal">&times;</span>
+
+    <h2>Profile</h2>
+
+    <div class="profile-info">
+      <p><strong>Name:</strong> Nguyen Van A</p>
+      <p><strong>Role:</strong> <span id="profileRole"></span></p>
+      <p><strong>Email:</strong> nguyenvana@email.com</p>
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD MODAL -->
+<div id="passwordModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close" id="closeModal">&times;</span>
+
+    <h2>Change Password</h2>
+
+    <label>Current Password</label>
+    <input type="password" placeholder="Enter current password" />
+
+    <label>New Password</label>
+    <input type="password" placeholder="Enter new password" />
+
+    <label>Confirm New Password</label>
+    <input type="password" placeholder="Confirm new password" />
+
+    <button>Update Password</button>
+  </div>
+</div>
+
+</div>

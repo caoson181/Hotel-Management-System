@@ -21,10 +21,10 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+     @Bean
+     public PasswordEncoder passwordEncoder() {
+         return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
+     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,27 +33,48 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/signup",
-                                "/auth/verify",
-                                "/auth/verify-otp",
-                                "/auth/login",
-                                "/auth/forgot-password",
-                                "/auth/verify-reset",
-                                "/auth/reset-password",
+                                "/",
+                                "/index",
+                                "/about",
+                                "/rooms",
+                                "/services",
+                                "/contact",
+                                "/homepage",
+                                "/about",
+                                "/login",
 
+                                "/auth/**",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
 
-                                "/css/**", "/js/**", "/images/**"
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/components/**",
+                                "/*.html"
                         ).permitAll()
+
                         .anyRequest().authenticated()
                 )
 
                 .formLogin(form -> form
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/index.html", true)
-                        .failureUrl("/auth/login?error=true")   //
+                        .successHandler((request, response, authentication) -> {
+
+                            boolean isCustomer = authentication.getAuthorities()
+                                    .stream()
+                                    .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_CUSTOMER")
+                                            || a.getAuthority().equalsIgnoreCase("Customer"));
+
+                            if (isCustomer) {
+                                response.sendRedirect("/homepage");
+                            } else {
+                                response.sendRedirect("/index");
+                            }
+
+                        })
+                        .failureUrl("/auth/login?error=true")
                         .permitAll()
                 )
                 .oauth2Login(oauth -> oauth

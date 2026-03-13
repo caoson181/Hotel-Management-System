@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole()) // Do NOT include "ROLE_" in DB
+                .roles(user.getUsertype())
                 .disabled(!user.isEnabled())
                 .build();
     }

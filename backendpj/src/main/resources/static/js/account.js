@@ -23,17 +23,29 @@ function setupAccountFeatures() {
 }
 
 function openPasswordModal(){
-  document.getElementById("passwordModal").classList.add("show");
+  const modal = document.getElementById("passwordModal");
+  if (modal) {
+    modal.classList.add("show");
+  }
 }
 
 function closePasswordModal(){
-  document.getElementById("passwordModal").classList.remove("show");
+  const modal = document.getElementById("passwordModal");
+  if (modal) {
+    modal.classList.remove("show");
+  }
 }
 
 function openProfileModal(){
-  document.getElementById("profileModal").classList.add("show");
+  const modal = document.getElementById("profileModal");
+  if (modal) {
+    modal.classList.add("show");
+  }
 }
 
 function closeProfileModal(){
-  document.getElementById("profileModal").classList.remove("show");
+  const modal = document.getElementById("profileModal");
+  if (modal) {
+    modal.classList.remove("show");
+  }
 }

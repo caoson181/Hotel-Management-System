@@ -41,6 +41,23 @@ public class AuthController {
         model.addAttribute("username", username);
         model.addAttribute("fullName", fullName);
     }
+    private boolean isValidPassword(String password) {
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$";
+        return password.matches(regex);
+    }
+    private boolean isValidFullname(String fullName) {
+        if (fullName == null || fullName.isBlank()) return false;
+        String regex = "^[a-zA-Z\\s\\p{L}]+$";
+        return fullName.matches(regex);
+    }
+    private boolean isOldEnough(LocalDate dateOfBirth) {
+        if (dateOfBirth == null) return false;
+        LocalDate today = LocalDate.now();
+        // 1. Không được là ngày ở tương lai
+        if (dateOfBirth.isAfter(today)) return false;
+        // 2. Phải đủ 18 năm tính đến hôm nay
+        return !dateOfBirth.plusYears(18).isAfter(today);
+    }
 
     // ===================== HANDLE SIGNUP =====================
     @PostMapping("/signup")
@@ -58,21 +75,57 @@ public class AuthController {
         // Check existing email
         if (userRepo.existsByEmail(email)) {
             keepForm(model, email, username, fullName);
-            model.addAttribute("error", "Email đã tồn tại");
+            model.addAttribute("error", "Email is already in use");
             return "signup";
         }
 
         // Check existing username
         if (userRepo.existsByUsername(username)) {
             keepForm(model, email, username, fullName);
-            model.addAttribute("error", "Username đã tồn tại");
+            model.addAttribute("error", "Username is already in use");
+            return "signup";
+        }
+        if (!isValidFullname(fullName)) {
+            keepForm(model, email, username, fullName);
+            model.addAttribute("error",
+                    "Fullname must only have character");
+            return "signup";
+        }
+
+        if (dateOfBirth == null) {
+            keepForm(model, email, username, fullName);
+            model.addAttribute("error", "Date of birth is invalid");
+            return "signup";
+        }
+
+        if (dateOfBirth.isAfter(LocalDate.now())) {
+            keepForm(model, email, username, fullName);
+            model.addAttribute("error", "Date of birth is invalid");
+            return "signup";
+        }
+
+        if (dateOfBirth != null && (dateOfBirth.getYear() < 1000 || dateOfBirth.getYear() > 9999)) {
+            keepForm(model, email, username, fullName);
+            model.addAttribute("error", "Date of birth is invalid ");
+            return "signup";
+        }
+
+        if (dateOfBirth != null && !isOldEnough(dateOfBirth)) {
+            keepForm(model, email, username, fullName);
+            model.addAttribute("error", "You need 18+");
             return "signup";
         }
 
         // Check password match
         if (!password.equals(confirmPassword)) {
             keepForm(model, email, username, fullName);
-            model.addAttribute("error", "Confirm password phải giống password");
+            model.addAttribute("error", "Confirm password = password");
+            return "signup";
+        }
+        if (!isValidPassword(password)) {
+            keepForm(model, email, username, fullName);
+            model.addAttribute("error",
+                    "Password must be at least 8 characters and include uppercase, lowercase and special character");
             return "signup";
         }
 
@@ -81,14 +134,14 @@ public class AuthController {
         } catch (Exception e) {
             keepForm(model, email, username, fullName);
             model.addAttribute("error",
-                    "Không gửi được OTP. Kiểm tra cấu hình Gmail/App Password hoặc thử lại.");
+                    "Can't send otp. Please try again");
             return "signup";
         }
         User u = new User();
         u.setEmail(email);
         u.setUsername(username);
         u.setPassword(passwordEncoder.encode(password));
-        u.setRole("USER");
+        u.setUsertype("Customer");
         u.setEnabled(false);
         u.setFullName(fullName == null ? "" : fullName.trim());
         u.setGender((gender == null || gender.isBlank()) ? null : gender);
@@ -119,14 +172,14 @@ public class AuthController {
 
         if (!ok) {
             model.addAttribute("email", email);
-            model.addAttribute("error", "OTP sai hoặc đã hết hạn");
+            model.addAttribute("error", "OTP is wrong");
             return "verify-otp";
         }
 
         User u = userRepo.findByEmail(email).orElse(null);
 
         if (u == null) {
-            model.addAttribute("error", "Không tìm thấy user theo email");
+            model.addAttribute("error", "Can't find user by email=" + email);
             return "signup";
         }
 
@@ -204,6 +257,13 @@ public class AuthController {
             model.addAttribute("error", "Passwords do not match");
             return "reset-password";
         }
+        if (!isValidPassword(password)) {
+            model.addAttribute("email", email);
+            model.addAttribute("error",
+                    "Password must be at least 8 characters and include uppercase, lowercase and special character");
+            return "reset-password";
+        }
+
 
         User user = userRepo.findByEmail(email).orElse(null);
 
@@ -215,5 +275,16 @@ public class AuthController {
         userRepo.save(user);
 
         return "redirect:/auth/login?resetSuccess";
+    }
+
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public String handleTypeMismatch(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex,
+                                     org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (ex.getName().equals("dateOfBirth")) {
+
+            redirectAttributes.addFlashAttribute("error", "Date of Birth is invalid");
+            return "redirect:/auth/signup";
+        }
+        return "redirect:/auth/login";
     }
 }

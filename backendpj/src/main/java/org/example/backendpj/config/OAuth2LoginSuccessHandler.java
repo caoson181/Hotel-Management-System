@@ -53,7 +53,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             response.sendRedirect(redirectUrl);
             return;
         }
+        var user = userRepo.findByEmail(email).orElse(null);
 
-        response.sendRedirect("/index.html");
+        if (user != null && user.getUsertype().equalsIgnoreCase("Customer")) {
+            response.sendRedirect("/homepage");
+        } else {
+            response.sendRedirect("/index");
+        }
+
     }
 }
