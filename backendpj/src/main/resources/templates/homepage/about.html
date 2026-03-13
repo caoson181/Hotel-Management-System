@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - Zero Gravity Hotel</title>
+    <link rel="stylesheet" th:href="@{/css/homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/about.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swiper/swiper-bundle.min.css"
+    />
+  </head>
+  <body class="light-bg">
+    <div th:replace="homepage/navbar :: navbar"></div>
+    <br /><br /><br />
+    <!-- About Section -->
+    <section id="about" class="about">
+      <div class="container">
+        <!-- Top Section: Text Left, Image Right -->
+        <div class="about-top">
+          <div class="about-text">
+            <h2>About Zero Gravity Hotel</h2>
+            <p>
+              Zero Gravity Hotel offers an unparalleled experience of luxury and
+              tranquility. Nestled in the heart of the city, our hotel combines
+              modern architecture with serene surroundings to create the perfect
+              escape from the hustle and bustle of everyday life.
+            </p>
+            <p>
+              Our world-class amenities include spacious rooms with breathtaking
+              views, a rejuvenating spa, fine dining options, and
+              state-of-the-art fitness facilities. Whether you're here for
+              business or pleasure, Zero Gravity Hotel ensures every moment is
+              memorable.
+            </p>
+            <p>
+              Founded in 2020, Zero Gravity Hotel has quickly become a premier
+              destination for discerning travelers. Our commitment to excellence
+              is reflected in every aspect of our service, from the moment you
+              arrive until the time you depart.
+            </p>
+          </div>
+          <div class="about-image">
+            <img th:src="@{/images/slide4.jpg}"
+              alt="Zero Gravity Hotel Exterior"
+            />
+          </div>
+        </div>
+
+        <!-- Bottom Section: Image Left, Text Right -->
+        <div class="about-bottom">
+          <div class="about-image">
+            <img th:src="@{/images/slide1.jpg}"
+              alt="Zero Gravity Hotel Interior"
+            />
+          </div>
+          <div class="about-text">
+            <p>
+              Our dedicated team of hospitality professionals is committed to
+              providing personalized service tailored to your needs. From our
+              concierge services to our 24/7 room service, we strive to make
+              your stay as comfortable and enjoyable as possible.
+            </p>
+            <p>
+              Experience the perfect blend of luxury, comfort, and innovation at
+              Zero Gravity Hotel. We look forward to welcoming you to our world
+              of exceptional hospitality.
+            </p>
+            <a href="homepage.html#contact" class="cta-button">Contact Us</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery">
+      <div class="container">
+        <h2>Our Gallery</h2>
+        <div class="swiper-container gallery-swiper">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+              <img th:src="@{/images/slide1.jpg}" alt="Hotel Room" />
+            </div>
+            <div class="swiper-slide">
+              <img th:src="@{/images/slide2.jpg}" alt="Spa" />
+            </div>
+            <div class="swiper-slide">
+              <img th:src="@{/images/slide3.jpg}" alt="Dining" />
+            </div>
+            <div class="swiper-slide">
+              <img th:src="@{/images/slide4.jpg}" alt="Exterior" />
+            </div>
+          </div>
+          <div class="swiper-pagination"></div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2026 Zero Gravity Hotel. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+      // Load navbar
+      fetch("navbar.html")
+        .then((response) => response.text())
+        .then((data) => {
+          document.getElementById("navbar-placeholder").innerHTML = data;
+
+          // Add scroll effect for navbar
+          const header = document.querySelector(".header");
+          window.addEventListener("scroll", () => {
+            if (window.scrollY > 50) {
+              header.classList.add("scrolled");
+            } else {
+              header.classList.remove("scrolled");
+            }
+          });
+        });
+
+      // Initialize Gallery Swiper
+      const gallerySwiper = new Swiper(".gallery-swiper", {
+        loop: true,
+        speed: 600,
+        autoplay: {
+          delay: 4000,
+          disableOnInteraction: false,
+        },
+        pagination: {
+          el: ".swiper-pagination",
+          clickable: true,
+        },
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
+        },
+        slidesPerView: 1,
+        spaceBetween: 20,
+        breakpoints: {
+          768: {
+            slidesPerView: 2,
+          },
+          1024: {
+            slidesPerView: 3,
+          },
+        },
+      });
+
+      // Fade-in animation for paragraphs
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("fade-in");
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll(".about-text p").forEach((p) => {
+        observer.observe(p);
+      });
+    </script>
+  </body>
+</html>
