@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Hotel - Homepage</title>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="/css/homepage.css">
+    <link rel="stylesheet" href="/css/room-card.css">
+
+    <!-- External CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+
+<!-- Navbar (Thymeleaf fragment) -->
+<div th:replace="homepage/navbar :: navbar"></div>
+
+<!-- Hero Section with Slider -->
+<section id="home" class="hero">
+    <div class="swiper-container">
+
+        <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+                <div class="slide-content">
+                    <img src="/images/slide1.jpg" alt="Luxury Hotel Room" class="hero-image">
+                    <div class="overlay"></div>
+
+                    <div class="hero-text">
+                        <h2 class="typing-effect">Welcome to Zero Gravity Hotel</h2>
+                        <p>Experience luxury and relaxation like never before</p>
+                        <a class="cta-button">Book Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swiper-slide">
+                <div class="slide-content">
+                    <img src="/images/slide2.jpg" alt="Spa Treatment" class="hero-image">
+                    <div class="overlay"></div>
+
+                    <div class="hero-text">
+                        <h2>Indulge in Our World-Class Spa</h2>
+                        <p>Rejuvenate your body and mind</p>
+                        <a class="cta-button">Explore Spa</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="swiper-slide">
+                <div class="slide-content">
+                    <img src="/images/slide3.jpg" alt="Dining Experience" class="hero-image">
+                    <div class="overlay"></div>
+
+                    <div class="hero-text">
+                        <h2>Savor Exquisite Cuisine</h2>
+                        <p>Fine dining with breathtaking views</p>
+                        <a class="cta-button">Reserve Table</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+
+    </div>
+</section>
+
+
+
+<!-- About Section -->
+<section class="about">
+    <div class="container">
+
+        <div class="about-content">
+
+            <div class="about-text">
+                <h2>About Gravity Hotel</h2>
+
+                <p>
+                    Gravity Hotel offers an unparalleled experience of luxury and tranquility.
+                    Nestled in the heart of the city, our hotel combines modern architecture with
+                    serene surroundings to create the perfect escape from the hustle and bustle
+                    of everyday life.
+                </p>
+
+                <p>
+                    Our world-class amenities include spacious rooms with breathtaking views,
+                    a rejuvenating spa, fine dining options, and state-of-the-art fitness
+                    facilities. Whether you're here for business or pleasure,
+                    Gravity Hotel ensures every moment is memorable.
+                </p>
+
+                <a href="/about" class="cta-button">Learn More</a>
+            </div>
+
+            <div class="about-image">
+                <img src="/images/slide4.jpg" alt="Zero Gravity Hotel Exterior">
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- Room rank (between About and Bookshelf) -->
+<!-- SECTION: Hiển thị 5 hạng phòng với background full -->
+<!-- SECTION: Full width room showcase - Safe for other sections -->
+<section class="nesta-room-showcase" id="nestaRoomShowcase">
+    <div class="showcase-card" id="showcaseCard">
+        <div class="card-background" id="dynamicBg"></div>
+        <div class="card-overlay"></div>
+
+        <div class="card-content">
+            <!-- HỘI THẢO VÀ SỰ KIỆN -->
+            <div class="event-header">
+                <h2>Room Category</h2>
+<!--                <span class="slogan">Nesta The Grand Hào Nam · tinh tế</span>-->
+            </div>
+
+            <!-- Room Info -->
+            <div class="featured-room">
+                <div class="featured-info">
+                    <div class="room-category" id="roomRankLabel">PREMIER</div>
+                    <h3 id="roomTitle">Premier Skyline</h3>
+                    <div class="basic-info" id="basicInfoList"></div>
+                    <button class="detail-btn" id="openModalBtn">
+                        Detail <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Thumbnails -->
+            <div class="thumbnail-strip" id="thumbStrip"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="roomModal"></div>
+</section>
+
+<section class="bookshelf-section">
+    <br><br>
+    <div class="container">
+        <h2 class="bookshelf-title">Our Premium Services</h2>
+        <!-- hoặc tiếng Việt: Dịch Vụ Nổi Bật -->
+    </div>
+    
+    <div class="book-shelf" id="bookShelf"></div>
+</section>
+
+
+<!-- Floating Elements -->
+<div class="floating-elements">
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2026 Gravity Hotel. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="/js/homepage.js"></script>
+<!-- Room card JavaScript -->
+<script src="/js/room-card.js"></script>
+
+<script>
+    // Navbar scroll effect
+    const header = document.querySelector('.header');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+</script>
+
+</body>
+</html>

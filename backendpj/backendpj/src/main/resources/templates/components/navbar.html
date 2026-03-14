@@ -1,0 +1,87 @@
+<nav class="navbar" th:fragment="navbar">
+  <div class="nav-left">
+    <a th:href="@{/index}" class="logo-link">🏨 Hotel Admin</a>
+  </div>
+
+  <div class="nav-right">
+    <div class="menu-item">
+      <span>Room Management ▾</span>
+      <div class="menu-dropdown">
+        <a th:href="@{/rooms/view-room-status}" id="viewRoomStatus"
+          >View Room Status</a
+        >
+        <a th:href="@{/rooms/check-equipment}" id="checkEquipment"
+          >Check Equipment</a
+        >
+        <a th:href="@{/rooms/check-in-out}" id="checkInOut"
+          >Check In / Check Out</a
+        >
+      </div>
+    </div>
+
+    <div class="menu-item">
+      <span>Staff Management ▾</span>
+      <div class="menu-dropdown">
+        <a th:href="@{/staff/view-staff}" id="viewStaff">View Staff</a>
+        <a th:href="@{/staff/manage-staff}" id="manageStaff">Manage Staff</a>
+      </div>
+    </div>
+
+    <div class="menu-item">
+      <span>User Management ▾</span>
+      <div class="menu-dropdown">
+        <a th:href="@{/users/manage-users}" id="manageUsers">Manage Users</a>
+      </div>
+    </div>
+
+    <div class="menu-item">
+      <span>Revenue ▾</span>
+      <div class="menu-dropdown">
+        <a th:href="@{/revenue/view-revenue}" id="viewRevenue">View Revenue</a>
+      </div>
+    </div>
+
+    <div class="menu-item">
+      <span>Reports ▾</span>
+      <div class="menu-dropdown">
+        <a th:href="@{/reports/view-reports}" id="viewReports">View Reports</a>
+      </div>
+    </div>
+
+    <!-- ACCOUNT -->
+
+    <div class="account" id="accountMenu">
+      <div class="avatar" id="avatar">NVA</div>
+
+      <div class="account-name" id="username">Nguyen Van A</div>
+
+      <div class="dropdown-icon">▼</div>
+
+      <div class="account-dropdown" id="dropdownMenu">
+        <a id="profileBtn">Profile</a>
+
+        <a id="changePasswordBtn">Change Password</a>
+
+        <form action="/logout" method="post" style="margin: 0">
+          <button
+            type="submit"
+            style="
+              display: block;
+              width: 100%;
+              padding: 12px 15px;
+              text-align: left;
+              background: none;
+              border: none;
+              color: #333;
+              font-size: 14px;
+              cursor: pointer;
+            "
+          >
+            Logout
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</nav>
+
