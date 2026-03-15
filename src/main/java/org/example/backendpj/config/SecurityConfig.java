@@ -21,10 +21,10 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
-    }
+     @Bean
+     public PasswordEncoder passwordEncoder() {
+         return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
+     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

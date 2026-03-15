@@ -33,8 +33,8 @@ public class User {
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "user_type", nullable = false, length = 50)
-    private String usertype;
+    @Column(name = "role", nullable = false, length = 50)
+    private String role;
 
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
@@ -66,14 +66,13 @@ public class User {
         this.password = password;
     }
 
-    public String getUsertype() {
-        return usertype;
+    public String getRole() {
+        return role;
     }
 
-    public void setUsertype(String usertype) {
-        this.usertype = usertype;
+    public void setRole(String role) {
+        this.role = role;
     }
-
     public String getEmail() {
         return email;
     }

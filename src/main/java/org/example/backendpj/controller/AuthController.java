@@ -69,7 +69,7 @@ public class AuthController {
                            @RequestParam(name="gender", required=false) String gender,
                            @RequestParam(name="phoneNumber", required=false) String phoneNumber,
                            @RequestParam(name="dateOfBirth", required=false)
-                           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
+                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
                            Model model) {
 
         // Check existing email
@@ -141,7 +141,7 @@ public class AuthController {
         u.setEmail(email);
         u.setUsername(username);
         u.setPassword(passwordEncoder.encode(password));
-        u.setUsertype("Customer");
+        u.setRole("Customer");
         u.setEnabled(false);
         u.setFullName(fullName == null ? "" : fullName.trim());
         u.setGender((gender == null || gender.isBlank()) ? null : gender);
@@ -153,7 +153,7 @@ public class AuthController {
 
         return "redirect:/auth/verify?email=" + java.net.URLEncoder.encode(email, java.nio.charset.StandardCharsets.UTF_8);
     }
-    // Create user
+        // Create user
 
 
     // ===================== VERIFY PAGE =====================
