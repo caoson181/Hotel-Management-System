@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             {
                 title: "Fitness Center",
                 desc: "Stay active with our fully equipped gym facilities.",
-                image: "/images/slide3.jpg"
+                image: "/images/slide6.jpg"
             },
             {
                 title: "Fine Dining Restaurant",

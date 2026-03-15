@@ -128,6 +128,18 @@ body {
     transition: all 0.2s ease;
 }
 
+.header.scrolled .account-btn,
+.contact-page .header.scrolled .account-btn {
+    background: #fff;
+    color: #333;
+    border-color: #ddd;
+}
+
+header.scrolled .account-btn:hover,
+.contact-page .header.scrolled .account-btn:hover {
+    background: #f3f3f3;
+}
+
 .account-btn:hover {
     background: rgba(255,255,255,0.15);
 }
@@ -227,6 +239,20 @@ body {
 
 .hamburger.active span:nth-child(3) {
     transform: rotate(45deg) translate(-5px, -6px);
+}
+
+.light-bg .nav-link {
+    color: #333;
+}
+
+.light-bg .account-btn {
+    background: #fff;
+    color: #333;
+    border-color: #ddd;
+}
+
+.light-bg .account-btn:hover {
+    background: #f3f3f3;
 }
 
 /* Hero Section */
@@ -329,6 +355,158 @@ body {
     padding: 80px 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     position: relative;
+}
+
+.profile-page {
+    padding: 120px 0 60px;
+    background: #f5f7ff;
+    min-height: 80vh;
+}
+
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    background: #fff;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.profile-hero {
+    position: relative;
+    height: 180px;
+    background: linear-gradient(135deg, #4ecdc4, #667eea);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 1rem;
+}
+
+.profile-banner {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.2), transparent 48%),
+                linear-gradient(150deg, rgba(255,255,255,0.14), rgba(255,255,255,0));
+}
+
+.profile-avatar {
+    z-index: 1;
+    width: 94px;
+    height: 94px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #4c4c4c;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+}
+
+.profile-content {
+    padding: 1.5rem 1.7rem 2rem;
+}
+
+.profile-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.profile-name {
+    margin: 0;
+    font-size: 1.7rem;
+    color: #1f2a3a;
+}
+
+.profile-role {
+    margin-top: 0.25rem;
+    color: #7f8a9b;
+}
+
+.edit-btn, .btn-primary, .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: none;
+    padding: 0.45rem 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary { background: #4ecdc4; color: white; }
+.btn-primary:hover { background: #38b1a8; }
+
+.btn-secondary { background: #eef2ff; color: #2f3a55; margin-right: 0.5rem; }
+.btn-secondary:hover { background: #dbe3ff; }
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 1rem;
+    margin-top: 0.9rem;
+}
+
+.profile-info-card {
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 10px;
+    padding: 1rem;
+    background: #fafbff;
+}
+
+.profile-info-card h3 { margin: 0 0 0.45rem; color: #1e2a43; }
+
+.profile-info-card p { margin: 0.25rem 0; color: #3f4f6f; }
+
+.profile-actions { margin-top: 1.4rem; }
+
+@media (max-width: 860px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .profile-name-row { flex-direction: column; align-items: flex-start; }
+}
+
+.profile-hero-section {
+    position: relative;
+    padding: 6rem 0 3rem;
+    background: linear-gradient(120deg, #4ecdc4 0%, #667eea 40%, #223b6f 100%);
+    color: #fff;
+    text-align: left;
+    overflow: hidden;
+}
+
+.profile-hero-section .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+}
+
+.profile-hero-section .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+}
+
+.profile-hero-section h1 {
+    margin: 0;
+    font-size: 2.3rem;
+    letter-spacing: 0.1rem;
+}
+
+.profile-hero-section p {
+    margin-top: 0.6rem;
+    color: rgba(255,255,255,0.92);
+    font-size: 1rem;
+    max-width: 600px;
 }
 
 .glassmorphism {

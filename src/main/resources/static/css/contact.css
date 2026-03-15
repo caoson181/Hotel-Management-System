@@ -58,6 +58,10 @@
     text-align: center;
 }
 
+.profile-hero {
+    background: url('/images/slide5.jpg') no-repeat center center/cover !important;
+}
+
 .contact-hero .overlay {
     position: absolute;
     top: 0;
@@ -78,6 +82,18 @@
     font-weight: bold;
 }
 
+.title-anim {
+    display: inline-block;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards;
+    animation-delay: 0.2s;
+}
+
+@keyframes fadeInUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
 /* ==========================================================================
    3. CONTACT CONTENT (Wrapper & Info)
    ========================================================================== */
@@ -86,6 +102,7 @@
     background: #f4f7f6;
 }
 
+.profile-section .contact-wrapper,
 .contact-wrapper {
     display: flex;
     gap: 50px;
@@ -97,6 +114,10 @@
     max-width: 1140px;
     position: relative;
     z-index: 5;
+}
+
+.profile-section {
+    padding-top: 80px;
 }
 
 .contact-info {
@@ -178,11 +199,82 @@
    5. RESPONSIVE
    ========================================================================== */
 @media (max-width: 992px) {
-    .contact-wrapper {
+    .contact-wrapper, .profile-wrapper {
         flex-direction: column;
-        margin-top: -100px;
+        margin-top: -90px;
         padding: 30px;
         margin-left: 15px;
         margin-right: 15px;
     }
+}
+
+.profile-grid-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+.profile-summary-card,
+.profile-details-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    padding: 1rem;
+}
+
+.profile-chip {
+    display: inline-block;
+    padding: 0.25rem 0.7rem;
+    background: #ffe8d4;
+    color: #ab4d00;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 0.9rem;
+}
+
+.profile-avatar-large {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff8a78, #ff4d95);
+    color: white;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.7rem;
+}
+
+.profile-name { font-size: 1.4rem; margin-bottom: 0.1rem; font-weight: 700; }
+.profile-sub { color: #5a6478; margin-bottom: 0.9rem; }
+
+.profile-stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0.4rem; margin-bottom: 0.9rem; }
+.profile-stats div { background: #fbfcff; border-radius: 10px; padding: 0.55rem; text-align: center; }
+.profile-stats span { display: block; font-weight: 700; color: #1f2a3a; }
+.profile-stats small { color: #6b7a98; }
+
+.profile-details-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 1rem; }
+.profile-table { border-radius: 10px; overflow: hidden; border: 1px solid rgba(0,0,0,0.08); }
+.profile-table .row { display: grid; grid-template-columns: 1fr 1.1fr; padding: 0.65rem 0.8rem; align-items: center; }
+.profile-table .row:nth-child(odd) { background: #fbfcff; }
+.profile-table .row div:first-child { color: #67738f; font-size: 0.85rem; }
+.profile-table .row div:last-child { font-weight: 600; color: #1f2a3a; }
+.action-row { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.btn-primary { background: linear-gradient(135deg, #ff6b6b, #4ecdc4); color: #fff; border: none; border-radius: 10px; padding: 0.55rem 0.95rem; font-weight: 700; cursor: pointer; }
+.btn-secondary { background: #eef2ff; color: #2950c4; border: 1px solid #cedaf6; border-radius: 10px; padding: 0.45rem 0.75rem; cursor: pointer; }
+.btn-tertiary { background: #fff; color: #1f2a3a; border: 1px solid #d5dce9; border-radius: 10px; padding: 0.45rem 0.75rem; cursor: pointer; }
+
+@media (max-width: 992px) {
+    .profile-grid-layout { grid-template-columns: 1fr; }
+    .profile-section { margin-top: -90px; }
+    .profile-section .contact-wrapper { margin-top: -90px; }
+}
+.profile-section {
+    margin-top: -100px;
+}
+.profile-section .contact-wrapper {
+    margin-top: -30px;
 }

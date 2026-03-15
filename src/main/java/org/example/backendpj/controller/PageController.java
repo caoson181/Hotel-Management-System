@@ -68,6 +68,11 @@ public class PageController {
         return "pages/users/manage-users";
     }
 
+    @GetMapping("/profile")
+    public String profile() {
+        return "homepage/profile";
+    }
+
     // ================= REVENUE =================
 
     @GetMapping("/revenue/view-revenue")
