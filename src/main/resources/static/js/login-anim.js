@@ -1,6 +1,6 @@
 // Animated Login Form Logic
 window.addEventListener('DOMContentLoaded', function() {
-var usernameLabel = document.querySelector('#loginUsernameLabel'), username = document.querySelector('#loginUsername'), passwordLabel = document.querySelector('#loginPasswordLabel'), password = document.querySelector('#loginPassword'), showPasswordCheck = document.querySelector('#showPasswordCheck'), showPasswordToggle = document.querySelector('#showPasswordToggle'), mySVG = document.querySelector('.svgContainer'), twoFingers = document.querySelector('.twoFingers'), armL = document.querySelector('.armL'), armR = document.querySelector('.armR'), eyeL = document.querySelector('.eyeL'), eyeR = document.querySelector('.eyeR'), nose = document.querySelector('.nose'), mouth = document.querySelector('.mouth'), mouthBG = document.querySelector('.mouthBG'), mouthSmallBG = document.querySelector('.mouthSmallBG'), mouthMediumBG = document.querySelector('.mouthMediumBG'), mouthLargeBG = document.querySelector('.mouthLargeBG'), mouthMaskPath = document.querySelector('#mouthMaskPath'), mouthOutline = document.querySelector('.mouthOutline'), tooth = document.querySelector('.tooth'), tongue = document.querySelector('.tongue'), chin = document.querySelector('.chin'), face = document.querySelector('.face'), eyebrow = document.querySelector('.eyebrow'), outerEarL = document.querySelector('.earL .outerEar'), outerEarR = document.querySelector('.earR .outerEar'), earHairL = document.querySelector('.earL .earHair'), earHairR = document.querySelector('.earR .earHair'), hair = document.querySelector('.hair'), bodyBG = document.querySelector('.bodyBGnormal'), bodyBGchanged = document.querySelector('.bodyBGchanged');
+var usernameLabel = document.querySelector('#loginUsernameLabel') || document.querySelector('#forgotEmailLabel'), username = document.querySelector('#loginUsername') || document.querySelector('#forgotEmail'), passwordLabel = document.querySelector('#loginPasswordLabel'), password = document.querySelector('#loginPassword'), showPasswordCheck = document.querySelector('#showPasswordCheck'), showPasswordToggle = document.querySelector('#showPasswordToggle'), mySVG = document.querySelector('.svgContainer'), twoFingers = document.querySelector('.twoFingers'), armL = document.querySelector('.armL'), armR = document.querySelector('.armR'), eyeL = document.querySelector('.eyeL'), eyeR = document.querySelector('.eyeR'), nose = document.querySelector('.nose'), mouth = document.querySelector('.mouth'), mouthBG = document.querySelector('.mouthBG'), mouthSmallBG = document.querySelector('.mouthSmallBG'), mouthMediumBG = document.querySelector('.mouthMediumBG'), mouthLargeBG = document.querySelector('.mouthLargeBG'), mouthMaskPath = document.querySelector('#mouthMaskPath'), mouthOutline = document.querySelector('.mouthOutline'), tooth = document.querySelector('.tooth'), tongue = document.querySelector('.tongue'), chin = document.querySelector('.chin'), face = document.querySelector('.face'), eyebrow = document.querySelector('.eyebrow'), outerEarL = document.querySelector('.earL .outerEar'), outerEarR = document.querySelector('.earR .outerEar'), earHairL = document.querySelector('.earL .earHair'), earHairR = document.querySelector('.earR .earHair'), hair = document.querySelector('.hair'), bodyBG = document.querySelector('.bodyBGnormal'), bodyBGchanged = document.querySelector('.bodyBGchanged');
 var activeElement, curUsernameIndex, screenCenter, svgCoords, usernameCoords, usernameScrollMax, chinMin = .5, dFromC, mouthStatus = "small", blinking, eyeScale = 1, eyesCovered = false, showPasswordClicked = false;
 var eyeLCoords, eyeRCoords, noseCoords, mouthCoords, eyeLAngle, eyeLX, eyeLY, eyeRAngle, eyeRX, eyeRY, noseAngle, noseX, noseY, mouthAngle, mouthX, mouthY, mouthR, chinX, chinY, chinS, faceX, faceY, faceSkew, eyebrowSkew, outerEarX, outerEarY, hairX, hairS;
 
@@ -297,26 +297,42 @@ function initLoginForm() {
   noseCoords = {x: svgCoords.x + 97, y: svgCoords.y + 81};
   mouthCoords = {x: svgCoords.x + 100, y: svgCoords.y + 100};
   
-  username.addEventListener('focus', onUsernameFocus);
-  username.addEventListener('blur', onUsernameBlur);
-  username.addEventListener('input', onUsernameInput);
-  usernameLabel.addEventListener('click', onUsernameLabelClick);
-  password.addEventListener('focus', onPasswordFocus);
-  password.addEventListener('blur', onPasswordBlur);
-  showPasswordCheck.addEventListener('change', onPasswordToggleChange);
-  showPasswordCheck.addEventListener('focus', onPasswordToggleFocus);
-  showPasswordCheck.addEventListener('blur', onPasswordToggleBlur);
-  showPasswordCheck.addEventListener('click', onPasswordToggleClick);
-  showPasswordToggle.addEventListener('mouseup', onPasswordToggleMouseUp);
-  showPasswordToggle.addEventListener('mousedown', onPasswordToggleMouseDown);
+  if (username) {
+    username.addEventListener('focus', onUsernameFocus);
+    username.addEventListener('blur', onUsernameBlur);
+    username.addEventListener('input', onUsernameInput);
+  }
+  if (usernameLabel) {
+    usernameLabel.addEventListener('click', onUsernameLabelClick);
+  }
+  if (password) {
+    password.addEventListener('focus', onPasswordFocus);
+    password.addEventListener('blur', onPasswordBlur);
+  }
+  if (showPasswordCheck) {
+    showPasswordCheck.addEventListener('change', onPasswordToggleChange);
+    showPasswordCheck.addEventListener('focus', onPasswordToggleFocus);
+    showPasswordCheck.addEventListener('blur', onPasswordToggleBlur);
+    showPasswordCheck.addEventListener('click', onPasswordToggleClick);
+  }
+  if (showPasswordToggle) {
+    showPasswordToggle.addEventListener('mouseup', onPasswordToggleMouseUp);
+    showPasswordToggle.addEventListener('mousedown', onPasswordToggleMouseDown);
+  }
   TweenMax.set(armL, {x: -93, y: 220, rotation: 105, transformOrigin: "top left"});
   TweenMax.set(armR, {x: -93, y: 220, rotation: -105, transformOrigin: "top right"});
   TweenMax.set(mouth, {transformOrigin: "center center"});
   startBlinking(5);
-  usernameScrollMax = username.scrollWidth;
+  if (username) {
+    usernameScrollMax = username.scrollWidth;
+  }
   if(isMobileDevice()) {
-    password.type = "text";
-    showPasswordCheck.checked = true;
+    if (password) {
+      password.type = "text";
+    }
+    if (showPasswordCheck) {
+      showPasswordCheck.checked = true;
+    }
     TweenMax.set(twoFingers, {transformOrigin: "bottom left", rotation: 30, x: -9, y: -2, ease: Power2.easeInOut});
   }
   console.clear();

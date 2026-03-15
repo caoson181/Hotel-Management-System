@@ -1,42 +1,58 @@
-// Handle form submission
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const username = document.getElementById('loginUsername').value;
-    const password = document.getElementById('loginPassword').value;
-    const errorDiv = document.getElementById('errorMessage');
-    
-    // Simple validation (no backend)
-    if (username && password) {
-        // Store credentials in sessionStorage (for demo purposes only)
-        sessionStorage.setItem('user', JSON.stringify({
-            username: username,
-            lastLogin: new Date().toLocaleString()
-        }));
-        errorDiv.innerHTML = '<p class="success">Login successful! (Demo Mode)</p>';
-        errorDiv.style.color = '#28a745';
-        setTimeout(() => {
-            alert('Login successful! User: ' + username);
-        }, 500);
-    } else {
-        errorDiv.innerHTML = '<p class="error">Please enter both username and password</p>';
+document.addEventListener("DOMContentLoaded", function () {
+
+    const googleBtn = document.getElementById("googleLoginBtn");
+    const facebookBtn = document.getElementById("facebookLoginBtn");
+
+    if (googleBtn) {
+        googleBtn.addEventListener("click", function () {
+            window.location.href = "/oauth2/authorization/google";
+        });
     }
+
+    if (facebookBtn) {
+        facebookBtn.addEventListener("click", function () {
+            window.location.href = "/oauth2/authorization/facebook";
+        });
+    }
+
 });
 
-// Social login handlers
 function handleGoogleLogin() {
-    const errorDiv = document.getElementById('errorMessage');
-    errorDiv.innerHTML = '<p class="success">Redirecting to Google... (Demo)</p>';
-    errorDiv.style.color = '#28a745';
-    setTimeout(() => {
-        alert('Google login would redirect to: https://accounts.google.com/o/oauth2/v2/auth');
-    }, 500);
+    window.location.href = "/oauth2/authorization/google";
 }
 
 function handleFacebookLogin() {
-    const errorDiv = document.getElementById('errorMessage');
-    errorDiv.innerHTML = '<p class="success">Redirecting to Facebook... (Demo)</p>';
-    errorDiv.style.color = '#28a745';
-    setTimeout(() => {
-        alert('Facebook login would redirect to: https://www.facebook.com/v18.0/dialog/oauth');
-    }, 500);
+    window.location.href = "/oauth2/authorization/facebook";
 }
+/* ===== AUTO FILL GOOGLE INFO WHEN REDIRECT TO SIGNUP ===== */
+document.addEventListener("DOMContentLoaded", function () {
+
+    const params = new URLSearchParams(window.location.search);
+
+    const email = params.get("email");
+    const username = params.get("username");
+    const name = params.get("name");
+
+    if (email) {
+        const emailInput = document.getElementById("email");
+        if (emailInput) {
+            emailInput.value = email;
+            emailInput.readOnly = true;
+        }
+    }
+
+    if (username) {
+        const usernameInput = document.getElementById("loginUsername");
+        if (usernameInput) {
+            usernameInput.value = username;
+        }
+    }
+
+    if (name) {
+        const fullNameInput = document.getElementById("fullName");
+        if (fullNameInput) {
+            fullNameInput.value = name;
+        }
+    }
+
+});
