@@ -141,7 +141,7 @@ public class AuthController {
         u.setEmail(email);
         u.setUsername(username);
         u.setPassword(passwordEncoder.encode(password));
-        u.setUsertype("Customer");
+        u.setRole("Customer");
         u.setEnabled(false);
         u.setFullName(fullName == null ? "" : fullName.trim());
         u.setGender((gender == null || gender.isBlank()) ? null : gender);

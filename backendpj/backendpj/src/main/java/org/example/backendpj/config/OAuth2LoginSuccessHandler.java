@@ -55,7 +55,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
         var user = userRepo.findByEmail(email).orElse(null);
 
-        if (user != null && user.getUsertype().equalsIgnoreCase("Customer")) {
+        if (user != null && user.getRole().equalsIgnoreCase("Customer")) {
             response.sendRedirect("/homepage");
         } else {
             response.sendRedirect("/index");
