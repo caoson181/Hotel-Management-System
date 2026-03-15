@@ -12,8 +12,42 @@
         <li><a th:href="@{/services}" class="nav-link">Services</a></li>
         <li><a th:href="@{/about}" class="nav-link">About</a></li>
         <li><a th:href="@{/contact}" class="nav-link">Contact</a></li>
-        <li><a th:href="@{/auth/login}" class="nav-link">Login</a></li>
+
+        <li sec:authorize="isAnonymous()"><a th:href="@{/auth/login}" class="nav-link">Login</a></li>
+
+        <li class="account-menu" sec:authorize="isAuthenticated()">
+          <button class="account-btn" id="accountBtn" type="button" aria-expanded="false">
+            <span class="account-avatar">👤</span>
+            <span class="account-text">My Account</span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="account-dropdown" id="accountDropdown">
+            <a th:href="@{/profile}" class="dropdown-link">Profile</a>
+            <form th:action="@{/logout}" method="post" class="dropdown-form">
+              <button class="dropdown-link logout-btn" type="submit">Logout</button>
+            </form>
+          </div>
+        </li>
       </ul>
     </nav>
   </header>
+
+  <script th:inline="javascript">
+    const accountBtn = document.getElementById('accountBtn');
+    const accountDropdown = document.getElementById('accountDropdown');
+    if (accountBtn && accountDropdown) {
+      accountBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        accountDropdown.classList.toggle('show');
+        const expanded = accountBtn.getAttribute('aria-expanded') === 'true';
+        accountBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      });
+      document.addEventListener('click', (e) => {
+        if (!accountBtn.contains(e.target) && !accountDropdown.contains(e.target)) {
+          accountDropdown.classList.remove('show');
+          accountBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+  </script>
 </div>

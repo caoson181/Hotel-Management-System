@@ -109,6 +109,81 @@ body {
     position: relative;
 }
 
+.account-menu {
+    position: relative;
+    margin-left: 1rem;
+}
+
+.account-btn {
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.account-btn:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+.account-dropdown {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    right: 0;
+    width: 180px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 100;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.account-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-link,
+.dropdown-form .logout-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    color: #333;
+    font-size: 0.9rem;
+    text-decoration: none;
+    padding: 0.55rem 0.8rem;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.dropdown-link:hover,
+.dropdown-form .logout-btn:hover {
+    background: #f1f5ff;
+}
+
+.dropdown-form {
+    margin: 0;
+}
+
+.dropdown-form .logout-btn {
+    width: 100%;
+    text-align: left;
+}
+
 .nav-link:hover {
     color: #4ecdc4;
 }

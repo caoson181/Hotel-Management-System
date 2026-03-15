@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -192,6 +192,25 @@
             header.classList.remove('scrolled');
         }
     });
+
+    const accountBtn = document.getElementById('accountBtn');
+    const accountDropdown = document.getElementById('accountDropdown');
+
+    if (accountBtn && accountDropdown) {
+        accountBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            accountDropdown.classList.toggle('show');
+            const expanded = accountBtn.getAttribute('aria-expanded') === 'true';
+            accountBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!accountBtn.contains(e.target) && !accountDropdown.contains(e.target)) {
+                accountDropdown.classList.remove('show');
+                accountBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
 </script>
 
 </body>
