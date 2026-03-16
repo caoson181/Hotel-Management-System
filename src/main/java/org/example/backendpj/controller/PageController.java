@@ -2,11 +2,19 @@ package org.example.backendpj.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
+import org.springframework.security.core.Authentication;
+import org.example.backendpj.Entity.User;
+import org.example.backendpj.Repository.UserRepository;
 
 @Controller
 public class PageController {
 
+    private final UserRepository userRepository;
 
+    public PageController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     // ================= ADMIN HOME =================
 
@@ -69,7 +77,24 @@ public class PageController {
     }
 
     @GetMapping("/profile")
-    public String profile() {
+    public String profile(Model model, Authentication authentication) {
+
+        String login = null;
+
+        if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User userDetails) {
+            login = userDetails.getUsername();
+        }
+
+        else if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.core.user.OAuth2User oauthUser) {
+            login = oauthUser.getAttribute("email");
+        }
+
+        User user = userRepository
+                .findByUsernameOrEmail(login, login)
+                .orElse(null);
+
+        model.addAttribute("user", user);
+
         return "homepage/profile";
     }
 

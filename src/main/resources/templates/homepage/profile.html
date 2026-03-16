@@ -6,29 +6,45 @@
   <title>My Profile - Gravity Hotel</title>
   <link rel="stylesheet" th:href="@{/css/homepage.css}" />
   <link rel="stylesheet" th:href="@{/css/contact.css}" />
+
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 </head>
 <body class="contact-page">
-  <header class="header">
-    <div th:replace="~{homepage/navbar :: navbar}"></div>
-  </header>
+<header class="header">
+  <div th:replace="~{homepage/navbar :: navbar}"></div>
+</header>
 
-  <section class="contact-hero profile-hero">
-    <div class="overlay"></div>
-    <div class="container hero-content">
-      <h1 class="title-anim">My Profile</h1>
-      <p>Manage your account information and member offers.</p>
-    </div>
-  </section>
+<section class="contact-hero profile-hero">
+  <div class="overlay"></div>
+  <div class="container hero-content">
+    <h1 class="title-anim">My Profile</h1>
+    <p>Manage your account information and member offers.</p>
+  </div>
+</section>
 
-  <section class="contact-section profile-section">
-    <div class="container">
-      <div class="contact-wrapper profile-wrapper">
-        <div class="profile-grid-layout">
+<section class="contact-section profile-section">
+  <div class="container">
+    <div class="contact-wrapper profile-wrapper">
+      <div class="profile-grid-layout">
         <div class="profile-summary-card">
           <div class="profile-chip">Gold Member</div>
-          <div class="profile-avatar-large">AB</div>
-          <div class="profile-name">Anna Bui</div>
+
+          <div th:if="${user != null}">
+            <div class="profile-avatar-large"
+                 th:text="${#strings.substring(user.fullName,0,1)}">
+            </div>
+
+            <div class="profile-name"
+                 th:text="${user.fullName}">
+            </div>
+          </div>
+
+          <div th:if="${user == null}">
+            <div class="profile-avatar-large">U</div>
+            <div class="profile-name">Guest</div>
+          </div>
+
           <div class="profile-sub">VIP Member since 2024</div>
           <div class="profile-stats">
             <div><span>5,260</span><small>Points</small></div>
@@ -39,39 +55,126 @@
         </div>
 
         <div class="profile-details-card">
+
           <div class="profile-details-header">
-            <div><h3>Account Details</h3><p>Manage personal info & security</p></div>
-            <button class="btn-secondary">Edit</button>
+            <div>
+              <h3>Account Details</h3>
+              <p>Manage personal info & security</p>
+            </div>
+
+            <button type="button" class="btn-secondary" id="editBtn">
+              Edit
+            </button>
           </div>
-          <div class="profile-table">
-            <div class="row"><div>Name</div><div>Anna Bui</div></div>
-            <div class="row"><div>Email</div><div>anna@example.com</div></div>
-            <div class="row"><div>Phone</div><div>+84 912 345 678</div></div>
-            <div class="row"><div>Username</div><div>annabui</div></div>
-            <div class="row"><div>Membership</div><div>Platinum</div></div>
-            <div class="row"><div>Next Reward</div><div>Free Spa Treatment</div></div>
-          </div>
-          <div class="action-row"><button class="cta-button">Save Changes</button><button class="btn-tertiary">Change Password</button></div>
+
+          <form th:action="@{/profile/update}" method="post">
+
+            <div class="profile-table">
+
+              <div class="row">
+                <div>Name</div>
+                <div>
+                  <span class="view-mode" th:text="${user.fullName}"></span>
+
+                  <input
+                          class="edit-mode"
+                          type="text"
+                          name="fullName"
+                          th:value="${user.fullName}"
+                          style="display:none;"
+                  >
+                </div>
+              </div>
+
+              <div class="row">
+                <div>Email</div>
+                <div>
+                  <span class="view-mode" th:text="${user.email}"></span>
+
+                  <input
+                          class="edit-mode"
+                          type="email"
+                          name="email"
+                          th:value="${user.email}"
+                          style="display:none;"
+                  >
+                </div>
+              </div>
+
+              <div class="row">
+                <div>Phone</div>
+                <div>
+                  <span class="view-mode" th:text="${user.phoneNumber}"></span>
+
+                  <input
+                          class="edit-mode"
+                          type="text"
+                          name="phoneNumber"
+                          th:value="${user.phoneNumber}"
+                          style="display:none;"
+                  >
+                </div>
+              </div>
+
+              <div class="row">
+                <div>Username</div>
+                <div th:text="${user.username}"></div>
+              </div>
+
+              <div class="row">
+                <div>Membership</div>
+                <div>Standard</div>
+              </div>
+
+              <div class="row">
+                <div>Next Reward</div>
+                <div>Free Spa Treatment</div>
+              </div>
+
+            </div>
+
+            <div class="action-row">
+
+              <button
+                      type="submit"
+                      class="cta-button"
+                      id="saveBtn"
+                      style="display:none;"
+              >
+                Save Changes
+              </button>
+
+              <button type="button" id="ChangePasswordBtn">
+                Change Password
+              </button>
+
+            </div>
+
+          </form>
+
         </div>
-      </div>
-    </div>
-  </section>
 
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 Gravity Hotel. All rights reserved.</p>
-    </div>
-  </footer>
+</section>
 
-  <script>
-    const header = document.querySelector('.header');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
-    });
-  </script>
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2026 Gravity Hotel. All rights reserved.</p>
+  </div>
+
+</footer>
+
+
+
+<script>
+  const header = document.querySelector('.header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+</script>
+<script th:src="@{/js/profile.js}"></script>
 </body>
 </html>
