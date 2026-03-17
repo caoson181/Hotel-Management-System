@@ -1,35 +1,380 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>View Room Status</title>
-    <link rel="stylesheet" th:href="@{/css/global.css}" />
-    <link rel="stylesheet" th:href="@{/css/modal.css}" />
-    <link rel="stylesheet" th:href="@{/css/navbar.css}" />
-    <link rel="stylesheet" th:href="@{/css/profile.css}" />
-  </head>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Staff Management</title>
 
-  <body>
-    <div
-      id="navbar-container"
-      th:replace="~{components/navbar :: navbar}"
-    ></div>
+  <link rel="stylesheet" th:href="@{/css/global.css}">
+  <link rel="stylesheet" th:href="@{/css/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/modal.css}">
+  <link rel="stylesheet" th:href="@{/css/profile.css}">
+  <style>
 
-    <!-- PAGE CONTENT -->
+    body{
+        font-family: Arial, sans-serif;
+        background:#f5f6fa;
+    }
 
-    <section class="hero">
-      <div class="welcome-box">
-        <h1>Staff Management</h1>
-        <p>Manage staff users.</p>
-      </div>
-    </section>
+    .container{
+        width:90%;
+        margin:40px auto;
+        background:white;
+        padding:20px;
+        border-radius:10px;
+        box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    }
 
-    <!-- MODALS -->
-    <div th:replace="~{components/modals :: modals}"></div>
+    h2{
+        margin-bottom:20px;
+    }
 
-    <script th:src="@{/js/main.js}"></script>
-    <script th:src="@{/js/account.js}"></script>
-    <script th:src="@{/js/dropdown.js}"></script>
-    <script th:src="@{/js/role.js}"></script>
-  </body>
+    table{
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    table th{
+        background:#2c3e50;
+        color:white;
+        padding:10px;
+    }
+
+    table td{
+        padding:10px;
+        border-bottom:1px solid #ddd;
+    }
+
+    .btn{
+        padding:6px 12px;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+    }
+
+    .btn-edit{
+        background:#3498db;
+        color:white;
+    }
+
+    .btn-delete{
+        background:#e74c3c;
+        color:white;
+    }
+
+    .btn-add{
+        background:#27ae60;
+        color:white;
+        float:right;
+        margin-bottom:15px;
+    }
+
+    .search-box{
+        margin-bottom:15px;
+    }
+
+    .search-box input{
+        padding:6px;
+    }
+
+    .pagination{
+        margin-top:15px;
+        text-align:center;
+    }
+
+    .pagination a{
+        margin:0 5px;
+        text-decoration:none;
+    }
+
+    .btn-enable{
+    background:#27ae60;
+    color:white;
+    }
+
+    .btn-disable{
+    background:#e74c3c;
+    color:white;
+    }
+
+    /* ALERT */
+
+    .alert-success{
+        background:#d4edda;
+        color:#155724;
+        padding:10px;
+        border-radius:6px;
+        margin-bottom:15px;
+    }
+
+    .alert-error{
+        background:#f8d7da;
+        color:#721c24;
+        padding:10px;
+        border-radius:6px;
+        margin-bottom:15px;
+    }
+
+    /* MODAL */
+
+    .modal{
+        display:none;
+        position:fixed;
+        z-index:10;
+        left:0;
+        top:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.5);
+    }
+
+    .modal-content{
+        background:white;
+        width:400px;
+        margin:10% auto;
+        padding:20px;
+        border-radius:10px;
+    }
+
+    .modal-content input,
+    .modal-content select{
+        width:100%;
+        padding:8px;
+        margin-bottom:10px;
+    }
+
+  </style>
+</head>
+
+<body>
+<div id="navbar-container" th:replace="~{components/navbar :: navbar}"></div>
+<div class="container">
+
+  <h2>Staff List</h2>
+
+  <!-- SUCCESS -->
+  <div th:if="${success}" class="alert-success">
+    <span th:text="${success}"></span>
+  </div>
+
+  <!-- ERROR -->
+  <div th:if="${error}" class="alert-error">
+    <span th:text="${error}"></span>
+  </div>
+
+  <!-- SEARCH -->
+  <form class="search-box" th:action="@{/staff/view}" method="get">
+
+    <input type="text" name="keyword"
+           placeholder="Search staff..."
+           th:value="${keyword}">
+
+    <button type="submit">Search</button>
+
+  </form>
+
+  <button class="btn btn-add" onclick="openCreateModal()">+ Add Staff</button>
+
+  <table>
+
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Gender</th>
+      <th>Role</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    <tr th:each="staff : ${staffList}">
+
+      <td th:text="${staff.id}"></td>
+      <td th:text="${staff.fullName}"></td>
+      <td th:text="${staff.username}"></td>
+      <td th:text="${staff.email}"></td>
+      <td th:text="${staff.phoneNumber}"></td>
+      <td th:text="${staff.gender}"></td>
+      <td th:text="${staff.role}"></td>
+      <td>
+        <span th:if="${staff.enabled}" style="color:green;">Active</span>
+        <span th:unless="${staff.enabled}" style="color:red;">Disabled</span>
+      </td>
+
+      <td>
+
+        <button class="btn btn-edit"
+                th:attr="data-id=${staff.id},
+                 data-name=${staff.fullName},
+                 data-username=${staff.username},
+                 data-email=${staff.email},
+                 data-phone=${staff.phoneNumber},
+                 data-gender=${staff.gender},
+                 data-role=${staff.role}"
+                onclick="openEditModal(this)">
+          Edit
+        </button>
+
+        <a th:href="@{/staff/toggle/{id}(id=${staff.id})}">
+          <button th:class="${staff.enabled} ? 'btn btn-disable' : 'btn btn-enable'">
+
+            <span th:text="${staff.enabled} ? 'Disable' : 'Enable'"></span>
+
+          </button>
+        </a>
+
+      </td>
+
+    </tr>
+
+    </tbody>
+
+  </table>
+
+  <!-- PAGINATION -->
+
+  <div class="pagination">
+
+    <a th:if="${currentPage > 0}"
+       th:href="@{/staff/view(page=${currentPage-1}, keyword=${keyword})}">
+      Previous
+    </a>
+
+    <span th:text="${(currentPage ?: 0) + 1}"></span>
+    /
+    <span th:text="${totalPages}"></span>
+
+    <a th:if="${currentPage < totalPages-1}"
+       th:href="@{/staff/view(page=${currentPage+1}, keyword=${keyword})}">
+      Next
+    </a>
+
+  </div>
+
+</div>
+
+<!-- CREATE STAFF MODAL -->
+
+<div id="createModal" class="modal">
+
+  <div class="modal-content">
+
+    <h3>Create Staff</h3>
+
+    <form th:action="@{/staff/create}" method="post">
+
+      <input type="text" name="fullName" placeholder="Full Name" required>
+
+      <input type="text" name="username" placeholder="Username" required>
+
+      <input type="email" name="email" placeholder="Email" required>
+
+      <input type="text" name="phoneNumber" placeholder="Phone">
+
+      <select name="gender">
+        <option>Male</option>
+        <option>Female</option>
+      </select>
+
+      <input type="password" name="password" placeholder="Password">
+
+      <input type="date" name="dateOfBirth">
+
+      <select name="role">
+        <option>Manager</option>
+        <option>Admin</option>
+        <option>Receptionist</option>
+        <option>Housekeeper</option>
+      </select>
+
+      <button type="submit" class="btn btn-add">Create</button>
+
+      <button type="button" onclick="closeCreateModal()">Cancel</button>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- EDIT STAFF MODAL -->
+
+<div id="editModal" class="modal">
+
+  <div class="modal-content">
+
+    <h3>Edit Staff</h3>
+
+    <form th:action="@{/staff/update}" method="post">
+
+      <input type="hidden" name="id" id="editId">
+
+      <input type="text" name="fullName" id="editName" placeholder="Full Name">
+
+      <input type="text" name="username" id="editUsername" placeholder="Username">
+
+      <input type="email" name="email" id="editEmail" placeholder="Email">
+
+      <input type="text" name="phoneNumber" id="editPhone" placeholder="Phone">
+
+      <select name="gender" id="editGender">
+        <option>Male</option>
+        <option>Female</option>
+      </select>
+
+      <select name="role" id="editRole">
+        <option>Manager</option>
+        <option>Admin</option>
+        <option>Receptionist</option>
+        <option>Housekeeper</option>
+      </select>
+
+      <button type="submit" class="btn btn-edit">Update</button>
+
+      <button type="button" onclick="closeEditModal()">Cancel</button>
+
+    </form>
+
+  </div>
+
+</div>
+
+<script>
+
+  function openCreateModal(){
+      document.getElementById("createModal").style.display="block";
+  }
+
+  function closeCreateModal(){
+      document.getElementById("createModal").style.display="none";
+  }
+
+</script>
+
+<script>
+
+  function openEditModal(button){
+
+      document.getElementById("editId").value = button.dataset.id;
+      document.getElementById("editName").value = button.dataset.name;
+      document.getElementById("editUsername").value = button.dataset.username;
+      document.getElementById("editEmail").value = button.dataset.email;
+      document.getElementById("editPhone").value = button.dataset.phone;
+      document.getElementById("editGender").value = button.dataset.gender;
+      document.getElementById("editRole").value = button.dataset.role;
+
+      document.getElementById("editModal").style.display = "block";
+  }
+
+  function closeEditModal(){
+      document.getElementById("editModal").style.display = "none";
+  }
+
+</script>
+</body>
 </html>
+
