@@ -236,14 +236,45 @@ tr:hover td {
   color: #155724;
 }
 
-.status-empty {
+.status-reserved {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.status-occupied {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-checked-out {
+  background: #e2d5f1;
+  color: #5a3e8a;
+}
+
+.status-housekeeping {
   background: #fff3cd;
   color: #856404;
 }
 
-.status-booked {
-  background: #f8d7da;
-  color: #721c24;
+/* Màu sắc cho các ô tròn khi active */
+.status-circle[data-status="reserved"].active .circle {
+  background: #2196F3;
+  border-color: #2196F3;
+}
+
+.status-circle[data-status="occupied"].active .circle {
+  background: #f44336;
+  border-color: #f44336;
+}
+
+.status-circle[data-status="checked-out"].active .circle {
+  background: #9c27b0;
+  border-color: #9c27b0;
+}
+
+.status-circle[data-status="housekeeping"].active .circle {
+  background: #ff9800;
+  border-color: #ff9800;
 }
 
 /* Action Buttons */
