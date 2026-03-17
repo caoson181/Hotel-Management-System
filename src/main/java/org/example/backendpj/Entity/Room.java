@@ -2,6 +2,7 @@ package org.example.backendpj.Entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+
 @Entity
 @Table(name = "Room")
 public class Room {
@@ -23,7 +24,21 @@ public class Room {
     @Column(name = "status", nullable = false, length = 50)
     private String status;
 
+    @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal basePrice;
+
+    @Column(name = "room_rank")
+    private String roomRank;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "picture")
+    private String picture;
+
     public Room() {}
+
+    // ===== Getter & Setter =====
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
@@ -39,4 +54,16 @@ public class Room {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public BigDecimal getBasePrice() { return basePrice; }
+    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
+
+    public String getRoomRank() { return roomRank; }
+    public void setRoomRank(String roomRank) { this.roomRank = roomRank; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getPicture() { return picture; }
+    public void setPicture(String picture) { this.picture = picture; }
 }

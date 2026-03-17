@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <title>Hotel Admin</title>
@@ -17,8 +17,17 @@
     <!-- WELCOME -->
     <section class="hero">
       <div id="main-content" class="welcome-box">
-        <h1>Welcome, Nguyen Van A!</h1>
-        <p>You are logged in as: <span id="navbarRole"></span></p>
+
+        <h1>
+          Welcome, <span th:text="${currentUser.fullName}">User</span>!
+        </h1>
+
+        <p>
+          You are logged in as:
+          <span th:text="${currentUser.role}">Role</span>
+
+        </p>
+
       </div>
     </section>
 

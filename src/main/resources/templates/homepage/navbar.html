@@ -13,9 +13,9 @@
         </li>
         <li>
           <a
-            th:href="@{/services}"
-            th:text="#{navbar.services}"
-            class="nav-link"
+                  th:href="@{/services}"
+                  th:text="#{navbar.services}"
+                  class="nav-link"
           ></a>
         </li>
         <li>
@@ -23,9 +23,9 @@
         </li>
         <li>
           <a
-            th:href="@{/contact}"
-            th:text="#{navbar.contact}"
-            class="nav-link"
+                  th:href="@{/contact}"
+                  th:text="#{navbar.contact}"
+                  class="nav-link"
           ></a>
         </li>
 
@@ -35,14 +35,14 @@
 
         <li class="account-menu" sec:authorize="isAuthenticated()">
           <button
-            class="account-btn"
-            id="accountBtn"
-            type="button"
-            aria-expanded="false"
+                  class="account-btn"
+                  id="accountBtn"
+                  type="button"
+                  aria-expanded="false"
           >
             <span class="account-avatar">👤</span>
             <span class="account-text" th:text="#{account.title}"
-              >My Account</span
+            >My Account</span
             >
             <i class="fa fa-caret-down"></i>
           </button>
@@ -98,8 +98,8 @@
 
       document.addEventListener("click", (e) => {
         if (
-          !accountBtn.contains(e.target) &&
-          !accountDropdown.contains(e.target)
+                !accountBtn.contains(e.target) &&
+                !accountDropdown.contains(e.target)
         ) {
           accountDropdown.classList.remove("show");
           accountBtn.setAttribute("aria-expanded", "false");

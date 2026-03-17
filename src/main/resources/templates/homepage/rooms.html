@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Rooms</title>
+    <link rel="stylesheet" th:href="@{/css/room.css}">
+</head>
+<body>
+
+<h1 style="text-align:center;">Our Rooms</h1>
+
+<div class="room-container">
+
+    <div class="room-card" th:each="room : ${rooms}">
+
+        <img th:src="@{/images/default-room.jpg}" class="room-img"/>
+
+        <div class="room-info">
+            <h2 th:text="${room.roomType}"></h2>
+
+            <p th:text="${room.description}"></p>
+
+            <p class="price">
+                $<span th:text="${room.price}"></span> / night
+            </p>
+
+            <p class="status"
+               th:text="${room.status}"
+               th:classappend="${room.status == 'Available'} ? 'available' : 'booked'">
+            </p>
+
+            <a class="btn" th:href="@{'/booking?roomId=' + ${room.id}}">
+                Book Now
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

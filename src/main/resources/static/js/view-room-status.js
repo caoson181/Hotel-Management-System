@@ -1,61 +1,60 @@
 // View Room Status JavaScript
 
 // Sample data
-// Sample data với room_rank là string
 let rooms = [
     {
         id: 1,
         room_number: '101',
-        room_type: 'Single',
+        room_type: 'Standard',
         status: 'available',
         base_price: 500000,
         price: 500000,
-        room_rank: 'Standard',  // Đổi từ 3 thành 'Standard'
+        room_rank: 3,
         description: 'Standard room with city view',
         picture: 'https://via.placeholder.com/300x200'
     },
     {
         id: 2,
         room_number: '102',
-        room_type: 'Double',
-        status: 'reserved',
+        room_type: 'Deluxe',
+        status: 'booked',
         base_price: 800000,
         price: 750000,
-        room_rank: 'Superior',  // Đổi từ 4 thành 'Superior'
-        description: 'Deluxe room reserved for VIP',
+        room_rank: 4,
+        description: 'Deluxe room with ocean view',
         picture: 'https://via.placeholder.com/300x200'
     },
     {
         id: 3,
         room_number: '103',
-        room_type: 'Twin',
-        status: 'occupied',
+        room_type: 'Suite',
+        status: 'empty',
         base_price: 1200000,
         price: 1100000,
-        room_rank: 'Deluxe',  // Đổi từ 5 thành 'Deluxe'
-        description: 'Suite with guests',
+        room_rank: 5,
+        description: 'Luxury suite with premium services',
         picture: 'https://via.placeholder.com/300x200'
     },
     {
         id: 4,
         room_number: '104',
-        room_type: 'Triple',
-        status: 'checked-out',
+        room_type: 'Family',
+        status: 'available',
         base_price: 900000,
         price: 850000,
-        room_rank: 'Executive',  // Đổi từ 4 thành 'Executive'
-        description: 'Family room ready for cleaning',
+        room_rank: 4,
+        description: 'Family room with 2 double beds',
         picture: 'https://via.placeholder.com/300x200'
     },
     {
         id: 5,
         room_number: '105',
-        room_type: 'Family',
-        status: 'housekeeping',
+        room_type: 'VIP',
+        status: 'booked',
         base_price: 1500000,
         price: 1400000,
-        room_rank: 'Suite',  // Đổi từ 5 thành 'Suite'
-        description: 'VIP room being cleaned',
+        room_rank: 5,
+        description: 'VIP room with special services',
         picture: 'https://via.placeholder.com/300x200'
     }
 ];
@@ -190,7 +189,7 @@ function renderTable() {
             bVal = parseInt(bVal);
         }
 
-        if (currentSort.field === 'base_price' || currentSort.field === 'price') {
+        if (currentSort.field === 'base_price' || currentSort.field === 'price' || currentSort.field === 'room_rank') {
             aVal = Number(aVal);
             bVal = Number(bVal);
         }
@@ -219,7 +218,7 @@ function renderTable() {
             </td>
             <td>${formatCurrency(room.base_price)}</td>
             <td>${formatCurrency(room.price)}</td>
-            <td>${room.room_rank}</td>
+            <td>${room.room_rank} Star${room.room_rank > 1 ? 's' : ''}</td>
             <td>
                 <div class="action-btns">
                     <button class="btn-icon" onclick="viewDetails(${room.id})" title="View Details">
@@ -307,7 +306,7 @@ function viewDetails(id) {
         </div>
         <div class="detail-item">
             <div class="detail-label">Room Rank:</div>
-            <div class="detail-value">${room.room_rank}</div>
+            <div class="detail-value">${room.room_rank} Star${room.room_rank > 1 ? 's' : ''}</div>
         </div>
         <div class="detail-item">
             <div class="detail-label">Description:</div>
@@ -399,7 +398,7 @@ function saveRoom() {
         status: status.value,
         base_price: Number(basePrice.value),
         price: Number(price.value),
-        room_rank: roomRank.value,  // Bỏ Number()
+        room_rank: Number(roomRank.value),
         description: description ? description.value : '',
         picture: picture ? picture.value : ''
     };

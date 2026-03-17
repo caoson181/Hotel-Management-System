@@ -415,7 +415,7 @@ header.scrolled .account-btn:hover,
     position: absolute;
     inset: 0;
     background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 48%),
-        linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
+    linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
 }
 
 .profile-avatar {

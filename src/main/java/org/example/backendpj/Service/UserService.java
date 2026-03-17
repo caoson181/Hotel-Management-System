@@ -25,4 +25,8 @@
 
             userRepository.save(user);
         }
+        public User findByUsername(String username) {
+            return userRepository.findByUsernameOrEmail(username, username)
+                    .orElse(null);
+        }
     }

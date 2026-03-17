@@ -33,10 +33,10 @@ function loadNavbar() {
 
     if (avatarEl) {
       avatarEl.innerText = user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase();
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase();
     }
   }
 }

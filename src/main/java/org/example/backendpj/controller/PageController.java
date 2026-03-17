@@ -1,5 +1,6 @@
 package org.example.backendpj.controller;
 
+import org.example.backendpj.Service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
@@ -7,22 +8,35 @@ import org.springframework.security.core.Authentication;
 import org.example.backendpj.Entity.User;
 import org.example.backendpj.Repository.UserRepository;
 
+import java.security.Principal;
+
+
+
 @Controller
 public class PageController {
 
     private final UserRepository userRepository;
+    private final UserService userService;
 
-    public PageController(UserRepository userRepository) {
+
+    public PageController(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     // ================= ADMIN HOME =================
 
     @GetMapping("/index")
-    public String index(){
+    public String index(Model model, Principal principal) {
+
+        if (principal != null) {
+            String username = principal.getName();
+            User user = userService.findByUsername(username);
+            model.addAttribute("currentUser", user);
+        }
+
         return "index";
     }
-
     // ================= AUTH =================
 
     @GetMapping("/login")
@@ -97,7 +111,12 @@ public class PageController {
 
         return "homepage/profile";
     }
-
+    @GetMapping("/staff/profile")
+    public String staffProfile(Model model, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
+        return "pages/staff/profile";
+    }
     // ================= REVENUE =================
 
     @GetMapping("/revenue/view-revenue")

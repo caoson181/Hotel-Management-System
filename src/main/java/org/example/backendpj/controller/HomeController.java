@@ -2,9 +2,21 @@ package org.example.backendpj.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
+import org.example.backendpj.Entity.Room;
+import org.example.backendpj.Repository.RoomRepository;
+
+import java.util.List;
+
 
 @Controller
 public class HomeController {
+
+    private final RoomRepository roomRepository;
+
+    public HomeController(RoomRepository roomRepository) {
+        this.roomRepository = roomRepository;
+    }
 
     @GetMapping({"/", "/homepage"})
     public String home() {
@@ -17,9 +29,15 @@ public class HomeController {
     }
 
     @GetMapping("/rooms")
-    public String rooms() {
+    public String rooms(Model model) {
+
+        List<Room> rooms = roomRepository.findAll();
+
+        model.addAttribute("rooms", rooms);
+
         return "homepage/rooms";
     }
+
 
     @GetMapping("/services")
     public String services() {
