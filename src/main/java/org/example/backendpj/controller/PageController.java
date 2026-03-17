@@ -56,10 +56,7 @@ public class PageController {
 
     // ================= ROOMS =================
 
-    @GetMapping("/rooms/view-room-status")
-    public String viewRoomStatus(){
-        return "pages/rooms/view-room-status";
-    }
+
 
     @GetMapping("/rooms/check-equipment")
     public String checkEquipment(){

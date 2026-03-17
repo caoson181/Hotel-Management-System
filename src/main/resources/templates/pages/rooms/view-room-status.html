@@ -32,11 +32,11 @@
             </div>
             <div class="filter-sort">
                 <select class="sort-select" id="sortSelect">
-                    <option value="room_number">Room Number</option>
-                    <option value="room_type">Room Type</option>
-                    <option value="base_price">Base Price</option>
+                    <option value="roomNumber">Room Number</option>
+                    <option value="roomType">Room Type</option>
+                    <option value="basePrice">Base Price</option>
                     <option value="price">Current Price</option>
-                    <option value="room_rank">Room Rank</option>
+                    <option value="roomRank">Room Rank</option>
                 </select>
                 <div class="sort-order">
                     <button class="active" id="sortAsc" title="Ascending"><i class="fas fa-arrow-up"></i></button>
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <!-- Status Filter Circles -->
+        <!-- Status Filter Circles - 5 trạng thái -->
         <div class="status-filter">
             <div class="status-circle active" data-status="all">
                 <div class="circle">All</div>
@@ -57,17 +57,29 @@
                 </div>
                 <span class="circle-label">Available</span>
             </div>
-            <div class="status-circle" data-status="empty">
+            <div class="status-circle" data-status="reserved">
                 <div class="circle">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-clock"></i>
                 </div>
-                <span class="circle-label">Empty</span>
+                <span class="circle-label">Reserved</span>
             </div>
-            <div class="status-circle" data-status="booked">
+            <div class="status-circle" data-status="occupied">
                 <div class="circle">
-                    <i class="fas fa-bed"></i>
+                    <i class="fas fa-user"></i>
                 </div>
-                <span class="circle-label">Booked</span>
+                <span class="circle-label">Occupied</span>
+            </div>
+            <div class="status-circle" data-status="checked-out">
+                <div class="circle">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <span class="circle-label">Checked Out</span>
+            </div>
+            <div class="status-circle" data-status="housekeeping">
+                <div class="circle">
+                    <i class="fas fa-broom"></i>
+                </div>
+                <span class="circle-label">Housekeeping</span>
             </div>
             <button class="new-btn" onclick="openAddModal()">
                 <i class="fas fa-plus"></i>
@@ -91,7 +103,6 @@
             </tr>
             </thead>
             <tbody id="tableBody">
-            <!-- Data will be inserted here -->
             </tbody>
         </table>
 
@@ -147,11 +158,11 @@
                     <label for="room_type">Room Type *</label>
                     <select id="room_type" required>
                         <option value="">Select room type</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Deluxe">Deluxe</option>
-                        <option value="Suite">Suite</option>
+                        <option value="Single">Single</option>
+                        <option value="Double">Double</option>
+                        <option value="Twin">Twin</option>
+                        <option value="Triple">Triple</option>
                         <option value="Family">Family</option>
-                        <option value="VIP">VIP</option>
                     </select>
                 </div>
 
@@ -159,9 +170,11 @@
                     <label for="status">Status *</label>
                     <select id="status" required>
                         <option value="">Select status</option>
-                        <option value="available">Available</option>
-                        <option value="empty">Empty</option>
-                        <option value="booked">Booked</option>
+                        <option value="Available">Available</option>
+                        <option value="Reserved">Reserved</option>
+                        <option value="Occupied">Occupied</option>
+                        <option value="Checked-out">Checked Out</option>
+                        <option value="Housekeeping">Housekeeping</option>
                     </select>
                 </div>
 
@@ -179,11 +192,11 @@
                     <label for="room_rank">Room Rank *</label>
                     <select id="room_rank" required>
                         <option value="">Select rank</option>
-                        <option value="1">1 Star</option>
-                        <option value="2">2 Stars</option>
-                        <option value="3">3 Stars</option>
-                        <option value="4">4 Stars</option>
-                        <option value="5">5 Stars</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Superior">Superior</option>
+                        <option value="Deluxe">Deluxe</option>
+                        <option value="Executive">Executive</option>
+                        <option value="Suite">Suite</option>
                     </select>
                 </div>
 

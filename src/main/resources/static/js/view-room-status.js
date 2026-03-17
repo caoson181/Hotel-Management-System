@@ -1,470 +1,335 @@
-// View Room Status JavaScript
-
-// Sample data
-let rooms = [
-    {
-        id: 1,
-        room_number: '101',
-        room_type: 'Standard',
-        status: 'available',
-        base_price: 500000,
-        price: 500000,
-        room_rank: 3,
-        description: 'Standard room with city view',
-        picture: 'https://via.placeholder.com/300x200'
-    },
-    {
-        id: 2,
-        room_number: '102',
-        room_type: 'Deluxe',
-        status: 'booked',
-        base_price: 800000,
-        price: 750000,
-        room_rank: 4,
-        description: 'Deluxe room with ocean view',
-        picture: 'https://via.placeholder.com/300x200'
-    },
-    {
-        id: 3,
-        room_number: '103',
-        room_type: 'Suite',
-        status: 'empty',
-        base_price: 1200000,
-        price: 1100000,
-        room_rank: 5,
-        description: 'Luxury suite with premium services',
-        picture: 'https://via.placeholder.com/300x200'
-    },
-    {
-        id: 4,
-        room_number: '104',
-        room_type: 'Family',
-        status: 'available',
-        base_price: 900000,
-        price: 850000,
-        room_rank: 4,
-        description: 'Family room with 2 double beds',
-        picture: 'https://via.placeholder.com/300x200'
-    },
-    {
-        id: 5,
-        room_number: '105',
-        room_type: 'VIP',
-        status: 'booked',
-        base_price: 1500000,
-        price: 1400000,
-        room_rank: 5,
-        description: 'VIP room with special services',
-        picture: 'https://via.placeholder.com/300x200'
-    }
-];
-
-// State
+// =======================
+// STATE
+// =======================
+let rooms = [];
 let currentFilter = 'all';
 let currentSort = {
-    field: 'room_number',
+    field: 'roomNumber',
     order: 'asc'
 };
 let searchTerm = '';
 let currentPage = 1;
-const itemsPerPage = 5;
+const itemsPerPage = 10;
 
-// DOM Elements
-let tableBody, searchInput, sortSelect, sortAsc, sortDesc, statusCircles, pagination;
+// =======================
+// INIT
+// =======================
+document.addEventListener("DOMContentLoaded", () => {
+    loadRooms();
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('View Room Status JS loaded');
+    document.getElementById("searchInput")?.addEventListener("input", (e) => {
+        searchTerm = e.target.value.toLowerCase();
+        currentPage = 1;
+        renderTable();
+    });
 
-    // Get DOM elements
-    tableBody = document.getElementById('tableBody');
-    searchInput = document.getElementById('searchInput');
-    sortSelect = document.getElementById('sortSelect');
-    sortAsc = document.getElementById('sortAsc');
-    sortDesc = document.getElementById('sortDesc');
-    statusCircles = document.querySelectorAll('.status-circle');
-    pagination = document.getElementById('pagination');
+    document.getElementById("sortSelect")?.addEventListener("change", (e) => {
+        currentSort.field = e.target.value;
+        renderTable();
+    });
 
-    // Check if elements exist
-    if (!tableBody) {
-        console.error('Table body not found');
-        return;
-    }
+    document.getElementById("sortAsc")?.addEventListener("click", () => {
+        currentSort.order = "asc";
+        renderTable();
+    });
 
-    // Initial render
-    renderTable();
+    document.getElementById("sortDesc")?.addEventListener("click", () => {
+        currentSort.order = "desc";
+        renderTable();
+    });
 
-    // Event Listeners
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            searchTerm = e.target.value.toLowerCase();
+    document.querySelectorAll(".status-circle").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".status-circle").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentFilter = btn.dataset.status;
             currentPage = 1;
             renderTable();
         });
-    }
-
-    if (sortSelect) {
-        sortSelect.addEventListener('change', (e) => {
-            currentSort.field = e.target.value;
-            renderTable();
-        });
-    }
-
-    if (sortAsc) {
-        sortAsc.addEventListener('click', () => {
-            sortAsc.classList.add('active');
-            if (sortDesc) sortDesc.classList.remove('active');
-            currentSort.order = 'asc';
-            renderTable();
-        });
-    }
-
-    if (sortDesc) {
-        sortDesc.addEventListener('click', () => {
-            sortDesc.classList.add('active');
-            if (sortAsc) sortAsc.classList.remove('active');
-            currentSort.order = 'desc';
-            renderTable();
-        });
-    }
-
-    // Status filter
-    if (statusCircles) {
-        statusCircles.forEach(circle => {
-            circle.addEventListener('click', () => {
-                statusCircles.forEach(c => c.classList.remove('active'));
-                circle.classList.add('active');
-                currentFilter = circle.dataset.status;
-                currentPage = 1;
-                renderTable();
-            });
-        });
-    }
-
-    // Form submit
-    const roomForm = document.getElementById('roomForm');
-    if (roomForm) {
-        roomForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            saveRoom();
-        });
-    }
-
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-        if (e.target.classList.contains('modal')) {
-            closeModal(e.target.id);
-        }
     });
+
+    document.getElementById("roomForm")?.addEventListener("submit", saveRoom);
 });
 
-// Render table
+// =======================
+// LOAD DATA FROM BACKEND
+// =======================
+function loadRooms() {
+    fetch("/rooms/api")
+        .then(res => res.json())
+        .then(data => {
+            rooms = data;
+            renderTable();
+        })
+        .catch(err => console.error("Load rooms error:", err));
+}
+
+// =======================
+// UTIL
+// =======================
+function getStatusClass(status) {
+    return status.toLowerCase().replace(" ", "-");
+}
+
+function formatCurrency(value) {
+    return new Intl.NumberFormat("vi-VN", {
+        style: "currency",
+        currency: "VND"
+    }).format(value);
+}
+
+// =======================
+// RENDER TABLE
+// =======================
 function renderTable() {
+    const tableBody = document.getElementById("tableBody");
     if (!tableBody) return;
 
-    // Filter
-    let filteredRooms = rooms.filter(room => {
-        // Status filter
-        if (currentFilter !== 'all' && room.status !== currentFilter) {
-            return false;
-        }
+    let filtered = rooms.filter(room => {
+        if (currentFilter !== 'all' && room.status.toLowerCase() !== currentFilter) return false;
 
-        // Search filter
         if (searchTerm) {
-            return room.room_number.toLowerCase().includes(searchTerm) ||
-                   room.room_type.toLowerCase().includes(searchTerm) ||
-                   (room.description && room.description.toLowerCase().includes(searchTerm));
+            return room.roomNumber.toLowerCase().includes(searchTerm) ||
+                room.roomType.toLowerCase().includes(searchTerm);
         }
 
         return true;
     });
 
-    // Sort
-    filteredRooms.sort((a, b) => {
+    // SORT
+    filtered.sort((a, b) => {
         let aVal = a[currentSort.field];
         let bVal = b[currentSort.field];
 
-        if (currentSort.field === 'room_number') {
+        if (currentSort.field === "roomNumber") {
             aVal = parseInt(aVal);
             bVal = parseInt(bVal);
         }
 
-        if (currentSort.field === 'base_price' || currentSort.field === 'price' || currentSort.field === 'room_rank') {
-            aVal = Number(aVal);
-            bVal = Number(bVal);
-        }
-
-        if (currentSort.order === 'asc') {
-            return aVal > bVal ? 1 : -1;
-        } else {
-            return aVal < bVal ? 1 : -1;
-        }
+        return currentSort.order === "asc"
+            ? (aVal > bVal ? 1 : -1)
+            : (aVal < bVal ? 1 : -1);
     });
 
-    // Pagination
-    const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
+    // PAGINATION
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
     const start = (currentPage - 1) * itemsPerPage;
-    const paginatedRooms = filteredRooms.slice(start, start + itemsPerPage);
+    const pageData = filtered.slice(start, start + itemsPerPage);
 
-    // Render table rows
-    tableBody.innerHTML = paginatedRooms.map(room => `
+    // RENDER
+    tableBody.innerHTML = pageData.map(room => `
         <tr>
-            <td><strong>${room.room_number}</strong></td>
-            <td>${room.room_type}</td>
+            <td><strong>${room.roomNumber}</strong></td>
+            <td>${room.roomType}</td>
             <td>
-                <span class="status-badge status-${room.status}">
-                    ${room.status.charAt(0).toUpperCase() + room.status.slice(1)}
+                <span class="status-badge status-${getStatusClass(room.status)}">
+                    ${room.status}
                 </span>
             </td>
-            <td>${formatCurrency(room.base_price)}</td>
+            <td>${formatCurrency(room.basePrice)}</td>
             <td>${formatCurrency(room.price)}</td>
-            <td>${room.room_rank} Star${room.room_rank > 1 ? 's' : ''}</td>
+            <td>${room.roomRank}</td>
             <td>
                 <div class="action-btns">
-                    <button class="btn-icon" onclick="viewDetails(${room.id})" title="View Details">
+                    <button class="btn-icon" onclick="viewRoom(${room.id})">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn-icon" onclick="editRoom(${room.id})" title="Edit">
+                    <button class="btn-icon" onclick="editRoom(${room.id})">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-icon delete" onclick="deleteRoom(${room.id})" title="Delete">
+                    <button class="btn-icon delete" onclick="deleteRoom(${room.id})">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             </td>
         </tr>
-    `).join('');
+    `).join("");
 
-    // Render pagination
     renderPagination(totalPages);
 }
 
-// Render pagination
+// =======================
+// PAGINATION
+// =======================
 function renderPagination(totalPages) {
+    const pagination = document.getElementById("pagination");
     if (!pagination) return;
 
-    let paginationHtml = '';
+    let html = "";
     for (let i = 1; i <= totalPages; i++) {
-        paginationHtml += `
-            <button class="page-btn ${currentPage === i ? 'active' : ''}"
-                    onclick="goToPage(${i})">${i}</button>
-        `;
+        html += `<button class="page-btn ${i === currentPage ? "active" : ""}" onclick="goToPage(${i})">${i}</button>`;
     }
-    pagination.innerHTML = paginationHtml;
+
+    pagination.innerHTML = html;
 }
 
-// Go to page
 function goToPage(page) {
     currentPage = page;
     renderTable();
 }
 
-// Format currency (VND)
-function formatCurrency(value) {
-    return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
-    }).format(value);
+// =======================
+// VIEW
+// =======================
+function viewRoom(id) {
+    fetch(`/rooms/api/${id}`)
+        .then(res => res.json())
+        .then(room => {
+
+            const html = `
+                <div class="detail-item">
+                    <div class="detail-label">Room Number:</div>
+                    <div class="detail-value"><strong>${room.roomNumber}</strong></div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Room Type:</div>
+                    <div class="detail-value">${room.roomType}</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Status:</div>
+                    <div class="detail-value">
+                        <span class="status-badge status-${getStatusClass(room.status)}">
+                            ${room.status}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Base Price:</div>
+                    <div class="detail-value">${formatCurrency(room.basePrice)}</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Current Price:</div>
+                    <div class="detail-value">${formatCurrency(room.price)}</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Room Rank:</div>
+                    <div class="detail-value">${room.roomRank}</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Description:</div>
+                    <div class="detail-value">${room.description || "-"}</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Image:</div>
+                    <div class="detail-value">
+                        ${
+                room.picture
+                    ? `<img src="${room.picture}" style="width:80px;height:60px;border-radius:6px;">`
+                    : "-"
+            }
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("detailModalBody").innerHTML = html;
+
+            openModal("detailModal");
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Cannot load room details");
+        });
 }
-
-// View details
-function viewDetails(id) {
-    console.log('Viewing details for room:', id);
-    const room = rooms.find(r => r.id === id);
-    if (!room) return;
-
-    const modalBody = document.getElementById('detailModalBody');
-    if (!modalBody) {
-        console.error('Detail modal body not found');
-        return;
-    }
-
-    modalBody.innerHTML = `
-        <div class="detail-item">
-            <div class="detail-label">Room Number:</div>
-            <div class="detail-value"><strong>${room.room_number}</strong></div>
-        </div>
-        <div class="detail-item">
-            <div class="detail-label">Room Type:</div>
-            <div class="detail-value">${room.room_type}</div>
-        </div>
-        <div class="detail-item">
-            <div class="detail-label">Status:</div>
-            <div class="detail-value">
-                <span class="status-badge status-${room.status}">
-                    ${room.status.charAt(0).toUpperCase() + room.status.slice(1)}
-                </span>
-            </div>
-        </div>
-        <div class="detail-item">
-            <div class="detail-label">Base Price:</div>
-            <div class="detail-value">${formatCurrency(room.base_price)}</div>
-        </div>
-        <div class="detail-item">
-            <div class="detail-label">Current Price:</div>
-            <div class="detail-value">${formatCurrency(room.price)}</div>
-        </div>
-        <div class="detail-item">
-            <div class="detail-label">Room Rank:</div>
-            <div class="detail-value">${room.room_rank} Star${room.room_rank > 1 ? 's' : ''}</div>
-        </div>
-        <div class="detail-item">
-            <div class="detail-label">Description:</div>
-            <div class="detail-value">${room.description || 'No description available'}</div>
-        </div>
-        <div class="detail-item">
-            <div class="detail-label">Image:</div>
-            <div class="detail-value">
-                ${room.picture ? `<img src="${room.picture}" alt="Room ${room.room_number}" class="room-image">` : 'No image available'}
-            </div>
-        </div>
-    `;
-
-    openModal('detailModal');
-}
-
-// Open add modal
+// =======================
+// ADD / EDIT
+// =======================
 function openAddModal() {
-    console.log('Opening add modal');
-    const modalTitle = document.getElementById('modalTitle');
-    const roomForm = document.getElementById('roomForm');
-    const roomId = document.getElementById('roomId');
-
-    if (modalTitle) modalTitle.textContent = 'Add New Room';
-    if (roomForm) roomForm.reset();
-    if (roomId) roomId.value = '';
-
-    openModal('formModal');
+    document.getElementById("modalTitle").innerText = "Add Room";
+    document.getElementById("roomForm").reset();
+    document.getElementById("roomId").value = "";
+    openModal("formModal");
 }
 
-// Edit room
 function editRoom(id) {
-    console.log('Editing room:', id);
-    const room = rooms.find(r => r.id === id);
-    if (!room) return;
+    fetch(`/rooms/api/${id}`)
+        .then(res => res.json())
+        .then(room => {
+            document.getElementById("modalTitle").innerText = "Edit Room";
 
-    const modalTitle = document.getElementById('modalTitle');
-    const roomId = document.getElementById('roomId');
-    const roomNumber = document.getElementById('room_number');
-    const roomType = document.getElementById('room_type');
-    const status = document.getElementById('status');
-    const basePrice = document.getElementById('base_price');
-    const price = document.getElementById('price');
-    const roomRank = document.getElementById('room_rank');
-    const description = document.getElementById('description');
-    const picture = document.getElementById('picture');
+            document.getElementById("roomId").value = room.id;
+            document.getElementById("room_number").value = room.roomNumber;
+            document.getElementById("room_type").value = room.roomType;
+            document.getElementById("status").value = room.status;
+            document.getElementById("base_price").value = room.basePrice;
+            document.getElementById("price").value = room.price;
+            document.getElementById("room_rank").value = room.roomRank;
+            document.getElementById("description").value = room.description || "";
+            document.getElementById("picture").value = room.picture || "";
 
-    if (modalTitle) modalTitle.textContent = 'Edit Room';
-    if (roomId) roomId.value = room.id;
-    if (roomNumber) roomNumber.value = room.room_number;
-    if (roomType) roomType.value = room.room_type;
-    if (status) status.value = room.status;
-    if (basePrice) basePrice.value = room.base_price;
-    if (price) price.value = room.price;
-    if (roomRank) roomRank.value = room.room_rank;
-    if (description) description.value = room.description || '';
-    if (picture) picture.value = room.picture || '';
-
-    openModal('formModal');
+            openModal("formModal");
+        });
 }
 
-// Save room
-function saveRoom() {
-    console.log('Saving room');
-    const roomId = document.getElementById('roomId');
-    const roomNumber = document.getElementById('room_number');
-    const roomType = document.getElementById('room_type');
-    const status = document.getElementById('status');
-    const basePrice = document.getElementById('base_price');
-    const price = document.getElementById('price');
-    const roomRank = document.getElementById('room_rank');
-    const description = document.getElementById('description');
-    const picture = document.getElementById('picture');
+function saveRoom(e) {
+    e.preventDefault();
 
-    if (!roomNumber || !roomType || !status || !basePrice || !price || !roomRank) {
-        console.error('Required fields missing');
-        alert('Please fill in all required fields');
-        return;
-    }
+    const id = document.getElementById("roomId").value;
 
-    if (!roomNumber.value || !roomType.value || !status.value || !basePrice.value || !price.value || !roomRank.value) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    const roomData = {
-        room_number: roomNumber.value,
-        room_type: roomType.value,
-        status: status.value,
-        base_price: Number(basePrice.value),
-        price: Number(price.value),
-        room_rank: Number(roomRank.value),
-        description: description ? description.value : '',
-        picture: picture ? picture.value : ''
+    const room = {
+        roomNumber: document.getElementById("room_number").value,
+        roomType: document.getElementById("room_type").value,
+        status: document.getElementById("status").value,
+        basePrice: parseFloat(document.getElementById("base_price").value),
+        price: parseFloat(document.getElementById("price").value),
+        roomRank: document.getElementById("room_rank").value,
+        description: document.getElementById("description").value,
+        picture: document.getElementById("picture").value
     };
 
-    if (roomId && roomId.value) {
-        // Update existing room
-        const index = rooms.findIndex(r => r.id === Number(roomId.value));
-        if (index !== -1) {
-            rooms[index] = { ...rooms[index], ...roomData };
-            console.log('Room updated:', rooms[index]);
-            alert('Room updated successfully!');
-        }
-    } else {
-        // Add new room
-        const newId = rooms.length > 0 ? Math.max(...rooms.map(r => r.id)) + 1 : 1;
-        rooms.push({ id: newId, ...roomData });
-        console.log('New room added:', { id: newId, ...roomData });
-        alert('New room added successfully!');
-    }
+    const url = id ? `/rooms/api/${id}` : `/rooms/api`;
+    const method = id ? "PUT" : "POST";
 
-    closeModal('formModal');
-    renderTable();
+    fetch(url, {
+        method: method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(room)
+    })
+        .then(res => {
+            if (!res.ok) return res.text().then(msg => { throw new Error(msg); });
+            return res.json();
+        })
+        .then(() => {
+            alert(id ? "Updated!" : "Added!");
+            closeModal("formModal");
+            loadRooms();
+        })
+        .catch(err => alert(err.message));
 }
 
-// Delete room
+// =======================
+// DELETE
+// =======================
 function deleteRoom(id) {
-    console.log('Deleting room:', id);
-    if (confirm('Are you sure you want to delete this room?')) {
-        rooms = rooms.filter(r => r.id !== id);
-        if (rooms.length > 0) {
-            const totalPages = Math.ceil(rooms.length / itemsPerPage);
-            if (currentPage > totalPages) {
-                currentPage = totalPages;
-            }
-        } else {
-            currentPage = 1;
-        }
-        renderTable();
-        console.log('Room deleted');
-        alert('Room deleted successfully!');
-    }
+    if (!confirm("Delete this room?")) return;
+
+    fetch(`/rooms/api/${id}`, { method: "DELETE" })
+        .then(() => {
+            loadRooms();
+        });
 }
 
-// Modal functions
-function openModal(modalId) {
-    console.log('Opening modal:', modalId);
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'flex';
-        modal.classList.add('active');
-    } else {
-        console.error('Modal not found:', modalId);
-    }
+// =======================
+// MODAL
+// =======================
+function openModal(id) {
+    document.getElementById(id).style.display = "flex";
 }
 
-function closeModal(modalId) {
-    console.log('Closing modal:', modalId);
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'none';
-        modal.classList.remove('active');
-    }
+function closeModal(id) {
+    document.getElementById(id).style.display = "none";
 }
 
-// Make functions globally available
-window.viewDetails = viewDetails;
+// =======================
+// GLOBAL
+// =======================
+window.viewRoom = viewRoom;
 window.editRoom = editRoom;
 window.deleteRoom = deleteRoom;
 window.openAddModal = openAddModal;
