@@ -8,23 +8,74 @@
       </div>
 
       <ul class="nav-links">
-        <li><a th:href="@{/rooms}" class="nav-link">Rooms</a></li>
-        <li><a th:href="@{/services}" class="nav-link">Services</a></li>
-        <li><a th:href="@{/about}" class="nav-link">About</a></li>
-        <li><a th:href="@{/contact}" class="nav-link">Contact</a></li>
+        <li>
+          <a th:href="@{/rooms}" th:text="#{navbar.room}" class="nav-link"></a>
+        </li>
+        <li>
+          <a
+            th:href="@{/services}"
+            th:text="#{navbar.services}"
+            class="nav-link"
+          ></a>
+        </li>
+        <li>
+          <a th:href="@{/about}" th:text="#{navbar.about}" class="nav-link"></a>
+        </li>
+        <li>
+          <a
+            th:href="@{/contact}"
+            th:text="#{navbar.contact}"
+            class="nav-link"
+          ></a>
+        </li>
 
-        <li sec:authorize="isAnonymous()"><a th:href="@{/auth/login}" class="nav-link">Login</a></li>
+        <li sec:authorize="isAnonymous()">
+          <a th:href="@{/auth/login}" class="nav-link">Login</a>
+        </li>
 
         <li class="account-menu" sec:authorize="isAuthenticated()">
-          <button class="account-btn" id="accountBtn" type="button" aria-expanded="false">
+          <button
+            class="account-btn"
+            id="accountBtn"
+            type="button"
+            aria-expanded="false"
+          >
             <span class="account-avatar">👤</span>
-            <span class="account-text">My Account</span>
+            <span class="account-text" th:text="#{account.title}"
+              >My Account</span
+            >
             <i class="fa fa-caret-down"></i>
           </button>
           <div class="account-dropdown" id="accountDropdown">
-            <a th:href="@{/profile}" class="dropdown-link">Profile</a>
+            <a th:href="@{/profile}" class="dropdown-link">
+              <i class="fa fa-user"></i>
+              <span th:text="#{account.profile}">Profile</span>
+            </a>
+
+            <!-- LANGUAGE -->
+            <div class="language-parent" id="languageBtn">
+              <div class="dropdown-link">
+                <i class="fa fa-globe"></i>
+                <span th:text="#{account.language}">Language</span>
+                <span style="float: right">▶</span>
+              </div>
+
+              <div class="language-submenu" id="languageMenu">
+                <div class="language-item" onclick="changeLang('en')">
+                  <span class="fi fi-gb"></span> English
+                </div>
+
+                <div class="language-item" onclick="changeLang('vi')">
+                  <span class="fi fi-vn"></span> Tiếng Việt
+                </div>
+              </div>
+            </div>
+
             <form th:action="@{/logout}" method="post" class="dropdown-form">
-              <button class="dropdown-link logout-btn" type="submit">Logout</button>
+              <button class="dropdown-link logout-btn" type="submit">
+                <i class="fa fa-sign-out"></i>
+                <span th:text="#{account.logout}">Logout</span>
+              </button>
             </form>
           </div>
         </li>
@@ -33,21 +84,44 @@
   </header>
 
   <script th:inline="javascript">
-    const accountBtn = document.getElementById('accountBtn');
-    const accountDropdown = document.getElementById('accountDropdown');
+    const accountBtn = document.getElementById("accountBtn");
+    const accountDropdown = document.getElementById("accountDropdown");
+
     if (accountBtn && accountDropdown) {
-      accountBtn.addEventListener('click', (e) => {
+      accountBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        accountDropdown.classList.toggle('show');
-        const expanded = accountBtn.getAttribute('aria-expanded') === 'true';
-        accountBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        accountDropdown.classList.toggle("show");
+
+        const expanded = accountBtn.getAttribute("aria-expanded") === "true";
+        accountBtn.setAttribute("aria-expanded", expanded ? "false" : "true");
       });
-      document.addEventListener('click', (e) => {
-        if (!accountBtn.contains(e.target) && !accountDropdown.contains(e.target)) {
-          accountDropdown.classList.remove('show');
-          accountBtn.setAttribute('aria-expanded', 'false');
+
+      document.addEventListener("click", (e) => {
+        if (
+          !accountBtn.contains(e.target) &&
+          !accountDropdown.contains(e.target)
+        ) {
+          accountDropdown.classList.remove("show");
+          accountBtn.setAttribute("aria-expanded", "false");
         }
       });
+    }
+
+    /* ===== LANGUAGE SWITCH ===== */
+    const languageBtn = document.getElementById("languageBtn");
+    const languageMenu = document.getElementById("languageMenu");
+
+    if (languageBtn) {
+      languageBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        languageMenu.classList.toggle("show");
+      });
+    }
+
+    function changeLang(lang) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", lang);
+      window.location.href = url.toString();
     }
   </script>
 </div>

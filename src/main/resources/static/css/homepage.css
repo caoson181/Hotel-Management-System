@@ -18,8 +18,10 @@ body {
 }
 
 * {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
 }
 
 .container {
@@ -60,7 +62,7 @@ body {
     padding: 1rem 2rem;
 }
 
-.logo h1 a{
+.logo h1 a {
     color: #fff;
     font-size: 1.8rem;
     background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
@@ -115,8 +117,8 @@ body {
 }
 
 .account-btn {
-    border: 1px solid rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.06);
     color: #fff;
     border-radius: 999px;
     padding: 0.35rem 0.8rem;
@@ -141,7 +143,7 @@ header.scrolled .account-btn:hover,
 }
 
 .account-btn:hover {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .account-dropdown {
@@ -151,14 +153,14 @@ header.scrolled .account-btn:hover,
     width: 180px;
     background: #fff;
     border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.2s ease;
     z-index: 100;
-    overflow: hidden;
-    border: 1px solid rgba(0,0,0,0.08);
+    overflow: visible;
+    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .account-dropdown.show {
@@ -179,7 +181,7 @@ header.scrolled .account-btn:hover,
     border: 0;
     background: transparent;
     cursor: pointer;
-    border-bottom: 1px solid rgba(0,0,0,0.04);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .dropdown-link:hover,
@@ -194,6 +196,16 @@ header.scrolled .account-btn:hover,
 .dropdown-form .logout-btn {
     width: 100%;
     text-align: left;
+}
+
+.dropdown-link i {
+    width: 18px;
+    margin-right: 8px;
+    color: #555;
+}
+
+.logout-btn i {
+    color: #e74c3c;
 }
 
 .nav-link:hover {
@@ -266,7 +278,8 @@ header.scrolled .account-btn:hover,
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #000; /* Prevent white flash during fade transitions */
+    background: #000;
+    /* Prevent white flash during fade transitions */
 }
 
 .swiper-slide {
@@ -292,7 +305,7 @@ header.scrolled .account-btn:hover,
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(45deg, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3));
 }
 
 .hero-text {
@@ -308,7 +321,7 @@ header.scrolled .account-btn:hover,
 .hero-text h2 {
     font-size: 3rem;
     margin-bottom: 1rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .hero-text p {
@@ -341,13 +354,25 @@ header.scrolled .account-btn:hover,
 }
 
 @keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 100%;
+    }
 }
 
 @keyframes blink-caret {
-    from, to { border-color: transparent; }
-    50% { border-color: #fff; }
+
+    from,
+    to {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: #fff;
+    }
 }
 
 /* Booking Section */
@@ -372,8 +397,8 @@ header.scrolled .account-btn:hover,
     background: #fff;
     border-radius: 22px;
     overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
-    border: 1px solid rgba(0,0,0,0.03);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .profile-hero {
@@ -389,8 +414,8 @@ header.scrolled .account-btn:hover,
 .profile-banner {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.2), transparent 48%),
-                linear-gradient(150deg, rgba(255,255,255,0.14), rgba(255,255,255,0));
+    background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 48%),
+        linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0));
 }
 
 .profile-avatar {
@@ -405,7 +430,7 @@ header.scrolled .account-btn:hover,
     font-weight: 700;
     color: #4c4c4c;
     background: #fff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
 }
 
 .profile-content {
@@ -431,7 +456,9 @@ header.scrolled .account-btn:hover,
     color: #7f8a9b;
 }
 
-.edit-btn, .btn-primary, .btn-secondary {
+.edit-btn,
+.btn-primary,
+.btn-secondary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -444,35 +471,62 @@ header.scrolled .account-btn:hover,
     transition: all 0.2s ease;
 }
 
-.btn-primary { background: #4ecdc4; color: white; }
-.btn-primary:hover { background: #38b1a8; }
+.btn-primary {
+    background: #4ecdc4;
+    color: white;
+}
 
-.btn-secondary { background: #eef2ff; color: #2f3a55; margin-right: 0.5rem; }
-.btn-secondary:hover { background: #dbe3ff; }
+.btn-primary:hover {
+    background: #38b1a8;
+}
+
+.btn-secondary {
+    background: #eef2ff;
+    color: #2f3a55;
+    margin-right: 0.5rem;
+}
+
+.btn-secondary:hover {
+    background: #dbe3ff;
+}
 
 .profile-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0,1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     margin-top: 0.9rem;
 }
 
 .profile-info-card {
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 10px;
     padding: 1rem;
     background: #fafbff;
 }
 
-.profile-info-card h3 { margin: 0 0 0.45rem; color: #1e2a43; }
+.profile-info-card h3 {
+    margin: 0 0 0.45rem;
+    color: #1e2a43;
+}
 
-.profile-info-card p { margin: 0.25rem 0; color: #3f4f6f; }
+.profile-info-card p {
+    margin: 0.25rem 0;
+    color: #3f4f6f;
+}
 
-.profile-actions { margin-top: 1.4rem; }
+.profile-actions {
+    margin-top: 1.4rem;
+}
 
 @media (max-width: 860px) {
-    .profile-grid { grid-template-columns: 1fr; }
-    .profile-name-row { flex-direction: column; align-items: flex-start; }
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-name-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 .profile-hero-section {
@@ -487,7 +541,7 @@ header.scrolled .account-btn:hover,
 .profile-hero-section .overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.25);
+    background: rgba(0, 0, 0, 0.25);
 }
 
 .profile-hero-section .hero-content {
@@ -504,7 +558,7 @@ header.scrolled .account-btn:hover,
 
 .profile-hero-section p {
     margin-top: 0.6rem;
-    color: rgba(255,255,255,0.92);
+    color: rgba(255, 255, 255, 0.92);
     font-size: 1rem;
     max-width: 600px;
 }
@@ -597,17 +651,28 @@ header.scrolled .account-btn:hover,
     padding: 30px;
     border-radius: 15px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     opacity: 0;
     transform: translateY(30px);
     animation: fadeInUp 0.6s ease forwards;
 }
 
-.feature-card:nth-child(1) { animation-delay: 0.1s; }
-.feature-card:nth-child(2) { animation-delay: 0.2s; }
-.feature-card:nth-child(3) { animation-delay: 0.3s; }
-.feature-card:nth-child(4) { animation-delay: 0.4s; }
+.feature-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.feature-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.feature-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.feature-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
 
 @keyframes fadeInUp {
     to {
@@ -618,7 +683,7 @@ header.scrolled .account-btn:hover,
 
 .feature-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
 
 .feature-card i {
@@ -688,8 +753,15 @@ header.scrolled .account-btn:hover,
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
 }
 
 /* About Section */
@@ -721,7 +793,7 @@ header.scrolled .account-btn:hover,
     width: 100%;
     height: auto;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -734,10 +806,11 @@ header.scrolled .account-btn:hover,
     background: #111;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
     position: relative;
     perspective: 1800px;
-    margin: 80px auto;           /* cách các section khác */
+    margin: 80px auto;
+    /* cách các section khác */
 }
 
 .book-shelf .panel {
@@ -764,19 +837,19 @@ header.scrolled .account-btn:hover,
     flex: 3.2;
     transform: scale(1.07) rotateY(4deg);
     z-index: 30;
-    box-shadow: 0 0 70px rgba(0,0,0,0.8);
+    box-shadow: 0 0 70px rgba(0, 0, 0, 0.8);
 }
 
 .book-shelf .panel::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.82) 28%, transparent 68%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 28%, transparent 68%);
     transition: all 0.75s ease;
 }
 
 .book-shelf .panel:hover::before {
-    background: linear-gradient(to top, rgba(0,0,0,0.48) 38%, transparent 78%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.48) 38%, transparent 78%);
 }
 
 .book-shelf .content {
@@ -797,7 +870,7 @@ header.scrolled .account-btn:hover,
     font-weight: 700;
     letter-spacing: -0.7px;
     margin-bottom: 12px;
-    text-shadow: 0 3px 15px rgba(0,0,0,0.8);
+    text-shadow: 0 3px 15px rgba(0, 0, 0, 0.8);
 }
 
 .book-shelf .desc {
@@ -886,9 +959,11 @@ header.scrolled .account-btn:hover,
     .features-grid {
         grid-template-columns: 1fr;
     }
+
     .bookshelf-title {
         font-size: 2.2rem;
     }
+
     .bookshelf-section {
         padding: 40px 0 30px 0;
     }
@@ -905,4 +980,28 @@ header.scrolled .account-btn:hover,
     }
 }
 
+.language-parent {
+    position: relative;
+}
 
+.language-submenu {
+    position: static;
+    /* 🔥 quan trọng */
+    width: 100%;
+    display: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.language-submenu.show {
+    display: block;
+}
+
+.language-item {
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.language-item:hover {
+    background: #f1f5ff;
+}

@@ -1,5 +1,4 @@
 function loadNavbar() {
-
   const navbarContainer = document.getElementById("navbar-container");
 
   // nếu navbar đã được Thymeleaf render thì không cần fetch
