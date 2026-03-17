@@ -11,6 +11,7 @@ function applyRolePermissions() {
   const rolePermissions = {
     Manager: [
       "viewRoomStatus",
+      "viewRoom",
       "checkEquipment",
       "checkInOut",
       "viewStaff",
@@ -20,7 +21,7 @@ function applyRolePermissions() {
       "viewReports",
     ],
 
-    Receptionist: ["viewRoomStatus", "checkInOut"],
+    Receptionist: ["viewRoomStatus", "checkInOut", "viewRoom"],
 
     Admin: [
       "viewRoomStatus",
@@ -30,7 +31,7 @@ function applyRolePermissions() {
       "viewReports",
     ],
 
-    Housekeeping: ["viewRoomStatus", "checkEquipment"],
+    Housekeeping: ["viewRoomStatus", "checkEquipment", "viewRoom"],
   };
 
   rolePermissions[currentRole].forEach((id) => {

@@ -1,4 +1,5 @@
 function loadNavbar() {
+
   const navbarContainer = document.getElementById("navbar-container");
 
   // nếu navbar đã được Thymeleaf render thì không cần fetch
@@ -33,10 +34,10 @@ function loadNavbar() {
 
     if (avatarEl) {
       avatarEl.innerText = user.name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")
-          .toUpperCase();
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase();
     }
   }
 }
