@@ -29,7 +29,7 @@
   </div>
 
   <!-- SEARCH -->
-  <form class="search-box" th:action="@{/staff/view}" method="get">
+  <form class="search-box" th:action="@{/staff/manage}" method="get">
     <input
             type="text"
             name="keyword"
@@ -109,7 +109,7 @@
   <div class="pagination">
     <a
             th:if="${currentPage > 0}"
-            th:href="@{/staff/view(page=${currentPage-1}, keyword=${keyword})}"
+            th:href="@{/staff/manage(page=${currentPage-1}, keyword=${keyword})}"
     >
       Previous
     </a>
@@ -120,7 +120,7 @@
 
     <a
             th:if="${currentPage < totalPages-1}"
-            th:href="@{/staff/view(page=${currentPage+1}, keyword=${keyword})}"
+            th:href="@{/staff/manage(page=${currentPage+1}, keyword=${keyword})}"
     >
       Next
     </a>

@@ -21,11 +21,6 @@ public class RoomController {
     @Autowired
     private RoomRepository roomRepository;
 
-    @GetMapping("/view-room")
-    public String viewRoom() {
-        return "pages/rooms/view-room";
-    }
-
     @GetMapping("/view-room-status")
     public String viewRoomStatusPage(Model model) {
 
@@ -121,7 +116,29 @@ public class RoomController {
         room.setRoomType(updatedRoom.getRoomType());
         room.setStatus(updatedRoom.getStatus());
         room.setPrice(updatedRoom.getPrice());
+        room.setBasePrice(updatedRoom.getBasePrice());
+        room.setRoomRank(updatedRoom.getRoomRank());
+        room.setDescription(updatedRoom.getDescription());
+        room.setPicture(updatedRoom.getPicture());
 
         return roomRepository.save(room);
+    }
+
+    // ===============================
+// Delete Room
+// ===============================
+    @DeleteMapping("/api/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteRoom(@PathVariable Integer id) {
+
+        if (!roomRepository.existsById(id)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Room not found");
+        }
+
+        roomRepository.deleteById(id);
+
+        return ResponseEntity.ok("Deleted successfully");
     }
 }

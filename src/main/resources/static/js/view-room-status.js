@@ -195,6 +195,8 @@ function viewRoom(id) {
                         </span>
                     </div>
                 </div>
+                
+                
 
                 <div class="detail-item">
                     <div class="detail-label">Base Price:</div>

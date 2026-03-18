@@ -152,6 +152,38 @@
   font-weight: 600;
 }
 
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-available {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-reserved {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.status-occupied {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-checked-out {
+  background: #e2d5f1;
+  color: #5a3e8a;
+}
+
+.status-housekeeping {
+  background: #fff3cd;
+  color: #856404;
+}
+
 /* New Button */
 .new-btn {
   margin-left: auto;

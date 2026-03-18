@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>View Room - Hotel Admin</title>
     <link rel="stylesheet" th:href="@{/css/global.css}" />
@@ -9,128 +9,114 @@
     <link rel="stylesheet" th:href="@{/css/profile.css}" />
     <link rel="stylesheet" th:href="@{/css/view-room.css}" />
     <!-- Font Awesome for icons -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-  </head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
 
-  <body>
-    <div
-      id="navbar-container"
-      th:replace="~{components/navbar :: navbar}"
-    ></div>
+<body>
+<div
+        id="navbar-container"
+        th:replace="~{components/navbar :: navbar}"
+></div>
 
-    <!-- Room View Content -->
-    <div class="room-view-container">
-      <!-- Controls -->
-      <div class="controls">
+<!-- Room View Content -->
+<div class="room-view-container">
+    <!-- Controls -->
+    <div class="controls">
         <div class="search-section">
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input
-              type="text"
-              id="searchInput"
-              placeholder="Search by room number, type..."
-            />
-          </div>
-          <div class="filter-sort">
-            <select class="sort-select" id="sortSelect">
-              <option value="room_number">Room Number</option>
-              <option value="room_type">Room Type</option>
-              <option value="room_rank">Room Rank</option>
-            </select>
-            <div class="sort-order">
-              <button class="active" id="sortAsc" title="Ascending">
-                <i class="fas fa-arrow-up"></i>
-              </button>
-              <button id="sortDesc" title="Descending">
-                <i class="fas fa-arrow-down"></i>
-              </button>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by room number, type...">
             </div>
-          </div>
+            <div class="filter-sort">
+                <select class="sort-select" id="sortSelect">
+                    <option value="room_number">Room Number</option>
+                    <option value="room_type">Room Type</option>
+                    <option value="room_rank">Room Rank</option>
+                </select>
+                <div class="sort-order">
+                    <button class="active" id="sortAsc" title="Ascending"><i class="fas fa-arrow-up"></i></button>
+                    <button id="sortDesc" title="Descending"><i class="fas fa-arrow-down"></i></button>
+                </div>
+            </div>
         </div>
 
         <!-- Status Filter Circles -->
         <div class="status-filter">
-          <div class="status-circle active" data-status="all">
-            <div class="circle">All</div>
-            <span class="circle-label">All Rooms</span>
-          </div>
-          <div class="status-circle" data-status="available">
-            <div class="circle">
-              <i class="fas fa-check"></i>
+            <div class="status-circle active" data-status="all">
+                <div class="circle">All</div>
+                <span class="circle-label">All Rooms</span>
             </div>
-            <span class="circle-label">Available</span>
-          </div>
-          <div class="status-circle" data-status="reserved">
-            <div class="circle">
-              <i class="fas fa-clock"></i>
+            <div class="status-circle" data-status="available">
+                <div class="circle">
+                    <i class="fas fa-check"></i>
+                </div>
+                <span class="circle-label">Available</span>
             </div>
-            <span class="circle-label">Reserved</span>
-          </div>
-          <div class="status-circle" data-status="occupied">
-            <div class="circle">
-              <i class="fas fa-user"></i>
+            <div class="status-circle" data-status="reserved">
+                <div class="circle">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <span class="circle-label">Reserved</span>
             </div>
-            <span class="circle-label">Occupied</span>
-          </div>
-          <div class="status-circle" data-status="checked-out">
-            <div class="circle">
-              <i class="fas fa-sign-out-alt"></i>
+            <div class="status-circle" data-status="occupied">
+                <div class="circle">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="circle-label">Occupied</span>
             </div>
-            <span class="circle-label">Checked Out</span>
-          </div>
-          <div class="status-circle" data-status="housekeeping">
-            <div class="circle">
-              <i class="fas fa-broom"></i>
+            <div class="status-circle" data-status="checked-out">
+                <div class="circle">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <span class="circle-label">Checked Out</span>
             </div>
-            <span class="circle-label">Housekeeping</span>
-          </div>
+            <div class="status-circle" data-status="housekeeping">
+                <div class="circle">
+                    <i class="fas fa-broom"></i>
+                </div>
+                <span class="circle-label">Housekeeping</span>
+            </div>
         </div>
 
         <!-- User Role Indicator -->
         <div class="role-indicator" id="roleIndicator">
-          <i class="fas fa-user-tag"></i>
-          <span id="userRole">Receptionist</span>
+            <i class="fas fa-user-tag"></i>
+            <span id="userRole">Receptionist</span>
         </div>
-      </div>
+    </div>
 
-      <!-- Table -->
-      <div class="table-container">
+    <!-- Table -->
+    <div class="table-container">
         <table id="roomTable">
-          <thead>
+            <thead>
             <tr>
-              <th>Room Number</th>
-              <th>Room Type</th>
-              <th>Status</th>
-              <th>Room Rank</th>
-              <th>Actions</th>
+                <th>Room Number</th>
+                <th>Room Type</th>
+                <th>Status</th>
+                <th>Room Rank</th>
+                <th>Actions</th>
             </tr>
-          </thead>
-          <tbody id="tableBody">
+            </thead>
+            <tbody id="tableBody">
             <!-- Data will be inserted here -->
-          </tbody>
+            </tbody>
         </table>
 
         <!-- Pagination -->
         <div class="pagination" id="pagination"></div>
-      </div>
     </div>
+</div>
 
-    <!-- MODALS from components -->
-    <div th:replace="~{components/modals :: modals}"></div>
+<!-- MODALS from components -->
+<div th:replace="~{components/modals :: modals}"></div>
 
-    <!-- Scripts -->
-    <script th:src="@{/js/main.js}"></script>
-    <script th:src="@{/js/account.js}"></script>
-    <script th:src="@{/js/dropdown.js}"></script>
-    <script th:src="@{/js/role.js}"></script>
-    <script th:src="@{/js/view-room.js}"></script>
-  </body>
+<!-- Scripts -->
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/account.js}"></script>
+<script th:src="@{/js/dropdown.js}"></script>
+<script th:src="@{/js/role.js}"></script>
+<script th:src="@{/js/view-room.js}"></script>
+</body>
 </html>

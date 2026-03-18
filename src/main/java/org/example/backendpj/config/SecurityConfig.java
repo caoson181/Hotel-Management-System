@@ -53,6 +53,26 @@ public class SecurityConfig {
                                 "/components/**",
                                 "/*.html"
                         ).permitAll()
+                        // Staff VIEW (all staff roles)
+                        .requestMatchers("/staff/view/**")
+                        .hasAnyRole("ADMIN", "MANAGER", "RECEPTIONIST", "HOUSEKEEPER")
+
+                        // Staff MANAGE (only Admin & Manager)
+                        .requestMatchers("/staff/manage/**",
+                                "/staff/add",
+                                "/staff/edit/**",
+                                "/staff/delete/**")
+                        .hasAnyRole("ADMIN", "MANAGER")
+
+                        // Staff dashboard
+                        .requestMatchers("/index/**")
+                        .hasAnyRole("ADMIN", "MANAGER", "RECEPTIONIST", "HOUSEKEEPER")
+                        // Only Admin & Manager can access
+                        .requestMatchers("/rooms/view-room-status/**")
+                        .hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/users/manage/**")
+                        .hasAnyRole("ADMIN", "MANAGER")
+                        // Everything else
 
                         .anyRequest().authenticated()
                 )

@@ -21,7 +21,7 @@ function applyRolePermissions() {
       "viewReports",
     ],
 
-    Receptionist: ["viewRoomStatus", "checkInOut", "viewRoom"],
+    Receptionist: ["viewRoomStatus", "checkInOut","viewRoom"],
 
     Admin: [
       "viewRoomStatus",
@@ -31,14 +31,15 @@ function applyRolePermissions() {
       "viewReports",
     ],
 
-    Housekeeping: ["viewRoomStatus", "checkEquipment", "viewRoom"],
+    Housekeeping: ["viewRoomStatus", "checkEquipment","viewRoom"],
   };
 
+  if (rolePermissions[currentRole]) {
   rolePermissions[currentRole].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.style.display = "block";
   });
-
+  }
   allMenus.forEach((menu) => {
     const visible = menu.querySelectorAll(
       ".menu-dropdown a[style='display: block;']"

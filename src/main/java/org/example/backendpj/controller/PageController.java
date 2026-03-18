@@ -63,6 +63,11 @@ public class PageController {
         return "pages/rooms/check-equipment";
     }
 
+    @GetMapping("/rooms/view-room")
+    public String viewRoom() {
+        return "pages/rooms/view-room";
+    }
+
     @GetMapping("/rooms/check-in-out")
     public String checkInOut(){
         return "pages/rooms/check-in-out";

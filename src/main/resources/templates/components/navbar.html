@@ -1,4 +1,4 @@
-<nav class="navbar" th:fragment="navbar">
+<nav class="navbar" th:fragment="navbar" xmlns:sec="http://www.w3.org/1999/xhtml">
   <div class="nav-left">
     <a th:href="@{/index}" class="logo-link">🏨 Hotel Admin</a>
   </div>
@@ -7,71 +7,96 @@
     <div class="menu-item">
       <span>Room Management ▾</span>
       <div class="menu-dropdown">
-        <a th:href="@{/rooms/view-room-status}" id="viewRoomStatus"
-          >View Room Status</a
-        >
-        <a th:href="@{/rooms/view-room}" id="viewRoom"
-          >View Room</a
-        >
-        <a th:href="@{/rooms/check-equipment}" id="checkEquipment"
-          >Check Equipment</a
-        >
-        <a th:href="@{/rooms/check-in-out}" id="checkInOut"
-          >Check In / Check Out</a
-        >
+
+        <!-- Only Admin & Manager -->
+        <a th:href="@{/rooms/view-room-status}"
+           id="viewRoomStatus"
+           sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+          View Room Status
+        </a>
+
+        <!-- Other staff can still see these -->
+        <a th:href="@{/rooms/view-room}" id="viewRoom">
+          View Room
+        </a>
+
+        <a th:href="@{/rooms/check-equipment}" id="checkEquipment">
+          Check Equipment
+        </a>
+
+        <a th:href="@{/rooms/check-in-out}" id="checkInOut">
+          Check In / Check Out
+        </a>
+
       </div>
     </div>
+  </div>
 
-    <div class="menu-item">
-      <span>Staff Management ▾</span>
-      <div class="menu-dropdown">
-        <a th:href="@{/staff/view}" id="viewStaff">View Staff</a>
-        <a th:href="@{/staff/manage}" id="manageStaff">Manage Staff</a>
-      </div>
+  <div class="menu-item">
+    <span>Staff Management ▾</span>
+    <div class="menu-dropdown">
+
+      <!-- Everyone (staff) can see -->
+      <a th:href="@{/staff/view}" id="viewStaff">View Staff</a>
+
+      <!-- Only Admin & Manager -->
+      <a th:href="@{/staff/manage}"
+         id="manageStaff"
+         sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+        Manage Staff
+      </a>
+
+    </div>
+  </div>
+
+  <div class="menu-item"
+       sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+
+    <span>User Management ▾</span>
+
+    <div class="menu-dropdown">
+      <a th:href="@{/users/manage}" id="manageUsers">
+        Manage Users
+      </a>
     </div>
 
-    <div class="menu-item">
-      <span>User Management ▾</span>
-      <div class="menu-dropdown">
-        <a th:href="@{/users/manage}" id="manageUsers">Manage Users</a>
-      </div>
+  </div>
+
+  <div class="menu-item">
+    <span>Revenue ▾</span>
+    <div class="menu-dropdown">
+      <a th:href="@{/revenue/view-revenue}" id="viewRevenue">View Revenue</a>
+    </div>
+  </div>
+
+  <div class="menu-item">
+    <span>Reports ▾</span>
+    <div class="menu-dropdown">
+      <a th:href="@{/reports/view-reports}" id="viewReports">View Reports</a>
+    </div>
+  </div>
+
+  <!-- ACCOUNT -->
+
+  <div class="account" id="accountMenu">
+    <div class="avatar"
+         th:text="${#strings.substring(currentUser.fullName,0,1)}">
     </div>
 
-    <div class="menu-item">
-      <span>Revenue ▾</span>
-      <div class="menu-dropdown">
-        <a th:href="@{/revenue/view-revenue}" id="viewRevenue">View Revenue</a>
-      </div>
-    </div>
+    <div class="account-name" th:text="${currentUser.fullName}"></div>
 
-    <div class="menu-item">
-      <span>Reports ▾</span>
-      <div class="menu-dropdown">
-        <a th:href="@{/reports/view-reports}" id="viewReports">View Reports</a>
-      </div>
-    </div>
+    <div class="dropdown-icon">▼</div>
 
-    <!-- ACCOUNT -->
+    <div class="account-dropdown" id="dropdownMenu">
 
-    <div class="account" id="accountMenu">
-      <div class="avatar"
-           th:text="${#strings.substring(currentUser.fullName,0,1)}">
-      </div>
+      <a th:href="@{/staff/profile}">Profile</a>
 
-      <div class="account-name" th:text="${currentUser.fullName}"></div>
+      <a id="changePasswordBtn">Change Password</a>
 
-      <div class="dropdown-icon">▼</div>
-
-      <div class="account-dropdown" id="dropdownMenu">
-
-        <a id="profileBtn">Profile</a>
-
-        <a id="changePasswordBtn">Change Password</a>
-
-        <form action="/logout" method="post" style="margin: 0">
-          <button
-            type="submit"
-            style="
+      <form action="/logout" method="post" style="margin: 0">
+        <button
+                type="submit"
+                style="
               display: block;
               width: 100%;
               padding: 12px 15px;
@@ -82,12 +107,16 @@
               font-size: 14px;
               cursor: pointer;
             "
-          >
-            Logout
-          </button>
-        </form>
-      </div>
+        >
+          Logout
+        </button>
+      </form>
     </div>
   </div>
+  </div>
 </nav>
+
+
+
+
 
