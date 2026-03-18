@@ -21,6 +21,11 @@ public class RoomController {
     @Autowired
     private RoomRepository roomRepository;
 
+    @GetMapping("/view-room")
+    public String viewRoom() {
+        return "pages/rooms/view-room";
+    }
+
     @GetMapping("/view-room-status")
     public String viewRoomStatusPage(Model model) {
 
