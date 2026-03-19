@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -27,24 +26,26 @@ public class StaffController {
     public String viewStaff(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String role,
             Model model) {
 
-        return loadStaffPage(keyword, page, model, "pages/staff/view-staff");
+        return loadStaffPage(keyword, page, role, model, "pages/staff/view-staff");
     }
 
     @GetMapping("/staff/manage")
     public String manageStaff(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String role,
             Model model) {
 
-        return loadStaffPage(keyword, page, model, "pages/staff/manage-staff");
+        return loadStaffPage(keyword, page, role, model, "pages/staff/manage-staff");
     }
 
     // ================= CREATE STAFF =================
     @PostMapping("/staff/create")
     public String createStaff(@ModelAttribute User user,
-                              RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
 
         // Duplicate username
         if (userRepository.existsByUsername(user.getUsername())) {
@@ -114,7 +115,7 @@ public class StaffController {
 
     @GetMapping("/staff/toggle/{id}")
     public String toggleStaff(@PathVariable Integer id,
-                              RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
 
         User staff = userRepository.findById(id).orElseThrow();
 
@@ -129,21 +130,42 @@ public class StaffController {
     }
 
     // ================= HELPER METHOD =================
-    private String loadStaffPage(String keyword, int page, Model model, String viewName) {
+    private String loadStaffPage(String keyword, int page, String role, Model model, String viewName) {
 
         Page<User> staffPage;
 
-        if (keyword.isEmpty()) {
-            staffPage = userRepository.findByRoleNot("Customer", PageRequest.of(page, 10));
+        if (role != null && !role.isEmpty()) {
+
+            if (keyword.isEmpty()) {
+                staffPage = userRepository.findByRole(role, PageRequest.of(page, 10));
+            } else {
+                staffPage = userRepository
+                        .findByFullNameContainingIgnoreCaseAndRole(keyword, role, PageRequest.of(page, 10));
+            }
+
         } else {
-            staffPage = userRepository
-                    .findByFullNameContainingIgnoreCaseAndRoleNot(keyword, "Customer", PageRequest.of(page, 10));
+
+            if (keyword.isEmpty()) {
+                staffPage = userRepository.findByRoleNot("Customer", PageRequest.of(page, 10));
+            } else {
+                staffPage = userRepository
+                        .findByFullNameContainingIgnoreCaseAndRoleNot(keyword, "Customer", PageRequest.of(page, 10));
+            }
         }
 
+        // ====== DATA TABLE ======
         model.addAttribute("staffList", staffPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", staffPage.getTotalPages());
         model.addAttribute("keyword", keyword);
+        model.addAttribute("role", role);
+
+        // ====== DASHBOARD COUNT ======
+        model.addAttribute("totalStaff", userRepository.countByRoleNot("Customer"));
+        model.addAttribute("totalManager", userRepository.countByRole("Manager"));
+        model.addAttribute("totalAdmin", userRepository.countByRole("Admin"));
+        model.addAttribute("totalReceptionist", userRepository.countByRole("Receptionist"));
+        model.addAttribute("totalHousekeeper", userRepository.countByRole("Housekeeper"));
 
         return viewName;
     }
