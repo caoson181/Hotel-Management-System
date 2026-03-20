@@ -15,6 +15,8 @@ function openEditModal(btn) {
   document.getElementById("editPhone").value = btn.dataset.phone;
   document.getElementById("editGender").value = btn.dataset.gender;
   document.getElementById("editRole").value = btn.dataset.role;
+  document.getElementById("editHireDate").value = btn.dataset.hire;
+  document.getElementById("editSalary").value = btn.dataset.salary;
 
   document.getElementById("editModal").style.display = "block";
 }
@@ -30,6 +32,3 @@ window.onclick = function (e) {
   if (e.target === createModal) createModal.style.display = "none";
   if (e.target === editModal) editModal.style.display = "none";
 };
-
-
-

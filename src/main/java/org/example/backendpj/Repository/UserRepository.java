@@ -1,7 +1,9 @@
 package org.example.backendpj.Repository;
 
 import org.example.backendpj.Entity.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -19,15 +21,19 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
         boolean existsByUsername(String username);
 
+        @EntityGraph(attributePaths = "staff")
         Page<User> findByRoleNot(String role, Pageable pageable);
 
+        @EntityGraph(attributePaths = "staff")
         Page<User> findByFullNameContainingIgnoreCaseAndRoleNot(
                         String fullName,
                         String role,
                         Pageable pageable);
 
+        @EntityGraph(attributePaths = "staff")
         Page<User> findByRole(String role, Pageable pageable);
 
+        @EntityGraph(attributePaths = "staff")
         Page<User> findByFullNameContainingIgnoreCaseAndRole(
                         String keyword, String role, Pageable pageable);
 

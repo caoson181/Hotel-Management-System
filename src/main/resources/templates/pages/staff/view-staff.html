@@ -50,13 +50,15 @@
 
         <td>
           <button class="view-btn" th:attr="
-          data-id=${staff.id},
-          data-name=${staff.fullName},
-          data-email=${staff.email},
-          data-phone=${staff.phoneNumber},
-          data-gender=${staff.gender},
-          data-role=${staff.role},
-          data-status=${staff.enabled}">
+            data-id=${staff.id},
+            data-name=${staff.fullName},
+            data-email=${staff.email},
+            data-phone=${staff.phoneNumber},
+            data-gender=${staff.gender},
+            data-role=${staff.role},
+            data-status=${staff.enabled},
+            data-hire=${staff.staff != null && staff.staff.hireDate != null ? #temporals.format(staff.staff.hireDate, 'yyyy-MM-dd') : ''},
+            data-salary=${staff.staff != null && staff.staff.salary != null ? staff.staff.salary : ''}">
 
             <i class="fa-solid fa-eye"></i>
           </button>
@@ -66,18 +68,26 @@
   </table>
 
   <div class="pagination">
+
+    <!-- Previous -->
     <a th:if="${currentPage > 0}" th:href="@{/staff/view(page=${currentPage-1}, keyword=${keyword})}">
       Previous
     </a>
+    <a th:if="${currentPage == 0}" class="hidden-btn">Previous</a>
 
+    <!-- Page -->
     <span th:text="${currentPage + 1}"></span>
     /
     <span th:text="${totalPages}"></span>
 
+    <!-- Next -->
     <a th:if="${currentPage < totalPages - 1}" th:href="@{/staff/view(page=${currentPage+1}, keyword=${keyword})}">
       Next
     </a>
+    <a th:if="${currentPage >= totalPages - 1}" class="hidden-btn">Next</a>
+
   </div>
+
 
   <div th:replace="~{components/modals :: modals}"></div>
 
@@ -123,6 +133,16 @@
           <div class="info-item">
             <span class="label">Role</span>
             <span class="value" id="m-role"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Hire Date</span>
+            <span class="value" id="m-hireDate"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Salary</span>
+            <span class="value" id="m-salary"></span>
           </div>
 
           <div class="info-item">

@@ -10,6 +10,16 @@ document.querySelectorAll(".view-btn").forEach((btn) => {
     document.getElementById("m-phone").innerText = btn.dataset.phone;
     document.getElementById("m-gender").innerText = btn.dataset.gender;
     document.getElementById("m-role").innerText = btn.dataset.role;
+    document.getElementById("m-salary").innerText = btn.dataset.salary
+      ? Number(btn.dataset.salary).toLocaleString()
+      : "N/A";
+
+    if (btn.dataset.hire) {
+      const d = new Date(btn.dataset.hire);
+      document.getElementById("m-hireDate").innerText = d.toLocaleDateString();
+    } else {
+      document.getElementById("m-hireDate").innerText = "N/A";
+    }
 
     const statusEl = document.getElementById("m-status");
 

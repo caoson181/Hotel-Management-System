@@ -39,6 +39,9 @@ public class User {
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Staff staff;
+
     public User() {
     }
 
@@ -73,6 +76,7 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
+
     public String getEmail() {
         return email;
     }
@@ -112,11 +116,16 @@ public class User {
     public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public Staff getStaff() {
+        return staff;
     }
 }
