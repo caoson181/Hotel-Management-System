@@ -95,16 +95,8 @@ tr:hover {
 }
 
 .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
+    text-align: center;
     margin-top: 20px;
-}
-
-.hidden-btn {
-    visibility: hidden;
-    /* 🔥 giữ layout */
 }
 
 .pagination a {

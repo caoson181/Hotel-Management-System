@@ -1,48 +1,7 @@
 // View Room JavaScript - Cho Receptionist và Housekeeping
 
 // Sample data
-let rooms = [
-    {
-        id: 1,
-        room_number: '101',
-        room_type: 'Single',
-        status: 'available',
-        room_rank: 'Standard',
-        description: 'Standard room with city view'
-    },
-    {
-        id: 2,
-        room_number: '102',
-        room_type: 'Double',
-        status: 'reserved',
-        room_rank: 'Superior',
-        description: 'Deluxe room reserved for VIP'
-    },
-    {
-        id: 3,
-        room_number: '103',
-        room_type: 'Twin',
-        status: 'occupied',
-        room_rank: 'Deluxe',
-        description: 'Suite with guests'
-    },
-    {
-        id: 4,
-        room_number: '104',
-        room_type: 'Triple',
-        status: 'checked-out',
-        room_rank: 'Executive',
-        description: 'Family room ready for cleaning'
-    },
-    {
-        id: 5,
-        room_number: '105',
-        room_type: 'Family',
-        status: 'housekeeping',
-        room_rank: 'Suite',
-        description: 'VIP room being cleaned'
-    }
-];
+let rooms = window.rooms || [];
 
 // User role - Có thể lấy từ session/login
 // Thay đổi giá trị này để test: 'receptionist' hoặc 'housekeeping'
@@ -69,12 +28,14 @@ const statusFlows = {
 // State
 let currentFilter = 'all';
 let currentSort = {
-    field: 'room_number',
+    field: 'roomNumber',
     order: 'asc'
 };
 let searchTerm = '';
-let currentPage = 1;
-const itemsPerPage = 5;
+let currentPage = 0;
+const itemsPerPage = 20;
+
+
 
 // DOM Elements
 let tableBody, searchInput, sortSelect, sortAsc, sortDesc, statusCircles, pagination, roleIndicator;
@@ -105,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             searchTerm = e.target.value.toLowerCase();
-            currentPage = 1;
+            currentPage = 0;
             renderTable();
         });
     }
@@ -142,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusCircles.forEach(c => c.classList.remove('active'));
                 circle.classList.add('active');
                 currentFilter = circle.dataset.status;
-                currentPage = 1;
+                currentPage = 0;
                 renderTable();
             });
         });
@@ -162,74 +123,78 @@ document.addEventListener('DOMContentLoaded', function() {
 function renderTable() {
     if (!tableBody) return;
 
-    // Filter
-    let filteredRooms = rooms.filter(room => {
-        // Status filter
-        if (currentFilter !== 'all' && room.status !== currentFilter) {
-            return false;
-        }
+    fetch(`/api/rooms/search?keyword=${searchTerm}&page=${Math.max(0, currentPage - 0)}
+    &size=${itemsPerPage}
+    &sortField=${currentSort.field}
+    &sortDir=${currentSort.order}`
 
-        // Housekeeping chỉ thấy phòng checked-out
-        if (userRole === 'housekeeping' && room.status !== 'checked-out' && room.status !== 'housekeeping' && currentFilter === 'all') {
-            return false;
-        }
+    )
+        .then(res => res.json())
+        .then(data => {
 
-        // Search filter
-        if (searchTerm) {
-            return room.room_number.toLowerCase().includes(searchTerm) ||
-                   room.room_type.toLowerCase().includes(searchTerm) ||
-                   (room.description && room.description.toLowerCase().includes(searchTerm));
-        }
+            let rooms = data.rooms.map(r => ({
+                id: r.id,
+                roomNumber: r.roomNumber,
+                roomType: r.roomType,
+                roomRank: r.roomRank,
+                status: (r.status || '').toLowerCase()
+            }));
 
-        return true;
-    });
+            // ✅ Filter
+            let filteredRooms = rooms.filter(room => {
+                if (currentFilter !== 'all' && room.status !== currentFilter) {
+                    return false;
+                }
 
-    // Sort
-    filteredRooms.sort((a, b) => {
-        let aVal = a[currentSort.field];
-        let bVal = b[currentSort.field];
+                if (userRole === 'housekeeping' &&
+                    room.status !== 'checked-out' &&
+                    room.status !== 'housekeeping' &&
+                    currentFilter === 'all') {
+                    return false;
+                }
 
-        if (currentSort.field === 'room_number') {
-            aVal = parseInt(aVal);
-            bVal = parseInt(bVal);
-        }
+                return true;
+            });
 
-        if (currentSort.order === 'asc') {
-            return aVal > bVal ? 1 : -1;
-        } else {
-            return aVal < bVal ? 1 : -1;
-        }
-    });
+            // ✅ Sort
 
-    // Pagination
-    const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
-    const start = (currentPage - 1) * itemsPerPage;
-    const paginatedRooms = filteredRooms.slice(start, start + itemsPerPage);
+            filteredRooms.sort((a, b) => {
+                let fieldA = a[currentSort.field]|| '';
+                let fieldB = b[currentSort.field]|| '';
 
-    // Render table rows
-    tableBody.innerHTML = paginatedRooms.map(room => `
-        <tr>
-            <td><strong>${room.room_number}</strong></td>
-            <td>${room.room_type}</td>
-            <td>
-                <span class="status-badge status-${room.status}">
-                    ${formatStatus(room.status)}
-                </span>
-            </td>
-            <td>${room.room_rank}</td>
-            <td>
-                ${renderActionDropdown(room)}
-            </td>
-        </tr>
-    `).join('');
+                // xử lý string
+                if (typeof fieldA === 'string') {
+                    fieldA = fieldA.toLowerCase();
+                    fieldB = fieldB.toLowerCase();
+                }
 
-    // Render pagination
-    renderPagination(totalPages);
+                if (fieldA < fieldB) return currentSort.order === 'asc' ? -1 : 1;
+                if (fieldA > fieldB) return currentSort.order === 'asc' ? 1 : -1;
+                return 0;
+            });
+            // ✅ Render
+            tableBody.innerHTML = filteredRooms.map(room => `
+                <tr>
+                    <td><strong>${room.roomNumber}</strong></td>
+                    <td>${room.roomType}</td>
+                    <td>
+                        <span class="status-badge status-${room.status}">
+                            ${formatStatus(room.status)}
+                        </span>
+                    </td>
+                    <td>${room.roomRank}</td>
+                    <td>${renderActionDropdown(room)}</td>
+                </tr>
+            `).join('');
+
+            // ✅ Pagination dùng từ server
+            renderPagination(data.totalPages);
+        });
 }
 
 // Render action dropdown theo role và status
 function renderActionDropdown(room) {
-    const allowedStatuses = statusFlows[userRole]?.[room.status] || [];
+    const allowedStatuses = statusFlows[userRole]?.[room.status]  || [];
 
     if (allowedStatuses.length === 0) {
         return '<span class="no-action">—</span>';
@@ -300,18 +265,24 @@ function changeRoomStatus(roomId, newStatus) {
 
 // Render pagination
 function renderPagination(totalPages) {
-    if (!pagination) return;
+    pagination.innerHTML = '';
 
-    let paginationHtml = '';
-    for (let i = 1; i <= totalPages; i++) {
-        paginationHtml += `
-            <button class="page-btn ${currentPage === i ? 'active' : ''}"
-                    onclick="goToPage(${i})">${i}</button>
-        `;
+    for (let i = 0; i < totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.innerText = i + 1;
+
+        if (i === currentPage) {
+            btn.classList.add('active');
+        }
+
+        btn.addEventListener('click', () => {
+            currentPage = i;   // ✅ QUAN TRỌNG
+            renderTable();     // ✅ gọi lại API
+        });
+
+        pagination.appendChild(btn);
     }
-    pagination.innerHTML = paginationHtml;
 }
-
 // Go to page
 function goToPage(page) {
     currentPage = page;

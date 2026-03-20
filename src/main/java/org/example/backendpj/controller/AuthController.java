@@ -9,9 +9,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.time.LocalDate;
 
 @Controller
@@ -287,4 +290,45 @@ public class AuthController {
         }
         return "redirect:/auth/login";
     }
+
+    @GetMapping("/index")
+    public String staffHome() {
+        return "index";
+    }
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @PostMapping("/change-password")
+    public String changePassword(@RequestParam String currentPassword,
+                                 @RequestParam String newPassword,
+                                 @RequestParam String confirmPassword,
+                                 Principal principal,
+                                 RedirectAttributes redirectAttributes) {
+
+        User user = userRepository.findByUsername(principal.getName())
+                .orElse(null);
+
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("errorPassword", "User not found");
+            return "redirect:/index";
+        }
+
+        if (!user.getPassword().equals(currentPassword)) {
+            redirectAttributes.addFlashAttribute("errorPassword", "Current password is incorrect");
+            return "redirect:/index";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("errorPassword", "Passwords do not match");
+            return "redirect:/index";
+        }
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
+
+        redirectAttributes.addFlashAttribute("successPassword", "Password updated successfully");
+        return "redirect:/index";
+    }
+
 }

@@ -27,13 +27,14 @@
         <div class="search-section">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search by room number, type...">
+                <input type="text" id="searchInput" name="keyword"
+                       placeholder="Search by room number, type">
             </div>
             <div class="filter-sort">
                 <select class="sort-select" id="sortSelect">
-                    <option value="room_number">Room Number</option>
-                    <option value="room_type">Room Type</option>
-                    <option value="room_rank">Room Rank</option>
+                    <option value="roomNumber">Room Number</option>
+                    <option value="roomType">Room Type</option>
+                    <option value="roomRank">Room Rank</option>
                 </select>
                 <div class="sort-order">
                     <button class="active" id="sortAsc" title="Ascending"><i class="fas fa-arrow-up"></i></button>
@@ -99,12 +100,14 @@
                 <th>Actions</th>
             </tr>
             </thead>
-            <tbody id="tableBody">
-            <!-- Data will be inserted here -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
+
+
         </table>
 
         <!-- Pagination -->
+
+
         <div class="pagination" id="pagination"></div>
     </div>
 </div>
@@ -112,11 +115,37 @@
 <!-- MODALS from components -->
 <div th:replace="~{components/modals :: modals}"></div>
 
+<script th:inline="javascript">
+    window.rooms = [[${rooms}]].map(r => ({
+        room_number: r.roomNumber,
+        room_type: r.roomType,
+        room_rank: r.roomRank,
+        status: r.status.toLowerCase(),
+        description: r.description,
+        id: r.id
+    }));
+</script>
+
 <!-- Scripts -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".search-box form");
+        if (form) {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault(); //
+            });
+        }
+    });
+</script>
+
 <script th:src="@{/js/main.js}"></script>
 <script th:src="@{/js/account.js}"></script>
 <script th:src="@{/js/dropdown.js}"></script>
 <script th:src="@{/js/role.js}"></script>
+
+
 <script th:src="@{/js/view-room.js}"></script>
+
 </body>
 </html>

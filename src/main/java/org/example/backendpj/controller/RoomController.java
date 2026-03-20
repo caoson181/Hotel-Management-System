@@ -9,10 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.ui.Model;
-import java.util.List;
 
 @Controller
 @RequestMapping("/rooms")
@@ -20,6 +20,7 @@ public class RoomController {
 
     @Autowired
     private RoomRepository roomRepository;
+
 
     @GetMapping("/view-room-status")
     public String viewRoomStatusPage(Model model) {
@@ -29,12 +30,15 @@ public class RoomController {
 
         return "pages/rooms/view-room-status";
     }
+
+
     // ===============================
     // Get All Rooms
     // ===============================
     @GetMapping("/api")
     @ResponseBody
     public List<Room> getAllRooms(
+
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "roomNumber") String sortBy,
@@ -141,4 +145,6 @@ public class RoomController {
 
         return ResponseEntity.ok("Deleted successfully");
     }
+
+
 }

@@ -1,12 +1,19 @@
 package org.example.backendpj.controller;
 
+import org.example.backendpj.Entity.Room;
 import org.example.backendpj.Service.UserService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
 import org.springframework.security.core.Authentication;
 import org.example.backendpj.Entity.User;
 import org.example.backendpj.Repository.UserRepository;
+import org.example.backendpj.Repository.RoomRepository;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.security.Principal;
 
@@ -17,11 +24,12 @@ public class PageController {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final RoomRepository roomRepository;
 
-
-    public PageController(UserRepository userRepository, UserService userService) {
+    public PageController(UserRepository userRepository, UserService userService, RoomRepository roomRepository) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.roomRepository = roomRepository;
     }
 
     // ================= ADMIN HOME =================
@@ -64,7 +72,31 @@ public class PageController {
     }
 
     @GetMapping("/rooms/view-room")
-    public String viewRoom() {
+    public String viewRoom(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String keyword,
+            Model model
+    ) {
+
+        int pageSize = 20;
+
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("roomNumber").ascending());
+
+        Page<Room> roomPage;
+
+        if (keyword != null && !keyword.isEmpty()) {
+            roomPage = roomRepository
+                    .findByRoomNumberContainingIgnoreCaseOrRoomTypeContainingIgnoreCase(
+                            keyword, keyword, pageable);
+        } else {
+            roomPage = roomRepository.findAll(pageable);
+        }
+
+        model.addAttribute("rooms", roomPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", roomPage.getTotalPages());
+        model.addAttribute("keyword", keyword);
+
         return "pages/rooms/view-room";
     }
 
@@ -72,6 +104,7 @@ public class PageController {
     public String checkInOut(){
         return "pages/rooms/check-in-out";
     }
+
 
     // ================= STAFF =================
 

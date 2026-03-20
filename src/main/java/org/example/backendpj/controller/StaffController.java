@@ -1,10 +1,6 @@
 package org.example.backendpj.controller;
 
-import java.time.LocalDate;
-
-import org.example.backendpj.Entity.Staff;
 import org.example.backendpj.Entity.User;
-import org.example.backendpj.Repository.StaffRepository;
 import org.example.backendpj.Repository.UserRepository;
 
 import org.springframework.stereotype.Controller;
@@ -20,12 +16,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class StaffController {
 
     private final UserRepository userRepository;
-    private final StaffRepository staffRepository; // 👈 thêm dòng này
 
-    public StaffController(UserRepository userRepository,
-            StaffRepository staffRepository) { // 👈 sửa constructor
+    public StaffController(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.staffRepository = staffRepository;
     }
 
     // ================= VIEW STAFF =================
@@ -52,20 +45,31 @@ public class StaffController {
     // ================= CREATE STAFF =================
     @PostMapping("/staff/create")
     public String createStaff(@ModelAttribute User user,
-            @RequestParam LocalDate hireDate,
-            @RequestParam Double salary,
-            RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes) {
 
-        // validate như cũ...
+        // Duplicate username
+        if (userRepository.existsByUsername(user.getUsername())) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Username already exists!");
+            return "redirect:/staff/manage";
+        }
+
+        // Duplicate email
+        if (userRepository.existsByEmail(user.getEmail())) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Email already exists!");
+            return "redirect:/staff/manage";
+        }
+
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("Receptionist");
+        }
+
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            user.setPassword("123");
+        }
 
         userRepository.save(user);
-
-        Staff staff = new Staff();
-        staff.setUser(user);
-        staff.setHireDate(hireDate);
-        staff.setSalary(salary);
-
-        staffRepository.save(staff);
 
         redirectAttributes.addFlashAttribute("success",
                 "Staff created successfully!");
@@ -75,9 +79,7 @@ public class StaffController {
 
     // ================= UPDATE STAFF =================
     @PostMapping("/staff/update")
-    public String updateStaff(@ModelAttribute User user,
-            @RequestParam LocalDate hireDate,
-            @RequestParam Double salary) {
+    public String updateStaff(@ModelAttribute User user) {
 
         User existing = userRepository.findById(user.getId()).orElseThrow();
 
@@ -88,13 +90,6 @@ public class StaffController {
         existing.setRole(user.getRole());
 
         userRepository.save(existing);
-
-        Staff staff = staffRepository.findByUserId(existing.getId()).orElseThrow();
-
-        staff.setHireDate(hireDate);
-        staff.setSalary(salary);
-
-        staffRepository.save(staff);
 
         return "redirect:/staff/manage";
     }
@@ -120,7 +115,7 @@ public class StaffController {
 
     @GetMapping("/staff/toggle/{id}")
     public String toggleStaff(@PathVariable Integer id,
-            RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes) {
 
         User staff = userRepository.findById(id).orElseThrow();
 
@@ -157,11 +152,6 @@ public class StaffController {
                         .findByFullNameContainingIgnoreCaseAndRoleNot(keyword, "Customer", PageRequest.of(page, 10));
             }
         }
-
-        staffPage.getContent().forEach(u -> {
-            System.out.println("User: " + u.getFullName());
-            System.out.println("Staff: " + u.getStaff());
-        });
 
         // ====== DATA TABLE ======
         model.addAttribute("staffList", staffPage.getContent());

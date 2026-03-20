@@ -2,92 +2,170 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Staff Profile</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <link rel="stylesheet" th:href="@{/css/modal.css}" />
+    <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/profile.css}" />
+
     <style>
-        body { background-color: #f5f7fa;
+        body {
+            background-color: #f5f7fa;
             font-family: Arial, sans-serif;
         }
-.profile-container {
-    max-width: 600px;
-    margin: 60px auto;
-}
 
-.profile-card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    text-align: center;
-}
+        .profile-container {
+            max-width: 600px;
+            margin: 10px auto;
+        }
 
-.profile-avatar {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: #ddd;
-    margin: 0 auto 15px;
-}
+        .profile-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }
 
-.profile-name {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 auto 15px;
+        }
 
-.profile-role {
-    color: #888;
-    margin-bottom: 20px;
-}
+        .profile-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
 
-.profile-info {
-    text-align: left;
-    margin-top: 20px;
-}
+        .profile-role {
+            color: #888;
+            margin-bottom: 20px;
+        }
 
-.profile-info p {
-    margin: 8px 0;
-    font-size: 15px;
-}
+        .profile-info {
+            text-align: left;
+            margin-top: 20px;
+        }
 
-.label {
-    font-weight: bold;
-    color: #333;
-}
+        .profile-info p {
+            margin: 8px 0;
+            font-size: 15px;
+        }
 
-.back-btn {
-    margin-top: 25px;
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 6px;
-    background: #007bff;
-    color: white;
-    text-decoration: none;
-}
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
 
-.back-btn:hover {
-    background: #0056b3;
-}
-</style>
+        .back-btn {
+            margin-top: 25px;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+        }
 
+        .back-btn:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
+
 <body>
+
+<div id="editProfileModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeEditModal">&times;</span>
+
+        <h2>Edit Profile</h2>
+
+        <form th:action="@{/staff/profile/manage/update}" method="post">
+
+            <label>Username</label>
+            <input type="text" name="username" th:value="${user.username}" required>
+
+            <label>Full Name</label>
+            <input type="text" name="fullName" th:value="${user.fullName}" required>
+
+            <label>Gender</label>
+            <select name="gender">
+                <option value="Male" th:selected="${user.gender == 'Male'}">Male</option>
+                <option value="Female" th:selected="${user.gender == 'Female'}">Female</option>
+                <option value="Other" th:selected="${user.gender == 'Other'}">Other</option>
+            </select>
+
+            <input type="date" name="dateOfBirth"
+               th:value="${#temporals.format(user.dateOfBirth, 'yyyy-MM-dd')}">
+
+            <label>Email</label>
+            <input type="text" th:value="${user.email}" disabled>
+
+            <label>Phone</label>
+            <input type="text" th:value="${user.phoneNumber}" disabled>
+
+            <button type="submit" class="save-btn">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<div th:replace="~{components/navbar}"></div>
+
 <div class="profile-container">
-    <div class="profile-card"> <div class="profile-avatar"></div>
-        <div class="profile-name" th:text="${user.fullName}">Full Name</div>
+    <div class="profile-card">
+
+        <div class="profile-avatar"></div>
+
+        <div class="profile-name" th:text="${user.username}">Username</div>
         <div class="profile-role" th:text="${user.role}">Role</div>
-        <div class="profile-info"> <p>
-            <span class="label">Username:</span>
-            <span th:text="${user.username}"></span>
-        </p>
+
+        <div class="profile-info">
+
+            <p>
+                <span class="label">Username:</span>
+                <span th:text="${user.username}"></span>
+            </p>
+
+            <p>
+                <span class="label">Full Name:</span>
+                <span th:text="${user.fullName}"></span>
+            </p>
+
+            <p>
+                <span class="label">Gender:</span>
+                <span th:text="${user.gender}"></span>
+            </p>
+
+            <p>
+                <span class="label">Date of Birth:</span>
+                <span th:text="${user.dateOfBirth}"></span>
+            </p>
+
             <p>
                 <span class="label">Email:</span>
-                <span th:text="${user.email}"></span></p>
+                <span th:text="${user.email}"></span>
+            </p>
+
             <p>
                 <span class="label">Phone:</span>
                 <span th:text="${user.phoneNumber}"></span>
             </p>
 
         </div>
-    <a th:href="@{/index}" class="back-btn">Back</a>
 
-</div> </div> </body> </html>
+        <a th:href="@{/index}" class="back-btn">Back</a>
+
+        <button id="openEditModal" class="back-btn" style="background:#28a745;">
+            Edit Profile
+        </button>
+
+    </div>
+</div>
+
+</body>
+</html>
