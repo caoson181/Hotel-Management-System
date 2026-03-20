@@ -35,4 +35,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
         long countByRoleNot(String role);
 
+        Page<User> findByRoleAndEnabled(String role, boolean enabled, Pageable pageable);
+
+        Page<User> findByFullNameContainingIgnoreCaseAndRoleAndEnabled(
+                        String keyword, String role, boolean enabled, Pageable pageable);
+
+        long countByRoleAndEnabled(String role, boolean enabled);
+
 }
