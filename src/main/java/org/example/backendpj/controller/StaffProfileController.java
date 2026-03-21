@@ -4,6 +4,8 @@ import org.example.backendpj.Entity.User;
 import org.example.backendpj.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -25,7 +27,7 @@ public class StaffProfileController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         model.addAttribute("user", user);
-        return "staff/profile"; // your profile.html
+        return "pages/staff/profile"; // your profile.html
     }
 
     // UPDATE PROFILE
@@ -51,6 +53,12 @@ public class StaffProfileController {
         userRepository.save(currentUser);
 
         // FIX HERE
+        UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                username,
+                currentUser.getPassword(),
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
         redirectAttributes.addFlashAttribute("successProfile", "Profile updated successfully!");
 
         return "redirect:/staff/profile";

@@ -16,131 +16,151 @@
 </head>
 
 <body>
-<div id="navbar-container" th:replace="~{components/navbar :: navbar}"></div>
-<h1>Staff List</h1>
+  <div id="navbar-container" th:replace="~{components/navbar :: navbar}"></div>
+  <h1>Staff List</h1>
 
-<div class="search-box">
-  <form th:action="@{/staff/view}" method="get">
-    <input type="text" name="keyword" th:value="${keyword}" placeholder="Search staff name..." />
-    <button type="submit">Search</button>
-  </form>
-</div>
+  <div class="search-box">
+    <form th:action="@{/staff/view}" method="get">
+      <input type="text" name="keyword" th:value="${keyword}" placeholder="Search staff name..." />
+      <button type="submit">Search</button>
+    </form>
+  </div>
 
-<table class="staff-table">
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Role</th>
-    <th>Status</th>
-    <th>View</th>
-  </tr>
-  </thead>
+  <table class="staff-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>View</th>
+      </tr>
+    </thead>
 
-  <tbody>
-  <tr th:each="staff : ${staffList}">
-    <td th:text="${staff.id}"></td>
-    <td th:text="${staff.fullName}"></td>
-    <td th:text="${staff.role}"></td>
+    <tbody>
+      <tr th:each="staff : ${staffList}">
+        <td th:text="${staff.id}"></td>
+        <td th:text="${staff.fullName}"></td>
+        <td th:text="${staff.role}"></td>
 
-    <td>
-      <span th:if="${staff.enabled}" class="status-active">Active</span>
-      <span th:unless="${staff.enabled}" class="status-disabled">Disabled</span>
-    </td>
+        <td>
+          <span th:if="${staff.enabled}" class="status-active">Active</span>
+          <span th:unless="${staff.enabled}" class="status-disabled">Disabled</span>
+        </td>
 
-    <td>
-      <button class="view-btn" th:attr="
-          data-id=${staff.id},
-          data-name=${staff.fullName},
-          data-email=${staff.email},
-          data-phone=${staff.phoneNumber},
-          data-gender=${staff.gender},
-          data-role=${staff.role},
-          data-status=${staff.enabled}">
+        <td>
+          <button class="view-btn" th:attr="
+            data-id=${staff.id},
+            data-name=${staff.fullName},
+            data-email=${staff.email},
+            data-phone=${staff.phoneNumber},
+            data-gender=${staff.gender},
+            data-role=${staff.role},
+            data-status=${staff.enabled},
+            data-salary=${staff.staff != null ? staff.staff.salary : ''},
+            data-hiredate=${staff.staff != null ? staff.staff.hireDate : ''}">
 
-        <i class="fa-solid fa-eye"></i>
-      </button>
-    </td>
-  </tr>
-  </tbody>
-</table>
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
-<div class="pagination">
-  <a th:if="${currentPage > 0}" th:href="@{/staff/view(page=${currentPage-1}, keyword=${keyword})}">
-    Previous
-  </a>
+  <div class="pagination">
 
-  <span th:text="${currentPage + 1}"></span>
-  /
-  <span th:text="${totalPages}"></span>
+    <a th:if="${currentPage > 0}" th:href="@{/staff/view(page=${currentPage-1}, keyword=${keyword}, role=${role})}">
+      Previous
+    </a>
 
-  <a th:if="${currentPage < totalPages - 1}" th:href="@{/staff/view(page=${currentPage+1}, keyword=${keyword})}">
-    Next
-  </a>
-</div>
+    <span th:unless="${currentPage > 0}" class="hidden">Previous</span>
 
-<div th:replace="~{components/modals :: modals}"></div>
+    <span class="page-info">
+      <span th:text="${(currentPage ?: 0) + 1}"></span> /
+      <span th:text="${totalPages}"></span>
+    </span>
 
-<div id="staffModal" class="modal">
-  <div class="modal-content">
+    <a th:if="${currentPage < totalPages-1}"
+      th:href="@{/staff/view(page=${currentPage+1}, keyword=${keyword}, role=${role})}">
+      Next
+    </a>
 
-    <div class="modal-header">
-      <div class="header-left">
-        <i class="fa-solid fa-user"></i>
-        <h2>Staff Details</h2>
-      </div>
-      <span class="close">&times;</span>
-    </div>
-
-    <div class="modal-body">
-      <div class="info-grid">
-
-        <div class="info-item">
-          <span class="label">ID</span>
-          <span class="value" id="m-id"></span>
-        </div>
-
-        <div class="info-item">
-          <span class="label">Name</span>
-          <span class="value" id="m-name"></span>
-        </div>
-
-        <div class="info-item">
-          <span class="label">Email</span>
-          <span class="value" id="m-email"></span>
-        </div>
-
-        <div class="info-item">
-          <span class="label">Phone</span>
-          <span class="value" id="m-phone"></span>
-        </div>
-
-        <div class="info-item">
-          <span class="label">Gender</span>
-          <span class="value" id="m-gender"></span>
-        </div>
-
-        <div class="info-item">
-          <span class="label">Role</span>
-          <span class="value" id="m-role"></span>
-        </div>
-
-        <div class="info-item">
-          <span class="label">Status</span>
-          <span id="m-status" class="status-badge"></span>
-        </div>
-
-      </div>
-    </div>
+    <span th:unless="${currentPage < totalPages-1}" class="hidden">Next</span>
 
   </div>
-</div>
 
-<script th:src="@{/js/main.js}"></script>
-<script th:src="@{/js/account.js}"></script>
-<script th:src="@{/js/dropdown.js}"></script>
-<script th:src="@{/js/role.js}"></script>
-<script th:src="@{/js/view-staff.js}"></script>
+  <div th:replace="~{components/modals :: modals}"></div>
+
+  <div id="staffModal" class="modal">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <div class="header-left">
+          <i class="fa-solid fa-user"></i>
+          <h2>Staff Details</h2>
+        </div>
+        <span class="close">&times;</span>
+      </div>
+
+      <div class="modal-body">
+        <div class="info-grid">
+
+          <div class="info-item">
+            <span class="label">ID</span>
+            <span class="value" id="m-id"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Name</span>
+            <span class="value" id="m-name"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Email</span>
+            <span class="value" id="m-email"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Phone</span>
+            <span class="value" id="m-phone"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Gender</span>
+            <span class="value" id="m-gender"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Role</span>
+            <span class="value" id="m-role"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Salary</span>
+            <span class="value" id="m-salary"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Hire Date</span>
+            <span class="value" id="m-hiredate"></span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Status</span>
+            <span id="m-status" class="status-badge"></span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script th:src="@{/js/main.js}"></script>
+  <script th:src="@{/js/account.js}"></script>
+  <script th:src="@{/js/dropdown.js}"></script>
+  <script th:src="@{/js/role.js}"></script>
+  <script th:src="@{/js/view-staff.js}"></script>
 </body>
 
 </html>

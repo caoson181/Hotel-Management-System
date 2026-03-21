@@ -1,8 +1,9 @@
+/* ===================== GLOBAL ===================== */
 body {
     font-family: Arial, sans-serif;
     background: #f5f6fa;
     margin: 0;
-    padding: 0px;
+    padding: 0;
 }
 
 h1 {
@@ -10,6 +11,7 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* ===================== SEARCH BOX ===================== */
 .search-box {
     text-align: center;
     margin-bottom: 20px;
@@ -26,6 +28,7 @@ h1 {
     border-radius: 6px;
 }
 
+/* ===================== INPUT + BUTTON ===================== */
 input[type="text"] {
     padding: 8px;
     width: 250px;
@@ -46,7 +49,8 @@ button:hover {
     background: #2980b9;
 }
 
-table {
+/* ===================== TABLE ===================== */
+.staff-table {
     width: 90%;
     margin: 20px auto;
     border-collapse: collapse;
@@ -56,28 +60,27 @@ table {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-th,
-td {
+.staff-table th,
+.staff-table td {
     padding: 12px;
     border-bottom: 1px solid #eee;
     text-align: center;
 }
 
-th {
+.staff-table th {
     background: #1e293b;
-    /* đậm hơn */
     color: white;
-    text-align: center;
 }
 
-tr {
+.staff-table tr {
     transition: 0.2s;
 }
 
-tr:hover {
+.staff-table tr:hover {
     background: #f2f2f2;
 }
 
+/* ===================== STATUS ===================== */
 .status-active {
     background: #d1fae5;
     color: #065f46;
@@ -94,23 +97,7 @@ tr:hover {
     font-size: 12px;
 }
 
-.pagination {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.pagination a {
-    padding: 8px 14px;
-    margin: 4px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-
-.pagination a:hover {
-    background: #2563eb;
-    color: white;
-}
-
+/* ===================== VIEW BUTTON ===================== */
 .view-btn {
     background: #2563eb;
     border: none;
@@ -125,6 +112,31 @@ tr:hover {
     background: #1e40af;
 }
 
+/* ===================== PAGINATION ===================== */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.pagination a {
+    padding: 6px 12px;
+    background: #3fa7f4;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.pagination .hidden {
+    visibility: hidden;
+}
+
+.page-info {
+    font-weight: bold;
+}
+
+/* ===================== MODAL ===================== */
 .modal {
     display: none;
     position: fixed;
@@ -138,6 +150,7 @@ tr:hover {
     align-items: center;
 }
 
+/* ===================== MODAL CONTENT ===================== */
 .modal-content {
     width: 500px;
     background: white;
@@ -146,7 +159,7 @@ tr:hover {
     animation: fadeIn 0.3s ease;
 }
 
-/* HEADER */
+/* ===================== MODAL HEADER ===================== */
 .modal-header {
     background: linear-gradient(135deg, #6366f1, #7c3aed);
     color: white;
@@ -166,7 +179,7 @@ tr:hover {
     font-size: 20px;
 }
 
-/* CLOSE BUTTON */
+/* ===================== CLOSE BUTTON ===================== */
 .close {
     font-size: 22px;
     cursor: pointer;
@@ -177,19 +190,19 @@ tr:hover {
     opacity: 1;
 }
 
-/* BODY */
+/* ===================== MODAL BODY ===================== */
 .modal-body {
     padding: 20px;
 }
 
-/* GRID */
+/* ===================== INFO GRID ===================== */
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
 }
 
-/* ITEM */
+/* ===================== INFO ITEM ===================== */
 .info-item {
     display: flex;
     flex-direction: column;
@@ -198,21 +211,21 @@ tr:hover {
     border-radius: 10px;
 }
 
-/* LABEL */
+/* ===================== LABEL ===================== */
 .label {
     font-size: 12px;
     color: #6b7280;
     margin-bottom: 4px;
 }
 
-/* VALUE */
+/* ===================== VALUE ===================== */
 .value {
     font-size: 15px;
     font-weight: 600;
     color: #111827;
 }
 
-/* STATUS BADGE */
+/* ===================== STATUS BADGE (MODAL) ===================== */
 .status-badge {
     padding: 6px 12px;
     border-radius: 20px;
@@ -231,7 +244,7 @@ tr:hover {
     color: white;
 }
 
-/* animation */
+/* ===================== ANIMATION ===================== */
 @keyframes fadeIn {
     from {
         opacity: 0;

@@ -1,6 +1,10 @@
 package org.example.backendpj.controller;
 
+import java.time.LocalDate;
+
+import org.example.backendpj.Entity.Staff;
 import org.example.backendpj.Entity.User;
+import org.example.backendpj.Repository.StaffRepository;
 import org.example.backendpj.Repository.UserRepository;
 
 import org.springframework.stereotype.Controller;
@@ -10,15 +14,20 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class StaffController {
 
     private final UserRepository userRepository;
+    private final StaffRepository staffRepository;
 
-    public StaffController(UserRepository userRepository) {
+    public StaffController(UserRepository userRepository,
+            StaffRepository staffRepository) {
         this.userRepository = userRepository;
+        this.staffRepository = staffRepository;
     }
 
     // ================= VIEW STAFF =================
@@ -45,19 +54,17 @@ public class StaffController {
     // ================= CREATE STAFF =================
     @PostMapping("/staff/create")
     public String createStaff(@ModelAttribute User user,
-                              RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) String hireDate,
+            @RequestParam(required = false) Double salary,
+            RedirectAttributes redirectAttributes) {
 
-        // Duplicate username
         if (userRepository.existsByUsername(user.getUsername())) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Username already exists!");
+            redirectAttributes.addFlashAttribute("error", "Username already exists!");
             return "redirect:/staff/manage";
         }
 
-        // Duplicate email
         if (userRepository.existsByEmail(user.getEmail())) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Email already exists!");
+            redirectAttributes.addFlashAttribute("error", "Email already exists!");
             return "redirect:/staff/manage";
         }
 
@@ -69,20 +76,37 @@ public class StaffController {
             user.setPassword("123");
         }
 
-        userRepository.save(user);
+        // 👉 Save user
+        User savedUser = userRepository.save(user);
 
-        redirectAttributes.addFlashAttribute("success",
-                "Staff created successfully!");
+        // 👉 Save staff
+        if (hireDate != null && salary != null) {
+            Staff staff = new Staff();
+            staff.setUser(savedUser);
+            staff.setHireDate(LocalDate.parse(hireDate));
+            staff.setSalary(salary);
+
+            staffRepository.save(staff);
+        }
+
+        redirectAttributes.addFlashAttribute("success", "Staff created successfully!");
 
         return "redirect:/staff/manage";
     }
 
     // ================= UPDATE STAFF =================
     @PostMapping("/staff/update")
-    public String updateStaff(@ModelAttribute User user) {
+    public String updateStaff(@ModelAttribute User user,
+            @RequestParam(required = false) String hireDate,
+            @RequestParam(required = false) Double salary) {
 
         User existing = userRepository.findById(user.getId()).orElseThrow();
 
+        String currentLogin = SecurityContextHolder.getContext().getAuthentication().getName();
+        String oldUsername = existing.getUsername(); // lưu trước khi đổi
+
+        // ===== UPDATE USER =====
+        existing.setUsername(user.getUsername());
         existing.setFullName(user.getFullName());
         existing.setEmail(user.getEmail());
         existing.setPhoneNumber(user.getPhoneNumber());
@@ -90,6 +114,28 @@ public class StaffController {
         existing.setRole(user.getRole());
 
         userRepository.save(existing);
+
+        // ===== UPDATE STAFF =====
+        if (hireDate != null && salary != null) {
+
+            Staff staff = staffRepository.findByUserId(existing.getId())
+                    .orElse(new Staff());
+
+            staff.setUser(existing);
+            staff.setHireDate(LocalDate.parse(hireDate));
+            staff.setSalary(salary);
+
+            staffRepository.save(staff);
+        }
+        if (currentLogin.equals(oldUsername)) {
+
+            UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                    existing.getUsername(),
+                    existing.getPassword(),
+                    SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+        }
 
         return "redirect:/staff/manage";
     }
@@ -115,7 +161,7 @@ public class StaffController {
 
     @GetMapping("/staff/toggle/{id}")
     public String toggleStaff(@PathVariable Integer id,
-                              RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes) {
 
         User staff = userRepository.findById(id).orElseThrow();
 

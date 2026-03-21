@@ -16,6 +16,10 @@ function openEditModal(btn) {
   document.getElementById("editGender").value = btn.dataset.gender;
   document.getElementById("editRole").value = btn.dataset.role;
 
+  // 👉 THÊM 2 DÒNG NÀY
+  document.getElementById("editHireDate").value = btn.dataset.hiredate;
+  document.getElementById("editSalary").value = btn.dataset.salary;
+
   document.getElementById("editModal").style.display = "block";
 }
 

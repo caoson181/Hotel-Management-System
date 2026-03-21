@@ -15,207 +15,328 @@
 
 
 <body>
-<div id="navbar-container" th:replace="~{components/navbar :: navbar}"></div>
+  <div id="navbar-container" th:replace="~{components/navbar :: navbar}"></div>
 
-<div class="container">
+  <div class="container">
 
-  <div class="header">
-    <h2>Staff Management</h2>
-    <button class="btn btn-add" onclick="openCreateModal()">+ Add Staff</button>
-  </div>
-
-  <div class="cards">
-
-    <div class="card" th:classappend="${role == null or role == ''} ? 'active'"
-         onclick="window.location='?role=&keyword='">
-      <i class="fas fa-users"></i>
-      <div>
-        <p>Total Staff</p>
-        <h3 th:text="${totalStaff}">0</h3>
-      </div>
+    <div class="header">
+      <h2>Staff Management</h2>
+      <button class="btn btn-add" onclick="openCreateModal()">+ Add Staff</button>
     </div>
 
-    <div class="card manager" th:classappend="${role == 'Manager'} ? 'active'"
-         onclick="window.location='?role=Manager'">
-      <i class="fas fa-user-tie"></i>
-      <div>
-        <p>Managers</p>
-        <h3 th:text="${totalManager}">0</h3>
+    <div class="cards">
+
+      <div class="card" th:classappend="${role == null or role == ''} ? 'active'"
+        onclick="window.location='?role=&keyword='">
+        <i class="fas fa-users"></i>
+        <div>
+          <p>Total Staff</p>
+          <h3 th:text="${totalStaff}">0</h3>
+        </div>
       </div>
+
+      <div class="card manager" th:classappend="${role == 'Manager'} ? 'active'"
+        onclick="window.location='?role=Manager'">
+        <i class="fas fa-user-tie"></i>
+        <div>
+          <p>Managers</p>
+          <h3 th:text="${totalManager}">0</h3>
+        </div>
+      </div>
+
+      <div class="card admin" th:classappend="${role == 'Admin'} ? 'active'" onclick="window.location='?role=Admin'">
+        <i class="fas fa-user-shield"></i>
+        <div>
+          <p>Admins</p>
+          <h3 th:text="${totalAdmin}">0</h3>
+        </div>
+      </div>
+
+      <div class="card receptionist" th:classappend="${role == 'Receptionist'} ? 'active'"
+        onclick="window.location='?role=Receptionist'">
+        <i class="fas fa-concierge-bell"></i>
+        <div>
+          <p>Receptionists</p>
+          <h3 th:text="${totalReceptionist}">0</h3>
+        </div>
+      </div>
+
+      <div class="card housekeeper" th:classappend="${role == 'Housekeeper'} ? 'active'"
+        onclick="window.location='?role=Housekeeper'">
+        <i class="fas fa-broom"></i>
+        <div>
+          <p>Housekeepers</p>
+          <h3 th:text="${totalHousekeeper}">0</h3>
+        </div>
+      </div>
+
     </div>
 
-    <div class="card admin" th:classappend="${role == 'Admin'} ? 'active'" onclick="window.location='?role=Admin'">
-      <i class="fas fa-user-shield"></i>
-      <div>
-        <p>Admins</p>
-        <h3 th:text="${totalAdmin}">0</h3>
-      </div>
+    <div th:if="${success}" class="alert-success">
+      <span th:text="${success}"></span>
     </div>
 
-    <div class="card reception" th:classappend="${role == 'Receptionist'} ? 'active'"
-         onclick="window.location='?role=Receptionist'">
-      <i class="fas fa-concierge-bell"></i>
-      <div>
-        <p>Receptionists</p>
-        <h3 th:text="${totalReceptionist}">0</h3>
-      </div>
+    <div th:if="${error}" class="alert-error">
+      <span th:text="${error}"></span>
     </div>
 
-    <div class="card housekeeper" th:classappend="${role == 'Housekeeper'} ? 'active'"
-         onclick="window.location='?role=Housekeeper'">
-      <i class="fas fa-broom"></i>
-      <div>
-        <p>Housekeepers</p>
-        <h3 th:text="${totalHousekeeper}">0</h3>
-      </div>
-    </div>
-
-  </div>
-
-  <div th:if="${success}" class="alert-success">
-    <span th:text="${success}"></span>
-  </div>
-
-  <div th:if="${error}" class="alert-error">
-    <span th:text="${error}"></span>
-  </div>
-
-  <form class="search-box" th:action="@{/staff/manage}" method="get">
-    <input type="hidden" name="role" th:value="${role}">
-    <input type="text" name="keyword" placeholder="Search staff..." th:value="${keyword}" />
-    <button type="submit">Search</button>
-  </form>
-
-  <table>
-    <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Username</th>
-      <th>Email</th>
-      <th>Phone</th>
-      <th>Gender</th>
-      <th>Role</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    <tr th:each="staff : ${staffList}">
-      <td th:text="${staff.id}"></td>
-      <td th:text="${staff.fullName}"></td>
-      <td th:text="${staff.username}"></td>
-      <td th:text="${staff.email}"></td>
-      <td th:text="${staff.phoneNumber}"></td>
-      <td th:text="${staff.gender}"></td>
-      <td th:text="${staff.role}"></td>
-      <td>
-        <span th:if="${staff.enabled}" class="badge active">Active</span>
-        <span th:unless="${staff.enabled}" class="badge disabled">Disabled</span>
-      </td>
-
-      <td>
-        <button class="btn btn-edit" th:attr="data-id=${staff.id},
-                 data-name=${staff.fullName},
-                 data-username=${staff.username},
-                 data-email=${staff.email},
-                 data-phone=${staff.phoneNumber},
-                 data-gender=${staff.gender},
-                 data-role=${staff.role}" onclick="openEditModal(this)">
-          Edit
-        </button>
-
-        <a th:href="@{/staff/toggle/{id}(id=${staff.id})}" onclick="return confirm('Are you sure?')">
-          <button th:class="${staff.enabled} ? 'btn btn-disable' : 'btn btn-enable'">
-            <span th:text="${staff.enabled} ? 'Disable' : 'Enable'"></span>
-          </button>
-        </a>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-
-  <div class="pagination">
-
-    <a th:if="${currentPage > 0}" th:href="@{/staff/manage(page=${currentPage-1}, keyword=${keyword}, role=${role})}">
-      Previous
-    </a>
-
-    <span th:text="${(currentPage ?: 0) + 1}"></span> /
-    <span th:text="${totalPages}"></span>
-
-    <a th:if="${currentPage < totalPages-1}"
-       th:href="@{/staff/manage(page=${currentPage+1}, keyword=${keyword}, role=${role})}">
-      Next
-    </a>
-
-  </div>
-</div>
-
-
-<!-- CREATE MODAL -->
-<div id="createModal" class="modal">
-  <div class="modal-content">
-    <h3>Create Staff</h3>
-    <form th:action="@{/staff/create}" method="post">
-      <input type="text" name="fullName" placeholder="Full Name" required />
-      <input type="text" name="username" placeholder="Username" required />
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="text" name="phoneNumber" placeholder="Phone" />
-
-      <select name="gender">
-        <option>Male</option>
-        <option>Female</option>
-      </select>
-
-      <input type="password" name="password" placeholder="Password" />
-      <input type="date" name="dateOfBirth" />
-
-      <select name="role">
-        <option>Manager</option>
-        <option>Admin</option>
-        <option>Receptionist</option>
-        <option>Housekeeper</option>
-      </select>
-
-      <button type="submit" class="btn btn-add">Create</button>
-      <button type="button" onclick="closeCreateModal()">Cancel</button>
+    <form class="search-box" th:action="@{/staff/manage}" method="get">
+      <input type="hidden" name="role" th:value="${role}">
+      <input type="text" name="keyword" placeholder="Search staff..." th:value="${keyword}" />
+      <button type="submit">Search</button>
     </form>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Gender</th>
+            <th>Role</th>
+            <th>Hire Date</th>
+            <th>Salary</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr th:each="user : ${staffList}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.fullName}"></td>
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.email}"></td>
+            <td th:text="${user.phoneNumber}"></td>
+            <td th:text="${user.gender}"></td>
+            <td th:text="${user.role}"></td>
+            <td th:text="${user.staff != null ? user.staff.hireDate : ''}"></td>
+            <td th:text="${user.staff != null ? user.staff.salary : ''}"></td>
+            <td>
+              <span th:if="${user.enabled}" class="badge active">Active</span>
+              <span th:unless="${user.enabled}" class="badge disabled">Disabled</span>
+            </td>
+
+            <td>
+              <button class="btn btn-edit" th:attr="data-id=${user.id},
+                 data-name=${user.fullName},
+                 data-username=${user.username},
+                 data-email=${user.email},
+                 data-phone=${user.phoneNumber},
+                 data-gender=${user.gender},
+                 data-role=${user.role},
+                 data-hiredate=${user.staff != null ? user.staff.hireDate : ''},
+                 data-salary=${user.staff != null ? user.staff.salary : ''}" onclick="openEditModal(this)">
+                Edit
+              </button>
+
+              <a th:href="@{/staff/toggle/{id}(id=${user.id})}" onclick="return confirm('Are you sure?')">
+                <button th:class="${user.enabled} ? 'btn btn-disable' : 'btn btn-enable'">
+                  <span th:text="${user.enabled} ? 'Disable' : 'Enable'"></span>
+                </button>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+
+      <a th:if="${currentPage > 0}" th:href="@{/staff/manage(page=${currentPage-1}, keyword=${keyword}, role=${role})}">
+        Previous
+      </a>
+
+      <span th:unless="${currentPage > 0}" class="hidden">Previous</span>
+
+      <span class="page-info">
+        <span th:text="${(currentPage ?: 0) + 1}"></span> /
+        <span th:text="${totalPages}"></span>
+      </span>
+
+      <a th:if="${currentPage < totalPages-1}"
+        th:href="@{/staff/manage(page=${currentPage+1}, keyword=${keyword}, role=${role})}">
+        Next
+      </a>
+
+      <span th:unless="${currentPage < totalPages-1}" class="hidden">Next</span>
+
+    </div>
   </div>
-</div>
 
-<!-- EDIT MODAL -->
-<div id="editModal" class="modal">
-  <div class="modal-content">
-    <h3>Edit Staff</h3>
-    <form th:action="@{/staff/update}" method="post">
-      <input type="hidden" name="id" id="editId" />
 
-      <input type="text" name="fullName" id="editName" />
-      <input type="text" name="username" id="editUsername" />
-      <input type="email" name="email" id="editEmail" />
-      <input type="text" name="phoneNumber" id="editPhone" />
+  <!-- CREATE MODAL -->
+  <div id="createModal" class="modal">
+    <div class="modal-content">
+      <h3>Create Staff</h3>
 
-      <select name="gender" id="editGender">
-        <option>Male</option>
-        <option>Female</option>
-      </select>
+      <form th:action="@{/staff/create}" method="post">
 
-      <select name="role" id="editRole">
-        <option>Manager</option>
-        <option>Admin</option>
-        <option>Receptionist</option>
-        <option>Housekeeper</option>
-      </select>
+        <h4>👤 Profile Info</h4>
 
-      <button type="submit" class="btn btn-edit">Update</button>
-      <button type="button" onclick="closeEditModal()">Cancel</button>
-    </form>
+        <div class="form-grid">
+
+          <div>
+            <label>👤 Full Name</label>
+            <input type="text" name="fullName" required />
+          </div>
+
+          <div>
+            <label>🆔 Username</label>
+            <input type="text" name="username" required />
+          </div>
+
+          <div>
+            <label>📧 Email</label>
+            <input type="email" name="email" required />
+          </div>
+
+          <div>
+            <label>📱 Phone</label>
+            <input type="text" name="phoneNumber" />
+          </div>
+
+          <div>
+            <label>⚧ Gender</label>
+            <select name="gender">
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          </div>
+
+          <div>
+            <label>🎂 Date of Birth</label>
+            <input type="date" name="dateOfBirth" />
+          </div>
+
+          <div>
+            <label>🔒 Password</label>
+            <input type="password" name="password" required />
+          </div>
+
+        </div>
+
+        <h4>💼 Job Info</h4>
+
+        <div class="form-grid">
+
+          <div>
+            <label>💼 Role</label>
+            <select name="role">
+              <option>Manager</option>
+              <option>Admin</option>
+              <option>Receptionist</option>
+              <option>Housekeeper</option>
+            </select>
+          </div>
+
+          <div>
+            <label>📅 Hire Date</label>
+            <input type="date" name="hireDate" />
+          </div>
+
+          <div>
+            <label>💰 Salary</label>
+            <input type="number" name="salary" step="0.01" />
+          </div>
+
+        </div>
+
+        <button type="submit" class="btn btn-add">Create</button>
+
+      </form>
+    </div>
   </div>
-</div>
 
-<script th:src="@{/js/manage-staff.js}"></script>
+  <!-- EDIT MODAL -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h3>Edit Staff</h3>
+      <form th:action="@{/staff/update}" method="post">
+
+        <input type="hidden" name="id" id="editId" />
+
+        <h4>👤 Profile Info</h4>
+
+        <div class="form-grid">
+
+          <div>
+            <label>👤 Full Name</label>
+            <input type="text" name="fullName" id="editName" />
+          </div>
+
+          <div>
+            <label>🆔 Username</label>
+            <input type="text" name="username" id="editUsername" />
+          </div>
+
+          <div>
+            <label>📧 Email</label>
+            <input type="email" name="email" id="editEmail" />
+          </div>
+
+          <div>
+            <label>📱 Phone</label>
+            <input type="text" name="phoneNumber" id="editPhone" />
+          </div>
+
+        </div>
+
+        <div class="form-grid">
+
+          <div>
+            <label>⚧ Gender</label>
+            <select name="gender" id="editGender">
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+          </div>
+
+          <div>
+            <label>🎂 Date of Birth</label>
+            <input type="date" name="dateOfBirth" id="editDob" />
+          </div>
+
+        </div>
+
+        <h4>💼 Job Info</h4>
+
+        <div class="form-grid">
+
+          <div>
+            <label>💼 Role</label>
+            <select name="role" id="editRole">
+              <option>Manager</option>
+              <option>Admin</option>
+              <option>Receptionist</option>
+              <option>Housekeeper</option>
+            </select>
+          </div>
+
+          <div>
+            <label>📅 Hire Date</label>
+            <input type="date" name="hireDate" id="editHireDate" />
+          </div>
+
+          <div>
+            <label>💰 Salary</label>
+            <input type="number" name="salary" id="editSalary" step="0.01" />
+          </div>
+
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-edit">Update</button>
+          <button type="button" onclick="closeEditModal()">Cancel</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script th:src="@{/js/manage-staff.js}"></script>
 
 </body>
 

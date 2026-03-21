@@ -9,4 +9,5 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
 
     Optional<Staff> findByUserId(Integer userId);
 
+
 }
