@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>About - Zero Gravity Hotel</title>
+    <title>About Gravity Hotel</title>
     <link rel="stylesheet" th:href="@{/css/homepage.css}" />
     <link rel="stylesheet" th:href="@{/css/about.css}" />
     <link
@@ -24,26 +24,10 @@
         <!-- Top Section: Text Left, Image Right -->
         <div class="about-top">
           <div class="about-text">
-            <h2>About Gravity Hotel</h2>
-            <p>
-              Gravity Hotel offers an unparalleled experience of luxury and
-              tranquility. Nestled in the heart of the city, our hotel combines
-              modern architecture with serene surroundings to create the perfect
-              escape from the hustle and bustle of everyday life.
-            </p>
-            <p>
-              Our world-class amenities include spacious rooms with breathtaking
-              views, a rejuvenating spa, fine dining options, and
-              state-of-the-art fitness facilities. Whether you're here for
-              business or pleasure, Gravity Hotel ensures every moment is
-              memorable.
-            </p>
-            <p>
-              Founded in 2020, Gravity Hotel has quickly become a premier
-              destination for discerning travelers. Our commitment to excellence
-              is reflected in every aspect of our service, from the moment you
-              arrive until the time you depart.
-            </p>
+            <h2 th:text="#{about.title}"></h2>
+            <p th:text="#{about.desc1}"></p>
+            <p th:text="#{about.desc2}"></p>
+            <p th:text="#{about.desc3}"></p>
           </div>
           <div class="about-image">
             <img th:src="@{/images/slide4.jpg}"
@@ -60,18 +44,9 @@
             />
           </div>
           <div class="about-text">
-            <p>
-              Our dedicated team of hospitality professionals is committed to
-              providing personalized service tailored to your needs. From our
-              concierge services to our 24/7 room service, we strive to make
-              your stay as comfortable and enjoyable as possible.
-            </p>
-            <p>
-              Experience the perfect blend of luxury, comfort, and innovation at
-              Zero Gravity Hotel. We look forward to welcoming you to our world
-              of exceptional hospitality.
-            </p>
-            <a href="homepage.html#contact" class="cta-button">Contact Us</a>
+            <p th:text="#{about.text1}"></p>
+            <p th:text="#{about.text2}"></p>
+            <a href="homepage.html#contact" class="cta-button" th:text="#{about.contact}"></a>
           </div>
         </div>
       </div>
@@ -80,7 +55,7 @@
     <!-- Gallery Section -->
     <section class="gallery">
       <div class="container">
-        <h2>Our Gallery</h2>
+        <h2 th:text="#{about.gallery}"></h2>
         <div class="swiper-container gallery-swiper">
           <div class="swiper-wrapper">
             <div class="swiper-slide">
@@ -106,7 +81,7 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="container">
-        <p>&copy; 2026 Gravity Hotel. All rights reserved.</p>
+        <p th:text="#{footer.copy}"></p>
       </div>
     </footer>
 
