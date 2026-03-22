@@ -38,6 +38,11 @@ public class HomeController {
         return "homepage/rooms";
     }
 
+    @GetMapping("/room-detail")
+    public String roomDetail() {
+        return "homepage/room-detail";
+    }
+
 
     @GetMapping("/services")
     public String services() {

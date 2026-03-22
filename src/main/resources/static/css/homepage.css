@@ -350,28 +350,27 @@ header.scrolled .account-btn:hover,
     border-right: 2px solid #fff;
     white-space: nowrap;
     overflow: hidden;
-    animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+    animation: typing 3s steps(40, end) forwards, blink-caret 3s step-end 1 forwards;
 }
 
 @keyframes typing {
     from {
         width: 0;
     }
-
     to {
         width: 100%;
     }
 }
 
 @keyframes blink-caret {
-
-    from,
-    to {
-        border-color: transparent;
-    }
-
-    50% {
+    0% {
         border-color: #fff;
+    }
+    99% {
+        border-color: #fff;
+    }
+    100% {
+        border-color: transparent;
     }
 }
 
