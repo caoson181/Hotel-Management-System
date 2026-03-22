@@ -3,23 +3,28 @@
 // Sample data
 let rooms = window.rooms || [];
 
-// User role - Có thể lấy từ session/login
-// Thay đổi giá trị này để test: 'receptionist' hoặc 'housekeeping'
-let userRole = 'receptionist'; // Mặc định là receptionist
+let userRole = '';
 
 // Status flow theo role
 const statusFlows = {
     receptionist: {
         available: ['reserved', 'occupied'],
-        reserved: ['occupied', 'available'],
+        reserved: ['occupied'],
         occupied: ['checked-out'],
         'checked-out': [],
-        housekeeping: [] // Receptionist không thể thay đổi status housekeeping
+        housekeeping: []
+    },
+    manager: {
+        available: ['reserved', 'occupied'],
+        reserved: ['occupied'],
+        occupied: ['checked-out'],
+        'checked-out': [],
+        housekeeping: []
     },
     housekeeping: {
         'checked-out': ['housekeeping'],
         housekeeping: ['available'],
-        available: [], // Housekeeping không thể thay đổi available
+        available: [],
         reserved: [],
         occupied: []
     }
@@ -42,6 +47,13 @@ let tableBody, searchInput, sortSelect, sortAsc, sortDesc, statusCircles, pagina
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    userRole = (window.userRoleFromServer || 'receptionist')
+        .replace('ROLE_', '')
+        .toLowerCase();
+
+    if (userRole === 'housekeeper') {
+        userRole = 'housekeeping';
+    }
     console.log('View Room JS loaded - Role:', userRole);
 
     // Get DOM elements
@@ -56,9 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Set role indicator
     if (roleIndicator) {
-        roleIndicator.textContent = userRole === 'receptionist' ? 'Receptionist' : 'Housekeeping';
+        roleIndicator.textContent =
+            userRole.charAt(0).toUpperCase() + userRole.slice(1);
     }
-
     // Initial render
     renderTable();
 
@@ -146,12 +158,6 @@ function renderTable() {
                     return false;
                 }
 
-                if (userRole === 'housekeeping' &&
-                    room.status !== 'checked-out' &&
-                    room.status !== 'housekeeping' &&
-                    currentFilter === 'all') {
-                    return false;
-                }
 
                 return true;
             });
@@ -194,7 +200,10 @@ function renderTable() {
 
 // Render action dropdown theo role và status
 function renderActionDropdown(room) {
-    const allowedStatuses = statusFlows[userRole]?.[room.status]  || [];
+    const role = (userRole || '').toLowerCase();
+    const status = (room.status || '').toLowerCase().trim();
+
+    const allowedStatuses = statusFlows[role]?.[status] || [];
 
     if (allowedStatuses.length === 0) {
         return '<span class="no-action">—</span>';
@@ -206,17 +215,16 @@ function renderActionDropdown(room) {
                 Change Status <i class="fas fa-chevron-down"></i>
             </button>
             <div class="dropdown-menu" id="dropdown-${room.id}">
-                ${allowedStatuses.map(status => `
-                    <div class="dropdown-item" onclick="changeRoomStatus(${room.id}, '${status}')">
-                        <i class="fas ${getStatusIcon(status)}"></i>
-                        ${formatStatus(status)}
+                ${allowedStatuses.map(s => `
+                    <div class="dropdown-item" onclick="changeRoomStatus(${room.id}, '${s}')">
+                        <i class="fas ${getStatusIcon(s)}"></i>
+                        ${formatStatus(s)}
                     </div>
                 `).join('')}
             </div>
         </div>
     `;
 }
-
 // Toggle dropdown
 function toggleDropdown(event, roomId) {
     event.stopPropagation();
@@ -260,7 +268,7 @@ function changeRoomStatus(roomId, newStatus) {
     alert(`Room ${room.room_number} status changed to ${formatStatus(newStatus)}`);
 
     // Re-render table
-    renderTable();
+renderTable();
 }
 
 // Render pagination
@@ -327,4 +335,15 @@ function setUserRole(role) {
         }
         renderTable();
     }
+}
+function changeRoomStatus(roomId, status) {
+    fetch(`/api/rooms/${roomId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status })
+    })
+        .then(() => renderTable()); // reload lại
+
 }

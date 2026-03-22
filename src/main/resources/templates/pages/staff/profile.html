@@ -1,120 +1,120 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
+<head>
     <title>Staff Profile</title>
     <link rel="stylesheet" th:href="@{/css/global.css}" />
     <link rel="stylesheet" th:href="@{/css/modal.css}" />
     <link rel="stylesheet" th:href="@{/css/navbar.css}" />
     <link rel="stylesheet" th:href="@{/css/profile.css}" />
     <link rel="stylesheet" th:href="@{/css/profile-staff.css}" />
-  </head>
+</head>
 
-  <body>
-    <div id="editProfileModal" class="modal">
-      <div class="modal-content">
+<body>
+<div id="editProfileModal" class="modal">
+    <div class="modal-content">
         <span class="close-btn" id="closeEditModal">&times;</span>
 
         <h2>Edit Profile</h2>
 
         <form th:action="@{/staff/profile/manage/update}" method="post">
-          <label>Username</label>
-          <input
-            type="text"
-            name="username"
-            th:value="${user.username}"
-            required
-          />
+            <label>Username</label>
+            <input
+                    type="text"
+                    name="username"
+                    th:value="${user.username}"
+                    required
+            />
 
-          <label>Full Name</label>
-          <input
-            type="text"
-            name="fullName"
-            th:value="${user.fullName}"
-            required
-          />
+            <label>Full Name</label>
+            <input
+                    type="text"
+                    name="fullName"
+                    th:value="${user.fullName}"
+                    required
+            />
 
-          <label>Gender</label>
-          <select name="gender">
-            <option value="Male" th:selected="${user.gender == 'Male'}">
-              Male
-            </option>
-            <option value="Female" th:selected="${user.gender == 'Female'}">
-              Female
-            </option>
-            <option value="Other" th:selected="${user.gender == 'Other'}">
-              Other
-            </option>
-          </select>
+            <label>Gender</label>
+            <select name="gender">
+                <option value="Male" th:selected="${user.gender == 'Male'}">
+                    Male
+                </option>
+                <option value="Female" th:selected="${user.gender == 'Female'}">
+                    Female
+                </option>
+                <option value="Other" th:selected="${user.gender == 'Other'}">
+                    Other
+                </option>
+            </select>
 
-          <input
-            type="date"
-            name="dateOfBirth"
-            th:value="${#temporals.format(user.dateOfBirth, 'yyyy-MM-dd')}"
-          />
+            <input
+                    type="date"
+                    name="dateOfBirth"
+                    th:value="${#temporals.format(user.dateOfBirth, 'yyyy-MM-dd')}"
+            />
 
-          <label>Email</label>
-          <input type="text" th:value="${user.email}" disabled />
+            <label>Email</label>
+            <input type="text" th:value="${user.email}" disabled />
 
-          <label>Phone</label>
-          <input type="text" th:value="${user.phoneNumber}" disabled />
+            <label>Phone</label>
+            <input type="text" th:value="${user.phoneNumber}" disabled />
 
-          <button type="submit" class="save-btn">Save Changes</button>
+            <button type="submit" class="save-btn">Save Changes</button>
         </form>
-      </div>
     </div>
+</div>
 
-    <!-- NAVBAR -->
-    <div th:replace="~{components/navbar}"></div>
+<!-- NAVBAR -->
+<div th:replace="~{components/navbar}"></div>
 
-    <div class="profile-container">
-      <div class="profile-card">
+<div class="profile-container">
+    <div class="profile-card">
         <div class="profile-avatar"></div>
 
         <div class="profile-name" th:text="${user.username}">Username</div>
         <div class="profile-role" th:text="${user.role}">Role</div>
 
         <div class="profile-info">
-          <p>
-            <span class="label">Username:</span>
-            <span th:text="${user.username}"></span>
-          </p>
+            <p>
+                <span class="label">Username:</span>
+                <span th:text="${user.username}"></span>
+            </p>
 
-          <p>
-            <span class="label">Full Name:</span>
-            <span th:text="${user.fullName}"></span>
-          </p>
+            <p>
+                <span class="label">Full Name:</span>
+                <span th:text="${user.fullName}"></span>
+            </p>
 
-          <p>
-            <span class="label">Gender:</span>
-            <span th:text="${user.gender}"></span>
-          </p>
+            <p>
+                <span class="label">Gender:</span>
+                <span th:text="${user.gender}"></span>
+            </p>
 
-          <p>
-            <span class="label">Date of Birth:</span>
-            <span th:text="${user.dateOfBirth}"></span>
-          </p>
+            <p>
+                <span class="label">Date of Birth:</span>
+                <span th:text="${user.dateOfBirth}"></span>
+            </p>
 
-          <p>
-            <span class="label">Email:</span>
-            <span th:text="${user.email}"></span>
-          </p>
+            <p>
+                <span class="label">Email:</span>
+                <span th:text="${user.email}"></span>
+            </p>
 
-          <p>
-            <span class="label">Phone:</span>
-            <span th:text="${user.phoneNumber}"></span>
-          </p>
+            <p>
+                <span class="label">Phone:</span>
+                <span th:text="${user.phoneNumber}"></span>
+            </p>
         </div>
 
         <a th:href="@{/index}" class="back-btn">Back</a>
 
         <button id="openEditModal" class="back-btn" style="background: #28a745">
-          Edit Profile
+            Edit Profile
         </button>
-      </div>
     </div>
-    <script th:src="@{/js/main.js}"></script>
-    <script th:src="@{/js/account.js}"></script>
-    <script th:src="@{/js/dropdown.js}"></script>
-    <script th:src="@{/js/role.js}"></script>
-  </body>
+</div>
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/account.js}"></script>
+<script th:src="@{/js/dropdown.js}"></script>
+<script th:src="@{/js/role.js}"></script>
+</body>
 </html>

@@ -34,4 +34,12 @@ public class RoomService {
         return roomRepository.findAll(pageable);
     }
 
+    public Room updateStatus(Integer id, String newStatus) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found with id: " + id));
+
+        room.setStatus(newStatus);
+        return roomRepository.save(room);
+    }
+
 }
