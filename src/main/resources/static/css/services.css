@@ -44,8 +44,9 @@
 }
 
 .service-image img {
-  width: 500px;
-  height: 320px;
+  width: 100%;
+  height: 100%;
+  max-height: 300px;
   object-fit: cover;
 }
 
@@ -71,20 +72,16 @@
 
 .services-layout {
   display: flex;
-  gap: 60px;
-  align-items: flex-start;
-  max-width: 1400px;
+  gap: 40px;
+  max-width: 1200px;
   margin: auto;
-  padding-left: 20px;
 }
 
 .service-sidebar {
   position: sticky;
   top: 120px;
-  min-width: 160px;
-  margin-left: -173px;
   width: 180px;
-  height: fit-content;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
