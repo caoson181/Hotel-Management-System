@@ -123,7 +123,6 @@ public class RoomController {
         room.setBasePrice(updatedRoom.getBasePrice());
         room.setRoomRank(updatedRoom.getRoomRank());
         room.setDescription(updatedRoom.getDescription());
-        room.setPicture(updatedRoom.getPicture());
 
         return roomRepository.save(room);
     }

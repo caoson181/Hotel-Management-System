@@ -1,208 +1,225 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!doctype html>
+<html
+  lang="en"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gravity Hotel - Homepage</title>
 
     <!-- Local CSS -->
-    <link rel="stylesheet" href="/css/homepage.css">
-    <link rel="stylesheet" href="/css/room-card.css">
+    <link rel="stylesheet" href="/css/homepage.css" />
+    <link rel="stylesheet" href="/css/room-card.css" />
 
     <!-- External CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
 
-    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swiper/swiper-bundle.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
 
-<body>
+  <body>
+    <!-- Navbar (Thymeleaf fragment) -->
+    <div th:replace="homepage/navbar :: navbar"></div>
 
-<!-- Navbar (Thymeleaf fragment) -->
-<div th:replace="homepage/navbar :: navbar"></div>
-
-<!-- Hero Section with Slider -->
-<section id="home" class="hero">
-    <div class="swiper-container">
-
+    <!-- Hero Section with Slider -->
+    <section id="home" class="hero">
+      <div class="swiper-container">
         <div class="swiper-wrapper">
+          <div class="swiper-slide">
+            <div class="slide-content">
+              <img
+                src="/images/slide1.jpg"
+                alt="Luxury Hotel Room"
+                class="hero-image"
+              />
+              <div class="overlay"></div>
 
-            <div class="swiper-slide">
-                <div class="slide-content">
-                    <img src="/images/slide1.jpg" alt="Luxury Hotel Room" class="hero-image">
-                    <div class="overlay"></div>
-
-                    <div class="hero-text">
-                        <h2 class="typing-effect" th:text="#{hero.welcome}"></h2>
-                        <p th:text="#{hero.desc}"></p>
-                        <a class="cta-button" th:text="#{hero.book}"></a>
-                    </div>
-                </div>
+              <div class="hero-text">
+                <h2 class="typing-effect" th:text="#{hero.welcome}"></h2>
+                <p th:text="#{hero.desc}"></p>
+                <a
+                  href="/room-detail"
+                  class="cta-button"
+                  th:text="#{hero.book}"
+                ></a>
+              </div>
             </div>
+          </div>
 
-            <div class="swiper-slide">
-                <div class="slide-content">
-                    <img src="/images/slide2.jpg" alt="Spa Treatment" class="hero-image">
-                    <div class="overlay"></div>
+          <div class="swiper-slide">
+            <div class="slide-content">
+              <img
+                src="/images/slide2.jpg"
+                alt="Spa Treatment"
+                class="hero-image"
+              />
+              <div class="overlay"></div>
 
-                    <div class="hero-text">
-                        <h2 th:text="#{hero.spa.title}"></h2>
-                        <p th:text="#{hero.spa.desc}"></p>
-                        <a class="cta-button" th:text="#{hero.spa.btn}"></a>
-                    </div>
-                </div>
+              <div class="hero-text">
+                <h2 th:text="#{hero.spa.title}"></h2>
+                <p th:text="#{hero.spa.desc}"></p>
+                <a class="cta-button" th:text="#{hero.spa.btn}"></a>
+              </div>
             </div>
+          </div>
 
-            <div class="swiper-slide">
-                <div class="slide-content">
-                    <img src="/images/slide3.jpg" alt="Dining Experience" class="hero-image">
-                    <div class="overlay"></div>
+          <div class="swiper-slide">
+            <div class="slide-content">
+              <img
+                src="/images/slide3.jpg"
+                alt="Dining Experience"
+                class="hero-image"
+              />
+              <div class="overlay"></div>
 
-                    <div class="hero-text">
-                        <h2 th:text="#{hero.food.title}"></h2>
-                        <p th:text="#{hero.food.desc}"></p>
-                        <a class="cta-button" th:text="#{hero.food.btn}"></a>
-                    </div>
-                </div>
+              <div class="hero-text">
+                <h2 th:text="#{hero.food.title}"></h2>
+                <p th:text="#{hero.food.desc}"></p>
+                <a class="cta-button" th:text="#{hero.food.btn}"></a>
+              </div>
             </div>
-
+          </div>
         </div>
 
         <div class="swiper-pagination"></div>
         <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
+      </div>
+    </section>
 
-    </div>
-</section>
-
-
-
-<!-- About Section -->
-<section class="about">
-    <div class="container">
-
+    <!-- About Section -->
+    <section class="about">
+      <div class="container">
         <div class="about-content">
+          <div class="about-text">
+            <h2 th:text="#{about.title}"></h2>
 
-            <div class="about-text">
-                <h2 th:text="#{about.title}"></h2>
+            <p th:text="#{about.desc1}"></p>
+            <p th:text="#{about.desc2}"></p>
 
-                <p th:text="#{about.desc1}"></p>
-                <p th:text="#{about.desc2}"></p>
+            <a href="/about" class="cta-button" th:text="#{about.btn}"></a>
+          </div>
 
-                <a href="/about" class="cta-button" th:text="#{about.btn}"></a>
-            </div>
-
-            <div class="about-image">
-                <img src="/images/slide7.jpg" alt="Zero Gravity Hotel Exterior">
-            </div>
-
+          <div class="about-image">
+            <img src="/images/slide7.jpg" alt="Zero Gravity Hotel Exterior" />
+          </div>
         </div>
+      </div>
+    </section>
 
-    </div>
-</section>
-
-<!-- Room rank (between About and Bookshelf) -->
-<!-- SECTION: Hiển thị 5 hạng phòng với background full -->
-<!-- SECTION: Full width room showcase - Safe for other sections -->
-<section class="nesta-room-showcase" id="nestaRoomShowcase">
-    <div class="showcase-card" id="showcaseCard">
+    <!-- Room rank (between About and Bookshelf) -->
+    <!-- SECTION: Hiển thị 5 hạng phòng với background full -->
+    <!-- SECTION: Full width room showcase - Safe for other sections -->
+    <section class="nesta-room-showcase" id="nestaRoomShowcase">
+      <div class="showcase-card" id="showcaseCard">
         <div class="card-background" id="dynamicBg"></div>
         <div class="card-overlay"></div>
 
         <div class="card-content">
-            <!-- HỘI THẢO VÀ SỰ KIỆN -->
-            <div class="event-header">
-                <h2 th:text="#{room.category}"></h2>
+          <!-- HỘI THẢO VÀ SỰ KIỆN -->
+          <div class="event-header">
+            <h2 th:text="#{room.category}"></h2>
 
-                <!--                <span class="slogan">Nesta The Grand Hào Nam · tinh tế</span>-->
+            <!--                <span class="slogan">Nesta The Grand Hào Nam · tinh tế</span>-->
+          </div>
+
+          <!-- Room Info -->
+          <div class="featured-room">
+            <div class="featured-info">
+              <div class="room-category" id="roomRankLabel">PREMIER</div>
+              <h3 id="roomTitle">Premier Skyline</h3>
+              <div class="basic-info" id="basicInfoList"></div>
+              <button class="detail-btn" id="openModalBtn">
+                <span th:text="#{room.detail}"></span>
+                <i class="fas fa-arrow-right"></i>
+              </button>
             </div>
+          </div>
 
-            <!-- Room Info -->
-            <div class="featured-room">
-                <div class="featured-info">
-                    <div class="room-category" id="roomRankLabel">PREMIER</div>
-                    <h3 id="roomTitle">Premier Skyline</h3>
-                    <div class="basic-info" id="basicInfoList"></div>
-                    <button class="detail-btn" id="openModalBtn">
-                        <span th:text="#{room.detail}"></span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Thumbnails -->
-            <div class="thumbnail-strip" id="thumbStrip"></div>
+          <!-- Thumbnails -->
+          <div class="thumbnail-strip" id="thumbStrip"></div>
         </div>
-    </div>
+      </div>
 
-    <!-- Modal -->
-    <div class="modal" id="roomModal"></div>
-</section>
+      <!-- Modal -->
+      <div class="modal" id="roomModal"></div>
+    </section>
 
-<section class="bookshelf-section">
-    <br><br>
-    <div class="container">
+    <section class="bookshelf-section">
+      <br /><br />
+      <div class="container">
         <h2 class="bookshelf-title" th:text="#{service.title}"></h2>
         <!-- hoặc tiếng Việt: Dịch Vụ Nổi Bật -->
+      </div>
+
+      <div class="book-shelf" id="bookShelf"></div>
+    </section>
+
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+      <div class="floating-circle"></div>
+      <div class="floating-circle"></div>
+      <div class="floating-circle"></div>
     </div>
 
-    <div class="book-shelf" id="bookShelf"></div>
-</section>
-
-
-<!-- Floating Elements -->
-<div class="floating-elements">
-    <div class="floating-circle"></div>
-    <div class="floating-circle"></div>
-    <div class="floating-circle"></div>
-</div>
-
-<!-- Footer -->
-<footer class="footer">
-    <div class="container">
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
         <p th:text="#{footer.copy}"></p>
-    </div>
-</footer>
+      </div>
+    </footer>
 
-<!-- Scripts -->
-<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-<script src="/js/homepage.js"></script>
-<!-- Room card JavaScript -->
-<script src="/js/room-card.js"></script>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="/js/homepage.js"></script>
+    <!-- Room card JavaScript -->
+    <script src="/js/room-card.js"></script>
 
-<script>
-    // Navbar scroll effect
-    const header = document.querySelector('.header');
+    <script>
+      // Navbar scroll effect
+      const header = document.querySelector(".header");
 
-    window.addEventListener('scroll', () => {
+      window.addEventListener("scroll", () => {
         if (window.scrollY > 50) {
-            header.classList.add('scrolled');
+          header.classList.add("scrolled");
         } else {
-            header.classList.remove('scrolled');
+          header.classList.remove("scrolled");
         }
-    });
+      });
 
-    const accountBtn = document.getElementById('accountBtn');
-    const accountDropdown = document.getElementById('accountDropdown');
+      const accountBtn = document.getElementById("accountBtn");
+      const accountDropdown = document.getElementById("accountDropdown");
 
-    if (accountBtn && accountDropdown) {
-        accountBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            accountDropdown.classList.toggle('show');
-            const expanded = accountBtn.getAttribute('aria-expanded') === 'true';
-            accountBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      if (accountBtn && accountDropdown) {
+        accountBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          accountDropdown.classList.toggle("show");
+          const expanded = accountBtn.getAttribute("aria-expanded") === "true";
+          accountBtn.setAttribute("aria-expanded", expanded ? "false" : "true");
         });
 
-        document.addEventListener('click', (e) => {
-            if (!accountBtn.contains(e.target) && !accountDropdown.contains(e.target)) {
-                accountDropdown.classList.remove('show');
-                accountBtn.setAttribute('aria-expanded', 'false');
-            }
+        document.addEventListener("click", (e) => {
+          if (
+            !accountBtn.contains(e.target) &&
+            !accountDropdown.contains(e.target)
+          ) {
+            accountDropdown.classList.remove("show");
+            accountBtn.setAttribute("aria-expanded", "false");
+          }
         });
-    }
-</script>
-
-</body>
-
+      }
+    </script>
+  </body>
 </html>
