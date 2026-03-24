@@ -1,0 +1,90 @@
+/* ===== PAGE CONTAINER ===== */
+.report-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* ===== TITLE ===== */
+.report-container h2 {
+    margin: 30px 0 15px;
+    font-size: 22px;
+    color: #2c3e50;
+    border-left: 5px solid #4f46e5;
+    padding-left: 10px;
+}
+
+/* ===== TABLE ===== */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== HEADER ===== */
+.report-table thead {
+    background: #4f46e5;
+    color: white;
+}
+
+.report-table th {
+    padding: 12px;
+    font-size: 14px;
+    text-align: left;
+}
+
+/* ===== BODY ===== */
+.report-table td {
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+/* ===== ROW EFFECT ===== */
+.report-table tbody tr {
+    transition: 0.2s;
+}
+
+.report-table tbody tr:hover {
+    background: #f5f7ff;
+}
+
+/* ===== ALTERNATE ROW ===== */
+.report-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+/* ===== BADGE (OPTIONAL) ===== */
+.badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge.user {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge.guest {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .report-container {
+        padding: 10px;
+    }
+
+    .report-table th,
+    .report-table td {
+        font-size: 12px;
+        padding: 8px;
+    }
+}

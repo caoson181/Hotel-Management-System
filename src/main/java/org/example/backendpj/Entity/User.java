@@ -42,6 +42,17 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Staff staff;
 
+    @OneToOne(mappedBy = "user")
+    private Customer customer;
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
     public Staff getStaff() {
         return staff;
     }

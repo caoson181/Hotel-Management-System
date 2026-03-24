@@ -1,6 +1,8 @@
 package org.example.backendpj.controller;
 
+import org.example.backendpj.Entity.Customer;
 import org.example.backendpj.Entity.User;
+import org.example.backendpj.Repository.CustomerRepository;
 import org.example.backendpj.Repository.UserRepository;
 import org.example.backendpj.Service.OtpService;
 
@@ -24,13 +26,16 @@ public class AuthController {
     private final UserRepository userRepo;
     private final OtpService otpService;
     private final PasswordEncoder passwordEncoder;
+    private final CustomerRepository customerRepository;
 
     public AuthController(UserRepository userRepo,
-                          OtpService otpService,
-                          PasswordEncoder passwordEncoder) {
+            OtpService otpService,
+            PasswordEncoder passwordEncoder,
+            CustomerRepository customerRepository) {
         this.userRepo = userRepo;
         this.otpService = otpService;
         this.passwordEncoder = passwordEncoder;
+        this.customerRepository = customerRepository;
     }
 
     // ===================== SIGNUP PAGE =====================
@@ -44,20 +49,26 @@ public class AuthController {
         model.addAttribute("username", username);
         model.addAttribute("fullName", fullName);
     }
+
     private boolean isValidPassword(String password) {
         String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$";
         return password.matches(regex);
     }
+
     private boolean isValidFullname(String fullName) {
-        if (fullName == null || fullName.isBlank()) return false;
+        if (fullName == null || fullName.isBlank())
+            return false;
         String regex = "^[a-zA-Z\\s\\p{L}]+$";
         return fullName.matches(regex);
     }
+
     private boolean isOldEnough(LocalDate dateOfBirth) {
-        if (dateOfBirth == null) return false;
+        if (dateOfBirth == null)
+            return false;
         LocalDate today = LocalDate.now();
         // 1. Không được là ngày ở tương lai
-        if (dateOfBirth.isAfter(today)) return false;
+        if (dateOfBirth.isAfter(today))
+            return false;
         // 2. Phải đủ 18 năm tính đến hôm nay
         return !dateOfBirth.plusYears(18).isAfter(today);
     }
@@ -65,15 +76,14 @@ public class AuthController {
     // ===================== HANDLE SIGNUP =====================
     @PostMapping("/signup")
     public String register(@RequestParam String email,
-                           @RequestParam String username,
-                           @RequestParam String password,
-                           @RequestParam String confirmPassword,
-                           @RequestParam(name="fullName", required=false) String fullName,
-                           @RequestParam(name="gender", required=false) String gender,
-                           @RequestParam(name="phoneNumber", required=false) String phoneNumber,
-                           @RequestParam(name="dateOfBirth", required=false)
-                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
-                           Model model) {
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String confirmPassword,
+            @RequestParam(name = "fullName", required = false) String fullName,
+            @RequestParam(name = "gender", required = false) String gender,
+            @RequestParam(name = "phoneNumber", required = false) String phoneNumber,
+            @RequestParam(name = "dateOfBirth", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateOfBirth,
+            Model model) {
 
         // Check existing email
         if (userRepo.existsByEmail(email)) {
@@ -149,15 +159,22 @@ public class AuthController {
         u.setFullName(fullName == null ? "" : fullName.trim());
         u.setGender((gender == null || gender.isBlank()) ? null : gender);
         u.setPhoneNumber((phoneNumber == null || phoneNumber.isBlank()) ? null : phoneNumber.trim());
-        u.setDateOfBirth(dateOfBirth == null ? LocalDate.of(2000,1,1) : dateOfBirth);
+        u.setDateOfBirth(dateOfBirth == null ? LocalDate.of(2000, 1, 1) : dateOfBirth);
         System.out.println("ABOUT TO SAVE user=" + email);
         userRepo.save(u);
+
+        Customer c = new Customer();
+        c.setUser(u);
+        c.setMemberLevel("Normal"); // default
+
+        customerRepository.save(c);
+
         System.out.println("SAVED user id=" + u.getId());
 
-        return "redirect:/auth/verify?email=" + java.net.URLEncoder.encode(email, java.nio.charset.StandardCharsets.UTF_8);
+        return "redirect:/auth/verify?email="
+                + java.net.URLEncoder.encode(email, java.nio.charset.StandardCharsets.UTF_8);
     }
-        // Create user
-
+    // Create user
 
     // ===================== VERIFY PAGE =====================
     @GetMapping("/verify")
@@ -165,11 +182,12 @@ public class AuthController {
         model.addAttribute("email", email);
         return "verify-otp";
     }
+
     // ===================== HANDLE OTP =====================
     @PostMapping("/verify-otp")
     public String verifyOtp(@RequestParam String email,
-                            @RequestParam String otp,
-                            Model model) {
+            @RequestParam String otp,
+            Model model) {
 
         boolean ok = otpService.verify(email, otp);
 
@@ -195,7 +213,7 @@ public class AuthController {
     // ===================== LOGIN PAGE =====================
     @GetMapping("/login")
     public String loginPage(@RequestParam(value = "error", required = false) String error,
-                            Model model) {
+            Model model) {
 
         if (error != null) {
             model.addAttribute("errorMessage", "Invalid username/email or password");
@@ -208,9 +226,10 @@ public class AuthController {
     public String forgotPasswordPage() {
         return "forgot-password";
     }
+
     @PostMapping("/forgot-password")
     public String handleForgotPassword(@RequestParam String email,
-                                       Model model) {
+            Model model) {
 
         userRepo.findByEmail(email).ifPresent(user -> {
             otpService.createAndSend(email);
@@ -228,10 +247,11 @@ public class AuthController {
         model.addAttribute("email", email);
         return "verify-reset-otp";
     }
+
     @PostMapping("/verify-reset")
     public String handleVerifyReset(@RequestParam String email,
-                                    @RequestParam String otp,
-                                    Model model) {
+            @RequestParam String otp,
+            Model model) {
 
         boolean valid = otpService.verify(email, otp);
 
@@ -243,17 +263,19 @@ public class AuthController {
 
         return "redirect:/auth/reset-password?email=" + email;
     }
+
     @GetMapping("/reset-password")
     public String resetPasswordPage(@RequestParam String email,
-                                    Model model) {
+            Model model) {
         model.addAttribute("email", email);
         return "reset-password";
     }
+
     @PostMapping("/reset-password")
     public String handleResetPassword(@RequestParam String email,
-                                      @RequestParam String password,
-                                      @RequestParam String confirmPassword,
-                                      Model model) {
+            @RequestParam String password,
+            @RequestParam String confirmPassword,
+            Model model) {
 
         if (!password.equals(confirmPassword)) {
             model.addAttribute("email", email);
@@ -266,7 +288,6 @@ public class AuthController {
                     "Password must be at least 8 characters and include uppercase, lowercase and special character");
             return "reset-password";
         }
-
 
         User user = userRepo.findByEmail(email).orElse(null);
 
@@ -282,7 +303,7 @@ public class AuthController {
 
     @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
     public String handleTypeMismatch(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex,
-                                     org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         if (ex.getName().equals("dateOfBirth")) {
 
             redirectAttributes.addFlashAttribute("error", "Date of Birth is invalid");
@@ -301,10 +322,10 @@ public class AuthController {
 
     @PostMapping("/change-password")
     public String changePassword(@RequestParam String currentPassword,
-                                 @RequestParam String newPassword,
-                                 @RequestParam String confirmPassword,
-                                 Principal principal,
-                                 RedirectAttributes redirectAttributes) {
+            @RequestParam String newPassword,
+            @RequestParam String confirmPassword,
+            Principal principal,
+            RedirectAttributes redirectAttributes) {
 
         User user = userRepository.findByUsername(principal.getName())
                 .orElse(null);

@@ -11,13 +11,15 @@ public class Customer {
     @Column(name = "customer_id")
     private Integer customerId;
 
-    @Column(name = "user_id", nullable = false, unique = true)
-    private Integer userId;
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
     @Column(name = "member_level", length = 50)
     private String memberLevel;
 
-    public Customer() {}
+    public Customer() {
+    }
 
     public Integer getCustomerId() {
         return customerId;
@@ -27,12 +29,12 @@ public class Customer {
         this.customerId = customerId;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getMemberLevel() {

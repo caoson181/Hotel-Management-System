@@ -1,35 +1,84 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>View Room Status</title>
-    <link rel="stylesheet" th:href="@{/css/global.css}" />
-    <link rel="stylesheet" th:href="@{/css/modal.css}" />
-    <link rel="stylesheet" th:href="@{/css/navbar.css}" />
-    <link rel="stylesheet" th:href="@{/css/profile.css}" />
-  </head>
 
-  <body>
-    <div
-      id="navbar-container"
-      th:replace="~{components/navbar :: navbar}"
-    ></div>
+<head>
+  <meta charset="UTF-8" />
+  <title>View Room Status</title>
+  <link rel="stylesheet" th:href="@{/css/global.css}" />
+  <link rel="stylesheet" th:href="@{/css/modal.css}" />
+  <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/profile.css}" />
+  <link rel="stylesheet" th:href="@{/css/view-report.css}" />
+</head>
 
-    <!-- PAGE CONTENT -->
+<body>
+  <div id="navbar-container" th:replace="~{components/navbar :: navbar}"></div>
 
-    <section class="hero">
-      <div class="welcome-box">
-        <h1>Reports</h1>
-        <p>Generate hotel reports.</p>
-      </div>
-    </section>
+  <!-- PAGE CONTENT -->
 
-    <!-- MODALS -->
-    <div th:replace="~{components/modals :: modals}"></div>
+  <section class="report-container">
 
-    <script th:src="@{/js/main.js}"></script>
-    <script th:src="@{/js/account.js}"></script>
-    <script th:src="@{/js/dropdown.js}"></script>
-    <script th:src="@{/js/role.js}"></script>
-  </body>
+    <h2>Customer Feedback</h2>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Subject</th>
+          <th>Message</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="c : ${contacts}" th:if="${c.customer != null}">
+          <td th:text="${c.contactId}"></td>
+          <td th:text="${c.customer.user.fullName}"></td>
+          <td th:text="${c.customer.user.email}"></td>
+          <td th:text="${c.subject}"></td>
+          <td th:text="${c.message}"></td>
+          <td th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Guest Feedback</h2>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Guest Name</th>
+          <th>Guest Email</th>
+          <th>Subject</th>
+          <th>Message</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="c : ${contacts}" th:if="${c.customer == null}">
+          <td th:text="${c.contactId}"></td>
+          <td th:text="${c.guestName}"></td>
+          <td th:text="${c.guestEmail}"></td>
+          <td th:text="${c.subject}"></td>
+          <td th:text="${c.message}"></td>
+          <td th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </section>
+
+  <!-- MODALS -->
+  <div th:replace="~{components/modals :: modals}"></div>
+
+  <script th:src="@{/js/main.js}"></script>
+  <script th:src="@{/js/account.js}"></script>
+  <script th:src="@{/js/dropdown.js}"></script>
+  <script th:src="@{/js/role.js}"></script>
+</body>
+
 </html>
