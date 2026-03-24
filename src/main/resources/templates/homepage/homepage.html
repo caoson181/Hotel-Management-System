@@ -49,11 +49,7 @@
               <div class="hero-text">
                 <h2 class="typing-effect" th:text="#{hero.welcome}"></h2>
                 <p th:text="#{hero.desc}"></p>
-                <a
-                  href="/room-detail"
-                  class="cta-button"
-                  th:text="#{hero.book}"
-                ></a>
+                <a href="rooms" class="cta-button" th:text="#{hero.book}"></a>
               </div>
             </div>
           </div>
@@ -70,7 +66,11 @@
               <div class="hero-text">
                 <h2 th:text="#{hero.spa.title}"></h2>
                 <p th:text="#{hero.spa.desc}"></p>
-                <a class="cta-button" th:text="#{hero.spa.btn}"></a>
+                <a
+                  href="services"
+                  class="cta-button"
+                  th:text="#{hero.spa.btn}"
+                ></a>
               </div>
             </div>
           </div>
@@ -87,7 +87,7 @@
               <div class="hero-text">
                 <h2 th:text="#{hero.food.title}"></h2>
                 <p th:text="#{hero.food.desc}"></p>
-                <a class="cta-button" th:text="#{hero.food.btn}"></a>
+                <a href="contact" class="cta-button" th:text="#{hero.food.btn}"></a>
               </div>
             </div>
           </div>
