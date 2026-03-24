@@ -73,6 +73,28 @@ let currentIndex = 0;
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const rank = params.get("rank")?.toLowerCase();
+    const type = params.get("type")?.toLowerCase();
+
+    if (window.roomData && rank && type) {
+        const rankData = window.roomData[rank];
+
+        if (rankData) {
+            const selectedRoom = rankData.rooms.find(
+                r => r.type.toLowerCase() === type
+            );
+
+            if (selectedRoom) {
+                roomInfo.guests = selectedRoom.guests;
+                roomInfo.size = selectedRoom.size;
+                roomInfo.price = selectedRoom.price;
+                roomInfo.amenities = selectedRoom.amenities;
+                roomInfo.description = selectedRoom.description;
+            }
+        }
+    }
+
     initRoomData();
     initGallery();
     initBooking();
@@ -408,3 +430,24 @@ window.roomDetail = {
     roomInfo,
     openLightbox
 };
+const params = new URLSearchParams(window.location.search);
+const rank = params.get("rank")?.toLowerCase();
+const type = params.get("type")?.toLowerCase();
+const guestsEl = document.querySelector('[data-guests]');
+const sizeEl = document.querySelector('[data-size]');
+let selectedRoom = null;
+
+if (window.roomData && rank && type) {
+    const rankData = window.roomData[rank];
+
+    if (rankData) {
+        selectedRoom = rankData.rooms.find(
+            r => r.type.toLowerCase() === type
+        );
+    }
+}
+
+if (selectedRoom) {
+    document.querySelector('[data-guests]').textContent = selectedRoom.guests;
+    document.querySelector('[data-size]').textContent = selectedRoom.size;
+}

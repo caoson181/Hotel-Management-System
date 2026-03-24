@@ -193,15 +193,16 @@
 
 <!-- Scripts -->
 <script th:inline="javascript">
-/*<![CDATA[*/
+    /*<![CDATA[*/
     // Set room data from backend
     window.roomData = /*[[${room}]]*/ {};
     window.roomRank = /*[[${rank}]]*/ 'deluxe';
     window.roomType = /*[[${type}]]*/ 'Double';
-/*]]>*/
+    /*]]>*/
 </script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script th:src="@{/js/room-detail.js}"></script>
+<script src="/js/room-homepage.js"></script>
 
 <!-- Navbar Scroll Animation -->
 <script>
