@@ -672,5 +672,6 @@ function showRoomDetails(rank, type) {
     if (!room) return;
 
     showNotification(`Viewing ${rankData.title} ${room.type} - $${room.price}/night`);
-    console.log('Room details:', { rank, type, room });
+   // console.log('Room details:', { rank, type, room });
+    window.location.href = `/room-detail?rank=${rank}&type=${room.type}`;
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${room != null ? room.type + ' | Gravity Hotel' : 'Room Detail | Gravity Hotel'}">Room Detail | Gravity Hotel</title>
+    <title th:text="${room != null ? type + ' | Gravity Hotel' : 'Room Detail | Gravity Hotel'}">Room Detail | Gravity Hotel</title>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -48,7 +48,7 @@
         </div>
 
         <div class="hero-overlay">
-            <h1 data-aos="fade-up" th:text="${room != null ? rank.toUpperCase() + ' ' + room.type : 'Deluxe Double Room'}">Deluxe Double Room</h1>
+            <h1 data-aos="fade-up" th:text="${room != null ? rank.toUpperCase() + ' ' + type : 'Deluxe Double Room'}"  >Deluxe Double Room</h1>
             <div class="room-meta" data-aos="fade-up" data-aos-delay="100">
                 <span><i class="fas fa-user"></i> <span th:text="${room != null ? room.guests : 2}">2</span> Guests</span>
                 <span><i class="fas fa-ruler-combined"></i> <span th:text="${room != null ? room.size : 32}">32</span> m²</span>

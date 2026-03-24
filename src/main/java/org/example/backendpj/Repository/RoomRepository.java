@@ -31,4 +31,6 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
             String roomType,
             Pageable pageable
     );
+
+    Room findByRoomRankIgnoreCaseAndRoomTypeIgnoreCase(String rank, String type);
 }

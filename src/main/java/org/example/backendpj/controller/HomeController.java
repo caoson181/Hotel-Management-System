@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
 import org.example.backendpj.Entity.Room;
 import org.example.backendpj.Repository.RoomRepository;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -39,9 +40,16 @@ public class HomeController {
     }
 
     @GetMapping("/room-detail")
-    public String roomDetail() {
+    public String roomDetail(@RequestParam String rank,
+                             @RequestParam String type,
+                             Model model) {
+
+        model.addAttribute("rank", rank);
+        model.addAttribute("type", type);
+
         return "homepage/room-detail";
     }
+
 
 
     @GetMapping("/services")

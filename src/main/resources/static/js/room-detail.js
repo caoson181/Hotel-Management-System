@@ -35,7 +35,7 @@ const galleryImages = [
 ];
 
 // ===== ROOM DATA (dynamic from backend) =====
-let roomInfo = window.roomData || {
+let roomInfo = Object.keys(window.roomData || {}).length ? window.roomData : {
     type: "Double",
     guests: 2,
     size: 32,
@@ -87,7 +87,10 @@ function initRoomData() {
     const heroTitle = document.querySelector('.hero-overlay h1');
     const roomMeta = document.querySelector('.hero-overlay .room-meta');
 
-    if (heroTitle) heroTitle.textContent = (window.roomRank ? window.roomRank.toUpperCase() + ' ' : '') + (roomInfo.type || 'Room');
+    if (heroTitle)
+        heroTitle.textContent =
+            (window.roomRank ? window.roomRank.toUpperCase() + ' ' : '') +
+            (window.roomType || roomInfo.type || 'Room');
     if (roomMeta) {
         roomMeta.innerHTML = `
             <span><i class="fas fa-user"></i> ${roomInfo.guests} Guests</span>
