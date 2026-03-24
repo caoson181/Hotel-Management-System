@@ -16,6 +16,34 @@
 
   <!-- PAGE CONTENT -->
 
+  <div class="report-summary">
+
+    <div class="summary-card positive">
+      <div class="icon">👍</div>
+      <div class="info">
+        <span class="label">Positive</span>
+        <span class="value" th:text="${#numbers.formatDecimal(posPercent,1,1)} + '%'"></span>
+      </div>
+    </div>
+
+    <div class="summary-card negative">
+      <div class="icon">👎</div>
+      <div class="info">
+        <span class="label">Negative</span>
+        <span class="value" th:text="${#numbers.formatDecimal(negPercent,1,1)} + '%'"></span>
+      </div>
+    </div>
+
+    <div class="summary-card neutral">
+      <div class="icon">😐</div>
+      <div class="info">
+        <span class="label">Neutral</span>
+        <span class="value" th:text="${#numbers.formatDecimal(neuPercent,1,1)} + '%'"></span>
+      </div>
+    </div>
+
+  </div>
+
   <section class="report-container">
 
     <h2>Customer Feedback</h2>
@@ -29,17 +57,24 @@
           <th>Subject</th>
           <th>Message</th>
           <th>Date</th>
+          <th>Sentiment</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr th:each="c : ${contacts}" th:if="${c.customer != null}">
+        <tr th:each="c : ${customerContacts}" th:classappend="${c.sentiment} == 'Negative' ? 'row-negative'">
           <td th:text="${c.contactId}"></td>
           <td th:text="${c.customer.user.fullName}"></td>
           <td th:text="${c.customer.user.email}"></td>
           <td th:text="${c.subject}"></td>
           <td th:text="${c.message}"></td>
           <td th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+          <td>
+            <span th:text="${c.sentiment}" th:class="'sentiment-badge ' + 
+      (${c.sentiment} == 'Positive' ? 'positive' : 
+      (${c.sentiment} == 'Negative' ? 'negative' : 'neutral'))">
+            </span>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -55,17 +90,24 @@
           <th>Subject</th>
           <th>Message</th>
           <th>Date</th>
+          <th>Sentiment</th>
         </tr>
       </thead>
 
       <tbody>
-        <tr th:each="c : ${contacts}" th:if="${c.customer == null}">
+        <tr th:each="c : ${guestContacts}" th:classappend="${c.sentiment} == 'Negative' ? 'row-negative'">
           <td th:text="${c.contactId}"></td>
           <td th:text="${c.guestName}"></td>
           <td th:text="${c.guestEmail}"></td>
           <td th:text="${c.subject}"></td>
           <td th:text="${c.message}"></td>
           <td th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+          <td>
+            <span th:text="${c.sentiment}" th:class="'sentiment-badge ' + 
+      (${c.sentiment} == 'Positive' ? 'positive' : 
+      (${c.sentiment} == 'Negative' ? 'negative' : 'neutral'))">
+            </span>
+          </td>
         </tr>
       </tbody>
     </table>

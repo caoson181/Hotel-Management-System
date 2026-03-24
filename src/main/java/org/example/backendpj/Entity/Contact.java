@@ -32,6 +32,9 @@ public class Contact {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "sentiment")
+    private String sentiment;
+
     public Contact() {
     }
 
@@ -91,4 +94,11 @@ public class Contact {
         this.createdAt = createdAt;
     }
 
+    public String getSentiment() {
+        return sentiment;
+    }
+
+    public void setSentiment(String sentiment) {
+        this.sentiment = sentiment;
+    }
 }
