@@ -15,100 +15,155 @@
 </head>
 
 <body>
-<div
-        id="navbar-container"
-        th:replace="~{components/navbar :: navbar}"
-></div>
+<div id="navbar-container" th:replace="~{components/navbar :: navbar}"></div>
 
 <!-- Room View Content -->
 <div class="room-view-container">
-    <!-- Controls -->
-    <div class="controls">
-        <div class="search-section">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" name="keyword"
-                       placeholder="Search by room number, type">
+    <div class="left-section">
+        <!-- Controls -->
+        <div class="controls">
+            <div class="search-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" name="keyword"
+                           placeholder="Search by room number, type">
+                </div>
+                <div class="filter-sort">
+                    <select class="sort-select" id="sortSelect">
+                        <option value="roomNumber">Room Number</option>
+                        <option value="roomType">Room Type</option>
+                        <option value="roomRank">Room Rank</option>
+                    </select>
+                    <div class="sort-order">
+                        <button class="active" id="sortAsc" title="Ascending"><i class="fas fa-arrow-up"></i></button>
+                        <button id="sortDesc" title="Descending"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                </div>
             </div>
-            <div class="filter-sort">
-                <select class="sort-select" id="sortSelect">
-                    <option value="roomNumber">Room Number</option>
-                    <option value="roomType">Room Type</option>
-                    <option value="roomRank">Room Rank</option>
-                </select>
-                <div class="sort-order">
-                    <button class="active" id="sortAsc" title="Ascending"><i class="fas fa-arrow-up"></i></button>
-                    <button id="sortDesc" title="Descending"><i class="fas fa-arrow-down"></i></button>
+
+            <!-- Filter Row: Type, Rank, and Role Indicator -->
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Room Type:</label>
+                    <select id="typeFilter" class="filter-select">
+                        <option value="all">All Types</option>
+                        <option value="Single">Single</option>
+                        <option value="Double">Double</option>
+                        <option value="Twin">Twin</option>
+                        <option value="Triple">Triple</option>
+                        <option value="Family">Family</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Room Rank:</label>
+                    <select id="rankFilter" class="filter-select">
+                        <option value="all">All Ranks</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Superior">Superior</option>
+                        <option value="Deluxe">Deluxe</option>
+                        <option value="Executive">Executive</option>
+                        <option value="Suite">Suite</option>
+                    </select>
+                </div>
+                <div class="role-indicator" id="roleIndicator">
+                    <i class="fas fa-user-tag"></i>
+                    <span id="userRole">Receptionist</span>
+                </div>
+            </div>
+
+            <!-- Status Filter Circles -->
+            <div class="status-filter">
+                <div class="status-circle active" data-status="all">
+                    <div class="circle">All</div>
+                    <span class="circle-label">All Rooms</span>
+                </div>
+                <div class="status-circle" data-status="available">
+                    <div class="circle">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <span class="circle-label">Available</span>
+                </div>
+                <div class="status-circle" data-status="reserved">
+                    <div class="circle">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <span class="circle-label">Reserved</span>
+                </div>
+                <div class="status-circle" data-status="occupied">
+                    <div class="circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="circle-label">Occupied</span>
+                </div>
+                <div class="status-circle" data-status="checked-out">
+                    <div class="circle">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <span class="circle-label">Checked Out</span>
+                </div>
+                <div class="status-circle" data-status="housekeeping">
+                    <div class="circle">
+                        <i class="fas fa-broom"></i>
+                    </div>
+                    <span class="circle-label">Housekeeping</span>
                 </div>
             </div>
         </div>
 
-        <!-- Status Filter Circles -->
-        <div class="status-filter">
-            <div class="status-circle active" data-status="all">
-                <div class="circle">All</div>
-                <span class="circle-label">All Rooms</span>
-            </div>
-            <div class="status-circle" data-status="available">
-                <div class="circle">
-                    <i class="fas fa-check"></i>
-                </div>
-                <span class="circle-label">Available</span>
-            </div>
-            <div class="status-circle" data-status="reserved">
-                <div class="circle">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <span class="circle-label">Reserved</span>
-            </div>
-            <div class="status-circle" data-status="occupied">
-                <div class="circle">
-                    <i class="fas fa-user"></i>
-                </div>
-                <span class="circle-label">Occupied</span>
-            </div>
-            <div class="status-circle" data-status="checked-out">
-                <div class="circle">
-                    <i class="fas fa-sign-out-alt"></i>
-                </div>
-                <span class="circle-label">Checked Out</span>
-            </div>
-            <div class="status-circle" data-status="housekeeping">
-                <div class="circle">
-                    <i class="fas fa-broom"></i>
-                </div>
-                <span class="circle-label">Housekeeping</span>
-            </div>
-        </div>
+        <!-- Table -->
+        <div class="table-container">
+            <table id="roomTable">
+                <thead>
+                    <tr>
+                        <th>Room Number</th>
+                        <th>Room Type</th>
+                        <th>Status</th>
+                        <th>Room Rank</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
 
-        <!-- User Role Indicator -->
-        <div class="role-indicator" id="roleIndicator">
-            <i class="fas fa-user-tag"></i>
-            <span id="userRole">Receptionist</span>
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
         </div>
     </div>
 
-    <!-- Table -->
-    <div class="table-container">
-        <table id="roomTable">
-            <thead>
-            <tr>
-                <th>Room Number</th>
-                <th>Room Type</th>
-                <th>Status</th>
-                <th>Room Rank</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
+    <div class="right-section">
+        <!-- Bookings Table -->
+        <div class="bookings-container">
+            <h3><i class="fas fa-calendar-alt"></i> Customer Bookings</h3>
+            <div class="bookings-table-wrapper">
+                <table id="bookingsTable">
+                    <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Room Type</th>
+                            <th>Room Rank</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTableBody">
+                        <!-- Bookings data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-        </table>
-
-        <!-- Pagination -->
-
-
-        <div class="pagination" id="pagination"></div>
+<!-- Modal for Booking Details - Use different ID and structure -->
+<div id="bookingDetailsModal" class="booking-modal" style="display: none;">
+    <div class="booking-modal-overlay"></div>
+    <div class="booking-modal-container">
+        <div class="booking-modal-header">
+            <h3><i class="fas fa-info-circle"></i> Booking Details</h3>
+            <button class="booking-modal-close">&times;</button>
+        </div>
+        <div class="booking-modal-body" id="bookingDetailsBody">
+            <!-- Dynamic content will be inserted here -->
+        </div>
     </div>
 </div>
 
@@ -136,7 +191,7 @@
         const form = document.querySelector(".search-box form");
         if (form) {
             form.addEventListener("submit", function (e) {
-                e.preventDefault(); //
+                e.preventDefault();
             });
         }
     });
@@ -146,8 +201,6 @@
 <script th:src="@{/js/account.js}"></script>
 <script th:src="@{/js/dropdown.js}"></script>
 <script th:src="@{/js/role.js}"></script>
-
-
 <script th:src="@{/js/view-room.js}"></script>
 
 </body>

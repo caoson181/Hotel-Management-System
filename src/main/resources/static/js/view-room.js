@@ -2,8 +2,8 @@
 
 // Sample data
 let rooms = window.rooms || [];
-
 let userRole = '';
+let allBookings = []; // Store all bookings data
 
 // Status flow theo role
 const statusFlows = {
@@ -38,12 +38,13 @@ let currentSort = {
 };
 let searchTerm = '';
 let currentPage = 0;
-const itemsPerPage = 20;
-
-
+let currentTypeFilter = 'all';
+let currentRankFilter = 'all';
+const itemsPerPage = 10;
 
 // DOM Elements
 let tableBody, searchInput, sortSelect, sortAsc, sortDesc, statusCircles, pagination, roleIndicator;
+let typeFilter, rankFilter, bookingsTableBody;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -65,14 +66,19 @@ document.addEventListener('DOMContentLoaded', function() {
     statusCircles = document.querySelectorAll('.status-circle');
     pagination = document.getElementById('pagination');
     roleIndicator = document.getElementById('userRole');
+    typeFilter = document.getElementById('typeFilter');
+    rankFilter = document.getElementById('rankFilter');
+    bookingsTableBody = document.getElementById('bookingsTableBody');
 
     // Set role indicator
     if (roleIndicator) {
         roleIndicator.textContent =
             userRole.charAt(0).toUpperCase() + userRole.slice(1);
     }
+    
     // Initial render
-    renderTable();
+    loadRooms();
+    fetchBookingsData();
 
     // Event Listeners
     if (searchInput) {
@@ -108,6 +114,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Type filter
+    if (typeFilter) {
+        typeFilter.addEventListener('change', (e) => {
+            currentTypeFilter = e.target.value;
+            currentPage = 0;
+            renderTable();
+        });
+    }
+
+    // Rank filter
+    if (rankFilter) {
+        rankFilter.addEventListener('change', (e) => {
+            currentRankFilter = e.target.value;
+            currentPage = 0;
+            renderTable();
+        });
+    }
+
     // Status filter
     if (statusCircles) {
         statusCircles.forEach(circle => {
@@ -131,71 +155,104 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Load rooms from backend (or from window.rooms initial payload)
+function loadRooms() {
+    fetch('/rooms/api')
+        .then(res => res.json())
+        .then(data => {
+            rooms = data.map(r => ({
+                ...r,
+                status: (r.status || '').toLowerCase()
+            }));
+            currentPage = 0;
+            renderTable();
+        })
+        .catch(error => {
+            console.error('Error loading rooms:', error);
+            // fallback to window.rooms if present
+            rooms = (window.rooms || []).map(r => ({
+                ...r,
+                status: (r.status || '').toLowerCase()
+            }));
+            currentPage = 0;
+            renderTable();
+        });
+}
+
 // Render table
 function renderTable() {
     if (!tableBody) return;
 
-    fetch(`/api/rooms/search?keyword=${searchTerm}&page=${Math.max(0, currentPage - 0)}
-    &size=${itemsPerPage}
-    &sortField=${currentSort.field}
-    &sortDir=${currentSort.order}`
+    let roomsData = (rooms || []).map(r => ({
+        id: r.id,
+        roomNumber: r.roomNumber,
+        roomType: r.roomType,
+        roomRank: r.roomRank,
+        status: (r.status || '').toLowerCase()
+    }));
 
-    )
-        .then(res => res.json())
-        .then(data => {
+    // Apply filters
+    let filteredRooms = roomsData.filter(room => {
+        if (currentFilter !== 'all' && room.status !== currentFilter) {
+            return false;
+        }
+        if (currentTypeFilter !== 'all' && room.roomType !== currentTypeFilter) {
+            return false;
+        }
+        if (currentRankFilter !== 'all' && room.roomRank !== currentRankFilter) {
+            return false;
+        }
+        if (searchTerm) {
+            const q = searchTerm.toLowerCase();
+            if (!room.roomNumber.toLowerCase().includes(q) && !room.roomType.toLowerCase().includes(q)) {
+                return false;
+            }
+        }
+        return true;
+    });
 
-            let rooms = data.rooms.map(r => ({
-                id: r.id,
-                roomNumber: r.roomNumber,
-                roomType: r.roomType,
-                roomRank: r.roomRank,
-                status: (r.status || '').toLowerCase()
-            }));
+    // Apply sorting
+    filteredRooms.sort((a, b) => {
+        let fieldA = a[currentSort.field] || '';
+        let fieldB = b[currentSort.field] || '';
 
-            // ✅ Filter
-            let filteredRooms = rooms.filter(room => {
-                if (currentFilter !== 'all' && room.status !== currentFilter) {
-                    return false;
-                }
+        if (typeof fieldA === 'string') {
+            fieldA = fieldA.toLowerCase();
+            fieldB = fieldB.toLowerCase();
+        }
 
+        if (fieldA < fieldB) return currentSort.order === 'asc' ? -1 : 1;
+        if (fieldA > fieldB) return currentSort.order === 'asc' ? 1 : -1;
+        return 0;
+    });
 
-                return true;
-            });
+    // Paginate
+    const totalPages = Math.max(1, Math.ceil(filteredRooms.length / itemsPerPage));
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+    const startIndex = currentPage * itemsPerPage;
+    const pageRooms = filteredRooms.slice(startIndex, startIndex + itemsPerPage);
 
-            // ✅ Sort
+    // Render table rows
+    if (pageRooms.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;">No rooms found</td></tr>';
+    } else {
+        tableBody.innerHTML = pageRooms.map(room => `
+            <tr>
+                <td><strong>${escapeHtml(room.roomNumber)}</strong></td>
+                <td>${escapeHtml(room.roomType)}</td>
+                <td>
+                    <span class="status-badge status-${escapeHtml(room.status)}">
+                        ${formatStatus(room.status)}
+                    </span>
+                </td>
+                <td>${escapeHtml(room.roomRank)}</td>
+                <td>${renderActionDropdown(room)}</td>
+            </tr>
+        `).join('');
+    }
 
-            filteredRooms.sort((a, b) => {
-                let fieldA = a[currentSort.field]|| '';
-                let fieldB = b[currentSort.field]|| '';
-
-                // xử lý string
-                if (typeof fieldA === 'string') {
-                    fieldA = fieldA.toLowerCase();
-                    fieldB = fieldB.toLowerCase();
-                }
-
-                if (fieldA < fieldB) return currentSort.order === 'asc' ? -1 : 1;
-                if (fieldA > fieldB) return currentSort.order === 'asc' ? 1 : -1;
-                return 0;
-            });
-            // ✅ Render
-            tableBody.innerHTML = filteredRooms.map(room => `
-                <tr>
-                    <td><strong>${room.roomNumber}</strong></td>
-                    <td>${room.roomType}</td>
-                    <td>
-                        <span class="status-badge status-${room.status}">
-                            ${formatStatus(room.status)}
-                        </span>
-                    </td>
-                    <td>${room.roomRank}</td>
-                    <td>${renderActionDropdown(room)}</td>
-                </tr>
-            `).join('');
-
-            // ✅ Pagination dùng từ server
-            renderPagination(data.totalPages);
-        });
+    renderPagination(totalPages);
+    initDropdowns();
 }
 
 // Render action dropdown theo role và status
@@ -211,10 +268,17 @@ function renderActionDropdown(room) {
 
     return `
         <div class="action-dropdown">
-            <button class="dropdown-btn" onclick="toggleDropdown(event, ${room.id})">
-                Change Status <i class="fas fa-chevron-down"></i>
+            <button class="dropdown-btn" data-room-id="${room.id}">
+                Actions <i class="fas fa-chevron-down"></i>
             </button>
             <div class="dropdown-menu" id="dropdown-${room.id}">
+                <div class="dropdown-item" style="padding: 8px 12px;">
+                    <input type="text" placeholder="Customer ID" class="customer-id-input" id="customerId_${room.id}" style="width: 100%;">
+                </div>
+                <div class="dropdown-item" onclick="assignRoomToCustomer(${room.id})">
+                    <i class="fas fa-user-plus"></i> Assign to Customer
+                </div>
+                <div class="dropdown-divider"></div>
                 ${allowedStatuses.map(s => `
                     <div class="dropdown-item" onclick="changeRoomStatus(${room.id}, '${s}')">
                         <i class="fas ${getStatusIcon(s)}"></i>
@@ -225,76 +289,200 @@ function renderActionDropdown(room) {
         </div>
     `;
 }
-// Toggle dropdown
-function toggleDropdown(event, roomId) {
-    event.stopPropagation();
 
-    // Close all other dropdowns
-    document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
-        if (menu.id !== `dropdown-${roomId}`) {
-            menu.classList.remove('show');
+// Initialize dropdowns
+function initDropdowns() {
+    document.querySelectorAll('.action-dropdown').forEach(dropdown => {
+        const btn = dropdown.querySelector('.dropdown-btn');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        
+        if (btn && menu) {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Close all other dropdowns
+                document.querySelectorAll('.dropdown-menu.show').forEach(m => {
+                    if (m !== menu) m.classList.remove('show');
+                });
+                menu.classList.toggle('show');
+            };
         }
     });
-
-    // Toggle current dropdown
-    const dropdown = document.getElementById(`dropdown-${roomId}`);
-    if (dropdown) {
-        dropdown.classList.toggle('show');
-    }
 }
 
 // Change room status
 function changeRoomStatus(roomId, newStatus) {
-    const room = rooms.find(r => r.id === roomId);
-    if (!room) return;
+    // Call API to update status
+    fetch(`/api/rooms/${roomId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => {
+        if (response.ok) {
+            // Show success message
+            showNotification(`Room status changed to ${formatStatus(newStatus)}`, 'success');
+            // Refresh data and table
+            loadRooms();
+        } else {
+            showNotification('Failed to change room status', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error changing room status:', error);
+        showNotification('Error changing room status', 'error');
+    });
+}
 
-    // Kiểm tra quyền
-    const allowedStatuses = statusFlows[userRole]?.[room.status] || [];
-    if (!allowedStatuses.includes(newStatus)) {
-        alert('You do not have permission to change to this status');
+// Assign room to customer
+function assignRoomToCustomer(roomId) {
+    const input = document.getElementById(`customerId_${roomId}`);
+    const customerId = input ? input.value.trim() : '';
+    
+    if (!customerId) {
+        showNotification('Please enter Customer ID', 'warning');
         return;
     }
+    
+    // Call API to assign room to customer
+    fetch(`/api/rooms/${roomId}/assign`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ customerId: customerId })
+    })
+    .then(response => {
+        if (response.ok) {
+            showNotification(`Room assigned to customer ${customerId}`, 'success');
+            // Clear input
+            if (input) input.value = '';
+            // Refresh data, table and bookings
+            loadRooms();
+            fetchBookingsData();
+        } else {
+            showNotification('Failed to assign room', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error assigning room:', error);
+        showNotification('Error assigning room', 'error');
+    });
+}
 
-    // Update status
-    room.status = newStatus;
+// Fetch bookings data
+function fetchBookingsData() {
+    // Replace with your actual API endpoint
+    fetch('/api/bookings/current')
+        .then(res => res.json())
+        .then(data => {
+            allBookings = data;
+            populateBookingsTable(data);
+        })
+        .catch(error => {
+            console.error('Error fetching bookings:', error);
+            // For demo, show empty state
+            populateBookingsTable([]);
+        });
+}
 
-    // Close dropdown
-    const dropdown = document.getElementById(`dropdown-${roomId}`);
-    if (dropdown) {
-        dropdown.classList.remove('show');
+// Populate bookings table
+function populateBookingsTable(bookings) {
+    if (!bookingsTableBody) return;
+    
+    bookingsTableBody.innerHTML = '';
+    
+    if (!bookings || bookings.length === 0) {
+        const row = bookingsTableBody.insertRow();
+        const cell = row.insertCell(0);
+        cell.colSpan = 4; // Customer ID, Room Type, Room Rank, Action
+        cell.textContent = 'No bookings found';
+        cell.style.textAlign = 'center';
+        cell.style.padding = '40px';
+        cell.style.color = '#6c757d';
+        cell.style.fontSize = '14px';
+        return;
     }
-
-    // Show success message
-    alert(`Room ${room.room_number} status changed to ${formatStatus(newStatus)}`);
-
-    // Re-render table
-renderTable();
+    
+    bookings.forEach(booking => {
+        const row = bookingsTableBody.insertRow();
+        row.className = 'booking-row';
+        row.style.cursor = 'pointer';
+        
+        // Customer ID
+        const cellId = row.insertCell(0);
+        cellId.textContent = booking.customerId || booking.customer_id || 'N/A';
+        
+        // Room Type
+        const cellType = row.insertCell(1);
+        cellType.textContent = booking.roomType || booking.room_type || 'N/A';
+        
+        // Room Rank
+        const cellRank = row.insertCell(2);
+        cellRank.textContent = booking.roomRank || booking.room_rank || 'N/A';
+        
+        // Action button
+        const cellAction = row.insertCell(3);
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'view-details-btn';
+        viewBtn.innerHTML = '<i class="fas fa-eye"></i> View Details';
+        viewBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.showBookingDetailsModal) {
+                window.showBookingDetailsModal(booking);
+            }
+        };
+        cellAction.appendChild(viewBtn);
+        
+        // Make row clickable
+        row.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON' && !e.target.closest('.view-details-btn')) {
+                if (window.showBookingDetailsModal) {
+                    window.showBookingDetailsModal(booking);
+                }
+            }
+        });
+    });
 }
 
 // Render pagination
 function renderPagination(totalPages) {
+    if (!pagination) return;
+    
     pagination.innerHTML = '';
+    
+    if (totalPages <= 1) return;
 
     for (let i = 0; i < totalPages; i++) {
         const btn = document.createElement('button');
         btn.innerText = i + 1;
-
+        btn.classList.add('page-btn');
+        
         if (i === currentPage) {
             btn.classList.add('active');
         }
-
+        
         btn.addEventListener('click', () => {
-            currentPage = i;   // ✅ QUAN TRỌNG
-            renderTable();     // ✅ gọi lại API
+            currentPage = i;
+            renderTable();
         });
-
+        
         pagination.appendChild(btn);
     }
 }
-// Go to page
-function goToPage(page) {
-    currentPage = page;
-    renderTable();
+
+// Helper function to escape HTML
+function escapeHtml(str) {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 // Format status
@@ -321,29 +509,155 @@ function getStatusIcon(status) {
     }
 }
 
+// Show notification
+function showNotification(message, type = 'info') {
+    // You can implement a toast notification here
+    alert(message); // Simple alert for now
+}
+
 // Make functions globally available
-window.toggleDropdown = toggleDropdown;
 window.changeRoomStatus = changeRoomStatus;
-window.goToPage = goToPage;
+window.assignRoomToCustomer = assignRoomToCustomer;
 
-// Function to set user role (có thể gọi từ login)
-function setUserRole(role) {
-    if (role === 'receptionist' || role === 'housekeeping') {
-        userRole = role;
-        if (roleIndicator) {
-            roleIndicator.textContent = role === 'receptionist' ? 'Receptionist' : 'Housekeeping';
+// Booking Details Modal Handler
+document.addEventListener('DOMContentLoaded', function() {
+    const bookingModal = document.getElementById('bookingDetailsModal');
+    const bookingModalClose = bookingModal ? bookingModal.querySelector('.booking-modal-close') : null;
+    const bookingModalOverlay = bookingModal ? bookingModal.querySelector('.booking-modal-overlay') : null;
+    
+    function closeBookingModal() {
+        if (bookingModal) {
+            bookingModal.style.display = 'none';
+            document.body.style.overflow = '';
         }
-        renderTable();
     }
-}
-function changeRoomStatus(roomId, status) {
-    fetch(`/api/rooms/${roomId}/status`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status })
-    })
-        .then(() => renderTable()); // reload lại
-
-}
+    
+    function openBookingModal() {
+        if (bookingModal) {
+            bookingModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    if (bookingModalClose) {
+        bookingModalClose.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeBookingModal();
+        });
+    }
+    
+    if (bookingModalOverlay) {
+        bookingModalOverlay.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeBookingModal();
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && bookingModal && bookingModal.style.display === 'flex') {
+            closeBookingModal();
+        }
+    });
+    
+    const modalContainer = bookingModal ? bookingModal.querySelector('.booking-modal-container') : null;
+    if (modalContainer) {
+        modalContainer.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    window.showBookingDetailsModal = function(booking) {
+        const modalBody = document.getElementById('bookingDetailsBody');
+        if (!modalBody) return;
+        
+        const formatDate = (dateString) => {
+            if (!dateString) return 'N/A';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch(e) {
+                return dateString;
+            }
+        };
+        
+        const detailsHtml = `
+            <div class="booking-detail-item">
+                <label>Booking ID</label>
+                <div class="detail-value">${escapeHtml(booking.bookingId || booking.id || 'N/A')}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Customer ID</label>
+                <div class="detail-value">${escapeHtml(booking.customerId || 'N/A')}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Customer Name</label>
+                <div class="detail-value">${escapeHtml(booking.customerName || 'N/A')}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Email</label>
+                <div class="detail-value">${escapeHtml(booking.email || 'N/A')}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Phone Number</label>
+                <div class="detail-value">${escapeHtml(booking.phone || 'N/A')}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Room Type</label>
+                <div class="detail-value">${escapeHtml(booking.roomType || 'N/A')}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Room Rank</label>
+                <div class="detail-value">${escapeHtml(booking.roomRank || 'N/A')}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Room Number</label>
+                <div class="detail-value">${escapeHtml(booking.roomNumber || 'Not assigned yet')}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Booking Time</label>
+                <div class="detail-value">${formatDate(booking.bookingTime)}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Check-in Time</label>
+                <div class="detail-value">${formatDate(booking.checkInTime)}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Check-out Time</label>
+                <div class="detail-value">${formatDate(booking.checkOutTime)}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Status</label>
+                <div class="detail-value">
+                    <span class="status-badge">${escapeHtml(booking.status || 'N/A')}</span>
+                </div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Total Amount</label>
+                <div class="detail-value">${booking.totalAmount ? '$' + Number(booking.totalAmount).toLocaleString() : 'N/A'}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Number of Guests</label>
+                <div class="detail-value">${booking.numberOfGuests || '1'}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Special Requests</label>
+                <div class="detail-value">${escapeHtml(booking.specialRequests || 'None')}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Payment Status</label>
+                <div class="detail-value">${escapeHtml(booking.paymentStatus || 'Pending')}</div>
+            </div>
+        `;
+        
+        modalBody.innerHTML = detailsHtml;
+        openBookingModal();
+    };
+});
