@@ -9,9 +9,7 @@
       <div class="menu-dropdown">
 
         <!-- Only Admin & Manager -->
-        <a th:href="@{/rooms/view-room-status}"
-           id="viewRoomStatus"
-           sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+        <a th:href="@{/rooms/view-room-status}" id="viewRoomStatus" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
           View Room Status
         </a>
 
@@ -22,10 +20,6 @@
 
         <a th:href="@{/rooms/check-equipment}" id="checkEquipment">
           Check Equipment
-        </a>
-
-        <a th:href="@{/rooms/check-in-out}" id="checkInOut">
-          Check In / Check Out
         </a>
 
       </div>
@@ -40,17 +34,14 @@
       <a th:href="@{/staff/view}" id="viewStaff">View Staff</a>
 
       <!-- Only Admin & Manager -->
-      <a th:href="@{/staff/manage}"
-         id="manageStaff"
-         sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+      <a th:href="@{/staff/manage}" id="manageStaff" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
         Manage Staff
       </a>
 
     </div>
   </div>
 
-  <div class="menu-item"
-       sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+  <div class="menu-item" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
 
     <span>User Management ▾</span>
 
@@ -62,14 +53,14 @@
 
   </div>
 
-  <div class="menu-item"sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+  <div class="menu-item" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
     <span>Revenue ▾</span>
     <div class="menu-dropdown">
       <a th:href="@{/revenue/view-revenue}" id="viewRevenue">View Revenue</a>
     </div>
   </div>
 
-  <div class="menu-item"sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+  <div class="menu-item" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
     <span>Reports ▾</span>
     <div class="menu-dropdown">
       <a th:href="@{/reports/view-reports}" id="viewReports">View Reports</a>
@@ -79,8 +70,7 @@
   <!-- ACCOUNT -->
 
   <div class="account" id="accountMenu">
-    <div class="avatar"
-         th:text="${#strings.substring(currentUser.fullName,0,1)}">
+    <div class="avatar" th:text="${#strings.substring(currentUser.fullName,0,1)}">
     </div>
 
     <div class="account-name" th:text="${currentUser.fullName}"></div>
@@ -94,9 +84,7 @@
       <a id="changePasswordBtn">Change Password</a>
 
       <form action="/logout" method="post" style="margin: 0">
-        <button
-                type="submit"
-                style="
+        <button type="submit" style="
               display: block;
               width: 100%;
               padding: 12px 15px;
@@ -106,11 +94,13 @@
               color: #333;
               font-size: 14px;
               cursor: pointer;
-            "
-        >
+            ">
           Logout
         </button>
       </form>
+      <button id="secretBtn" style="display: none;">
+        HTMG
+      </button>
     </div>
   </div>
   </div>
@@ -152,9 +142,9 @@
           strength = "Weak";
           color = "red";
         } else if (
-                value.match(/[A-Z]/) &&
-                value.match(/[0-9]/) &&
-                value.length >= 8
+          value.match(/[A-Z]/) &&
+          value.match(/[0-9]/) &&
+          value.length >= 8
         ) {
           strength = "Strong";
           color = "green";
@@ -174,8 +164,8 @@
 
     // ===== AUTO OPEN PASSWORD MODAL =====
     const hasPasswordMessage =
-            document.querySelector(".success-message.password-message") ||
-            document.querySelector(".error-message.password-message");
+      document.querySelector(".success-message.password-message") ||
+      document.querySelector(".error-message.password-message");
 
     if (hasPasswordMessage && passwordModal) {
       passwordModal.classList.add("show");
@@ -234,13 +224,32 @@
 
       });
     }
-// Hail the Machine God
-// Praise the Omnissiah
-// As Pasqal once said: https://youtu.be/6Cdamnz8mf8
+    const secretBtn = document.getElementById("secretBtn");
+
+    if (secretBtn) {
+      secretBtn.addEventListener("click", () => {
+        window.open("https://youtu.be/9gIMZ0WyY88?si=9eZVdRkWb3WH6Sfq", "_blank");
+      });
+    }
+
+    if (secretBtn) {
+      document.addEventListener("keydown", (e) => {
+        if (e.altKey) {
+          secretBtn.style.display = "block";
+        }
+      });
+
+      document.addEventListener("keyup", (e) => {
+        if (!e.altKey) {
+          secretBtn.style.display = "none";
+        }
+      });
+      window.addEventListener("blur", () => {
+        secretBtn.style.display = "none";
+      });
+    }
+    // Hail the Machine God
+    // Praise the Omnissiah
+    // As Pasqal once said: https://youtu.be/6Cdamnz8mf8
   });
 </script>
-
-
-
-
-

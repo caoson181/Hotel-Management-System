@@ -75,13 +75,14 @@
   display: block;
 }
 
-.account-dropdown{
-  display:none;
+.account-dropdown {
+  display: none;
 }
 
-.account-dropdown.show{
-  display:block;
+.account-dropdown.show {
+  display: block;
 }
+
 .account-dropdown a,
 .account-dropdown button {
   display: block;
@@ -98,4 +99,12 @@
 .account-dropdown a:hover,
 .account-dropdown button:hover {
   background: #f2f2f2;
+}
+
+.secret-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: none;
+  z-index: 9999;
 }
