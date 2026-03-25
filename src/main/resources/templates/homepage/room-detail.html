@@ -1,219 +1,278 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${room != null ? type + ' | Gravity Hotel' : 'Room Detail | Gravity Hotel'}">Room Detail | Gravity Hotel</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title
+      th:text="${room != null ? type + ' | Gravity Hotel' : 'Room Detail | Gravity Hotel'}"
+    >
+      Room Detail | Gravity Hotel
+    </title>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- AOS Animation -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
 
     <!-- Navbar CSS -->
-    <link rel="stylesheet" th:href="@{/css/homepage.css}">
+    <link rel="stylesheet" th:href="@{/css/homepage.css}" />
 
     <!-- Room Detail CSS -->
     <link rel="stylesheet" th:href="@{/css/room-detail.css}" />
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css"
+    />
+  </head>
+  <body>
+    <div th:replace="~{homepage/navbar :: navbar}"></div>
 
-<div th:replace="~{homepage/navbar :: navbar}"></div>
+    <!-- Back Button -->
+    <a href="#" class="back-btn" onclick="history.back()">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
 
-<!-- Back Button -->
-<a href="#" class="back-btn" onclick="history.back()">
-    <i class="fas fa-arrow-left"></i> Back
-</a>
-
-<!-- Main Content -->
-<main class="room-detail">
-    <!-- Hero Section với ảnh lớn -->
-    <div class="room-hero">
+    <!-- Main Content -->
+    <main class="room-detail">
+      <!-- Hero Section với ảnh lớn -->
+      <div class="room-hero">
         <div class="main-image-container">
-            <img class="main-image" id="mainImage" th:src="${room != null ? room.image : 'https://images.unsplash.com/photo-1590490360182-c33d5773345b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'}" alt="Room">
+          <img
+            class="main-image"
+            id="mainImage"
+            th:src="${room != null ? room.image : 'https://images.unsplash.com/photo-1590490360182-c33d5773345b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'}"
+            alt="Room"
+          />
         </div>
 
         <!-- Navigation Arrows -->
         <div class="image-nav">
-            <div class="nav-arrow" id="prevImage">
-                <i class="fas fa-chevron-left"></i>
-            </div>
-            <div class="nav-arrow" id="nextImage">
-                <i class="fas fa-chevron-right"></i>
-            </div>
+          <div class="nav-arrow" id="prevImage">
+            <i class="fas fa-chevron-left"></i>
+          </div>
+          <div class="nav-arrow" id="nextImage">
+            <i class="fas fa-chevron-right"></i>
+          </div>
         </div>
 
         <div class="hero-overlay">
-            <h1 data-aos="fade-up" th:text="${room != null ? rank.toUpperCase() + ' ' + type : 'Deluxe Double Room'}"  >Deluxe Double Room</h1>
-            <div class="room-meta" data-aos="fade-up" data-aos-delay="100">
-                <span><i class="fas fa-user"></i> <span th:text="${room != null ? room.guests : 2}">2</span> Guests</span>
-                <span><i class="fas fa-ruler-combined"></i> <span th:text="${room != null ? room.size : 32}">32</span> m²</span>
-                <span><i class="fas fa-star" style="color: #d4af37;"></i> 4.9 (128)</span>
-            </div>
+          <h1
+            data-aos="fade-up"
+            th:text="${room != null ? rank.toUpperCase() + ' ' + type : 'Deluxe Double Room'}"
+          >
+            Deluxe Double Room
+          </h1>
+          <div class="room-meta" data-aos="fade-up" data-aos-delay="100">
+            <span
+              ><i class="fas fa-user"></i>
+              <span th:text="${room != null ? room.guests : 2}">2</span>
+              Guests</span
+            >
+            <span
+              ><i class="fas fa-ruler-combined"></i>
+              <span th:text="${room != null ? room.size : 32}">32</span>
+              m²</span
+            >
+            <span
+              ><i class="fas fa-star" style="color: #d4af37"></i> 4.9
+              (128)</span
+            >
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Thumbnail Strip -->
-    <div class="thumbnail-wrapper">
+      <!-- Thumbnail Strip -->
+      <div class="thumbnail-wrapper">
         <div class="thumbnail-strip" id="thumbnailStrip">
-            <!-- Thumbnails will be created by JavaScript -->
+          <!-- Thumbnails will be created by JavaScript -->
         </div>
-    </div>
+      </div>
 
-    <div class="detail-container">
+      <div class="detail-container">
         <!-- Info Cards -->
         <div class="info-row" data-aos="fade-up">
-            <div class="info-card">
-                <i class="fas fa-wifi"></i>
-                <h3>Free WiFi</h3>
-                <p>High-speed</p>
-            </div>
-            <div class="info-card">
-                <i class="fas fa-coffee"></i>
-                <h3>Breakfast</h3>
-                <p>Included</p>
-            </div>
-            <div class="info-card">
-                <i class="fas fa-parking"></i>
-                <h3>Free Parking</h3>
-                <p>On-site</p>
-            </div>
-            <div class="info-card">
-                <i class="fas fa-concierge-bell"></i>
-                <h3>24/7 Service</h3>
-                <p>Room service</p>
-            </div>
+          <div class="info-card">
+            <i class="fas fa-wifi"></i>
+            <h3>Free WiFi</h3>
+            <p>High-speed</p>
+          </div>
+          <div class="info-card">
+            <i class="fas fa-coffee"></i>
+            <h3>Breakfast</h3>
+            <p>Included</p>
+          </div>
+          <div class="info-card">
+            <i class="fas fa-parking"></i>
+            <h3>Free Parking</h3>
+            <p>On-site</p>
+          </div>
+          <div class="info-card">
+            <i class="fas fa-concierge-bell"></i>
+            <h3>24/7 Service</h3>
+            <p>Room service</p>
+          </div>
         </div>
 
         <!-- Features Row -->
         <div class="features-row" data-aos="fade-up" data-aos-delay="100">
-            <div class="amenities-card">
-                <h2><i class="fas fa-list-ul"></i> Amenities</h2>
-                <div class="amenities-grid">
-                    <!-- Amenities will be populated by JavaScript -->
-                </div>
+          <div class="amenities-card">
+            <h2><i class="fas fa-list-ul"></i> Amenities</h2>
+            <div class="amenities-grid">
+              <!-- Amenities will be populated by JavaScript -->
             </div>
+          </div>
 
-            <div class="description-card">
-                <h2><i class="fas fa-info-circle"></i> Description</h2>
-                <div>
-                    <!-- Description will be populated by JavaScript -->
-                </div>
+          <div class="description-card">
+            <h2><i class="fas fa-info-circle"></i> Description</h2>
+            <div>
+              <!-- Description will be populated by JavaScript -->
             </div>
+          </div>
 
-            <div class="booking-card">
-                <div class="price">
-                    $199 <small>/night</small>
-                </div>
-                <hr>
-                <div class="date-picker">
-                    <label><i class="fas fa-calendar-alt"></i> Check-in</label>
-                    <input type="date" class="date-input" id="checkin" value="2025-04-01">
-                </div>
-                <div class="date-picker">
-                    <label><i class="fas fa-calendar-alt"></i> Check-out</label>
-                    <input type="date" class="date-input" id="checkout" value="2025-04-03">
-                </div>
-                <div class="guest-selector">
-                    <label><i class="fas fa-user"></i> Guests</label>
-                    <div class="guest-control">
-                        <button id="decrementGuest"><i class="fas fa-minus"></i></button>
-                        <span id="guestCount">2</span>
-                        <button id="incrementGuest"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
-                <div class="total-price">
-                    <span>Total</span><br>
-                    <span id="totalPrice">$398</span>
-                </div>
-                <button class="book-btn" id="bookNowBtn">
-                    <i class="fas fa-check-circle"></i> Book Now
+          <div class="booking-card">
+            <div class="price">$199 <small>/night</small></div>
+            <hr />
+            <div class="date-picker">
+              <label><i class="fas fa-calendar-alt"></i> Check-in</label>
+              <input
+                type="date"
+                class="date-input"
+                id="checkin"
+                value="2025-04-01"
+              />
+            </div>
+            <div class="date-picker">
+              <label><i class="fas fa-calendar-alt"></i> Check-out</label>
+              <input
+                type="date"
+                class="date-input"
+                id="checkout"
+                value="2025-04-03"
+              />
+            </div>
+            <div class="guest-selector">
+              <label><i class="fas fa-user"></i> Guests</label>
+              <div class="guest-control">
+                <button id="decrementGuest">
+                  <i class="fas fa-minus"></i>
                 </button>
-                <div class="secure-text">
-                    <i class="fas fa-lock"></i> Secure booking • Free cancellation
-                </div>
+                <span id="guestCount">2</span>
+                <button id="incrementGuest"><i class="fas fa-plus"></i></button>
+              </div>
             </div>
+            <div class="total-price">
+              <span>Total</span><br />
+              <span id="totalPrice">$398</span>
+            </div>
+            <button class="book-btn" id="bookNowBtn">
+              <i class="fas fa-check-circle"></i> Book Now
+            </button>
+            <div class="secure-text">
+              <i class="fas fa-lock"></i> Secure booking • Free cancellation
+            </div>
+          </div>
         </div>
 
         <!-- Similar Rooms -->
         <div class="similar-row" data-aos="fade-up" data-aos-delay="150">
-            <h2><i class="fas fa-hotel"></i> You May Also Like</h2>
-            <div class="similar-grid">
-                <div class="similar-card">
-                    <div class="similar-img" style="background-image: url('https://images.unsplash.com/photo-1618773928121-c32242e63f39?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80');"></div>
-                    <div class="similar-info">
-                        <h3>Superior Twin</h3>
-                        <p>2 Twin Beds | 30 m²</p>
-                        <span class="price">$159 /night</span>
-                    </div>
-                </div>
-                <div class="similar-card">
-                    <div class="similar-img" style="background-image: url('https://images.unsplash.com/photo-1578683010236-d716f9a3f461?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80');"></div>
-                    <div class="similar-info">
-                        <h3>Executive Suite</h3>
-                        <p>King Bed | 50 m²</p>
-                        <span class="price">$349 /night</span>
-                    </div>
-                </div>
-                <div class="similar-card">
-                    <div class="similar-img" style="background-image: url('https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80');"></div>
-                    <div class="similar-info">
-                        <h3>Presidential Suite</h3>
-                        <p>King + Living | 80 m²</p>
-                        <span class="price">$599 /night</span>
-                    </div>
-                </div>
+          <h2><i class="fas fa-hotel"></i> You May Also Like</h2>
+          <div class="similar-grid">
+            <div class="similar-card">
+              <div
+                class="similar-img"
+                style="
+                  background-image: url(&quot;https://images.unsplash.com/photo-1618773928121-c32242e63f39?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80&quot;);
+                "
+              ></div>
+              <div class="similar-info">
+                <h3>Superior Twin</h3>
+                <p>2 Twin Beds | 30 m²</p>
+                <span class="price">$159 /night</span>
+              </div>
             </div>
+            <div class="similar-card">
+              <div
+                class="similar-img"
+                style="
+                  background-image: url(&quot;https://images.unsplash.com/photo-1578683010236-d716f9a3f461?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80&quot;);
+                "
+              ></div>
+              <div class="similar-info">
+                <h3>Executive Suite</h3>
+                <p>King Bed | 50 m²</p>
+                <span class="price">$349 /night</span>
+              </div>
+            </div>
+            <div class="similar-card">
+              <div
+                class="similar-img"
+                style="
+                  background-image: url(&quot;https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80&quot;);
+                "
+              ></div>
+              <div class="similar-info">
+                <h3>Presidential Suite</h3>
+                <p>King + Living | 80 m²</p>
+                <span class="price">$599 /night</span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+    </main>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox">
+      <span class="close-lightbox">&times;</span>
+      <span class="lightbox-prev"><i class="fas fa-chevron-left"></i></span>
+      <span class="lightbox-next"><i class="fas fa-chevron-right"></i></span>
+      <img class="lightbox-img" id="lightboxImg" src="" alt="" />
     </div>
-</main>
 
-<!-- Lightbox Modal -->
-<div class="lightbox" id="lightbox">
-    <span class="close-lightbox">&times;</span>
-    <span class="lightbox-prev"><i class="fas fa-chevron-left"></i></span>
-    <span class="lightbox-next"><i class="fas fa-chevron-right"></i></span>
-    <img class="lightbox-img" id="lightboxImg" src="" alt="">
-</div>
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+      <i class="fas fa-check-circle"></i> Booked successfully!
+    </div>
 
-<!-- Toast Notification -->
-<div class="toast" id="toast">
-    <i class="fas fa-check-circle"></i> Booked successfully!
-</div>
-
-<footer class="footer">
-    <div class="container">
+    <footer class="footer">
+      <div class="container">
         <p th:text="#{footer.copy}"></p>
-    </div>
-</footer>
+      </div>
+    </footer>
 
-<!-- Scripts -->
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    // Set room data from backend
-    window.roomData = /*[[${room}]]*/ {};
-    window.roomRank = /*[[${rank}]]*/ 'deluxe';
-    window.roomType = /*[[${type}]]*/ 'Double';
-    /*]]>*/
-</script>
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script th:src="@{/js/room-detail.js}"></script>
-<script src="/js/room-homepage.js"></script>
+    <!-- Scripts -->
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      // Set room data from backend
+      window.roomData = /*[[${room}]]*/ {};
+      window.roomRank = /*[[${rank}]]*/ "deluxe";
+      window.roomType = /*[[${type}]]*/ "Double";
+      /*]]>*/
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script th:src="@{/js/room-detail.js}"></script>
+    <script src="/js/room-homepage.js"></script>
 
-<!-- Navbar Scroll Animation -->
-<script>
-    const header = document.querySelector('.header');
-    window.addEventListener('scroll', () => {
+    <!-- Navbar Scroll Animation -->
+    <script>
+      const header = document.querySelector(".header");
+      window.addEventListener("scroll", () => {
         if (window.scrollY > 50) {
-            header.classList.add('scrolled');
+          header.classList.add("scrolled");
         } else {
-            header.classList.remove('scrolled');
+          header.classList.remove("scrolled");
         }
-    });
-</script>
-</body>
+      });
+    </script>
+  </body>
 </html>
