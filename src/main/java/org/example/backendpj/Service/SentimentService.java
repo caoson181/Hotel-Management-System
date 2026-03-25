@@ -105,44 +105,4 @@ public class SentimentService {
         }
     }
 
-    public String translateToEnglish(String text) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-
-            String url = "https://router.huggingface.co/hf-inference/models/Helsinki-NLP/opus-mt-vi-en";
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Accept", "application/json");
-            headers.setBearerAuth(apiKey);
-            headers.set("x-wait-for-model", "true");
-
-            Map<String, String> body = new HashMap<>();
-            body.put("inputs", text);
-
-            HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-
-            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-
-            String json = response.getBody();
-
-            System.out.println("TRANSLATE RAW: " + json);
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            // response dạng: [{"translation_text":"..."}]
-            List<Map<String, String>> result = mapper.readValue(json, List.class);
-
-            String translated = result.get(0).get("translation_text");
-
-            System.out.println("TRANSLATED: " + translated);
-
-            return translated;
-
-        } catch (Exception e) {
-            System.out.println("❌ TRANSLATE ERROR:");
-            e.printStackTrace();
-            return text; // fallback nếu lỗi
-        }
-    }
 }

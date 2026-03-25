@@ -980,27 +980,37 @@ header.scrolled .account-btn:hover,
 }
 
 .language-parent {
-    position: relative;
+  position: relative;
 }
 
 .language-submenu {
-    position: static;
-    /* 🔥 quan trọng */
-    width: 100%;
-    display: none;
-    box-shadow: none;
-    border-radius: 0;
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  width: 180px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 100;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .language-submenu.show {
-    display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .language-item {
-    padding: 10px 14px;
-    cursor: pointer;
+  padding: 0.55rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 .language-item:hover {
-    background: #f1f5ff;
+  background: #f1f5ff;
 }
