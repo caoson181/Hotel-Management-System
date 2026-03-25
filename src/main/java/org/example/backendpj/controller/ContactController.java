@@ -51,12 +51,25 @@ public class ContactController {
         contact.setSentiment("Analyzing...");
 
         if (principal != null) {
-            // ✅ đã login
-            User user = userRepository.findByUsername(principal.getName()).orElse(null);
+            User user = null;
+
+            if (principal instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
+
+                var oauthToken = (org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) principal;
+                var oauthUser = oauthToken.getPrincipal();
+
+                String oauthEmail = oauthUser.getAttribute("email");
+
+                user = userRepository.findByEmail(oauthEmail).orElse(null);
+
+            } else {
+                user = userRepository.findByUsername(principal.getName()).orElse(null);
+            }
+
             Customer customer = customerRepository.findByUser(user).orElse(null);
             contact.setCustomer(customer);
+
         } else {
-            // ✅ guest
             contact.setGuestName(name);
             contact.setGuestEmail(email);
         }
