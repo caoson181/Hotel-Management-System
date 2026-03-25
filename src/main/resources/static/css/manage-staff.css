@@ -29,6 +29,28 @@ body {
     margin-bottom: 20px;
 }
 
+/* ===================== SUCCESS MESSAGE ====================*/
+.alert-success {
+    background-color: #e6f9ec;
+    color: #1e7e34;
+    border: 1px solid #28a745;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* ===================== ERROR MESSAGE ====================== */
+.alert-error {
+    background-color: #ffe5e5;
+    color: #d93025;
+    border: 1px solid #d93025;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
 /* ===================== BUTTON ===================== */
 .btn {
     padding: 6px 14px;

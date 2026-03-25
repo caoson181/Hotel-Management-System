@@ -3,6 +3,7 @@ package org.example.backendpj.controller;
 import org.example.backendpj.Entity.Room;
 import org.example.backendpj.Repository.RoomRepository;
 
+import org.example.backendpj.Service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.ui.Model;
 
@@ -21,7 +23,6 @@ public class RoomController {
     @Autowired
     private RoomRepository roomRepository;
 
-
     @GetMapping("/view-room-status")
     public String viewRoomStatusPage(Model model) {
 
@@ -30,7 +31,6 @@ public class RoomController {
 
         return "pages/rooms/view-room-status";
     }
-
 
     // ===============================
     // Get All Rooms
@@ -42,8 +42,7 @@ public class RoomController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "roomNumber") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir
-    ) {
+            @RequestParam(defaultValue = "asc") String sortDir) {
 
         Sort sort = sortDir.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy).descending()
@@ -62,10 +61,8 @@ public class RoomController {
         if (search != null && !search.isEmpty()) {
             String keyword = search.toLowerCase();
             rooms = rooms.stream()
-                    .filter(room ->
-                            room.getRoomNumber().toLowerCase().contains(keyword)
-                                    || room.getRoomType().toLowerCase().contains(keyword)
-                    )
+                    .filter(room -> room.getRoomNumber().toLowerCase().contains(keyword)
+                            || room.getRoomType().toLowerCase().contains(keyword))
                     .toList();
         }
 
@@ -89,8 +86,7 @@ public class RoomController {
     @ResponseBody
     public ResponseEntity<?> addRoom(@RequestBody Room room) {
 
-        Optional<Room> existingRoom =
-                roomRepository.findByRoomNumber(room.getRoomNumber());
+        Optional<Room> existingRoom = roomRepository.findByRoomNumber(room.getRoomNumber());
 
         if (existingRoom.isPresent()) {
             return ResponseEntity
@@ -110,8 +106,7 @@ public class RoomController {
     @ResponseBody
     public Room updateRoom(
             @PathVariable Integer id,
-            @RequestBody Room updatedRoom
-    ) {
+            @RequestBody Room updatedRoom) {
 
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
@@ -128,8 +123,8 @@ public class RoomController {
     }
 
     // ===============================
-// Delete Room
-// ===============================
+    // Delete Room
+    // ===============================
     @DeleteMapping("/api/{id}")
     @ResponseBody
     public ResponseEntity<?> deleteRoom(@PathVariable Integer id) {
@@ -145,5 +140,17 @@ public class RoomController {
         return ResponseEntity.ok("Deleted successfully");
     }
 
+    // Assign CustomerID to Room //
+    @Autowired
+    private RoomService roomService;
 
+    @PostMapping("/api/{roomId}/assign")
+    @ResponseBody
+    public ResponseEntity<?> assignRoom(
+            @PathVariable Integer roomId,
+            @RequestBody Map<String, String> request) {
+        String customerId = request.get("customerId");
+        roomService.assignRoomToCustomer(roomId, customerId);
+        return ResponseEntity.ok().build();
+    }
 }

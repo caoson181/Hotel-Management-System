@@ -98,12 +98,33 @@ public class StaffController {
     @PostMapping("/staff/update")
     public String updateStaff(@ModelAttribute User user,
             @RequestParam(required = false) String hireDate,
-            @RequestParam(required = false) Double salary) {
+            @RequestParam(required = false) Double salary,
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
         User existing = userRepository.findById(user.getId()).orElseThrow();
 
+        // ===== LOAD PAGE DATA =====
+        loadStaffPage("", 0, null, model, "pages/staff/manage-staff");
+
+        // ===== CHECK DUPLICATE USERNAME =====
+        if (!existing.getUsername().equals(user.getUsername()) &&
+                userRepository.existsByUsername(user.getUsername())) {
+
+            model.addAttribute("error", "Username already exists!");
+            return "pages/staff/manage-staff";
+        }
+
+        // ===== CHECK DUPLICATE EMAIL =====
+        if (!existing.getEmail().equals(user.getEmail()) &&
+                userRepository.existsByEmail(user.getEmail())) {
+
+            model.addAttribute("error", "Email already exists!");
+            return "pages/staff/manage-staff";
+        }
+
         String currentLogin = SecurityContextHolder.getContext().getAuthentication().getName();
-        String oldUsername = existing.getUsername(); // lưu trước khi đổi
+        String oldUsername = existing.getUsername();
 
         // ===== UPDATE USER =====
         existing.setUsername(user.getUsername());
@@ -127,6 +148,8 @@ public class StaffController {
 
             staffRepository.save(staff);
         }
+
+        // ===== UPDATE SESSION =====
         if (currentLogin.equals(oldUsername)) {
 
             UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
@@ -137,6 +160,7 @@ public class StaffController {
             SecurityContextHolder.getContext().setAuthentication(newAuth);
         }
 
+        redirectAttributes.addFlashAttribute("success", "Staff updated successfully!");
         return "redirect:/staff/manage";
     }
 
