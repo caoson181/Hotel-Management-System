@@ -53,9 +53,15 @@
   align-items: flex-start;
   gap: 40px;
 
+<<<<<<< HEAD
   max-width: 1400px;
   margin: auto;
   padding: 0 20px;
+=======
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 40px;
+>>>>>>> 9f6ccb8f4927d08c4d8c331093e4b53e7a6ad05b
 }
 
 /* =======================================================
@@ -65,7 +71,11 @@
   position: sticky;
   top: 120px;
 
+<<<<<<< HEAD
   width: 180px;
+=======
+  width: 160px;
+>>>>>>> 9f6ccb8f4927d08c4d8c331093e4b53e7a6ad05b
   min-width: 160px;
   height: fit-content;
   flex-shrink: 0;
@@ -99,6 +109,10 @@
 ======================================================= */
 .services-content {
   flex: 1;
+<<<<<<< HEAD
+=======
+  padding-right: 30px;
+>>>>>>> 9f6ccb8f4927d08c4d8c331093e4b53e7a6ad05b
 }
 
 /* =======================================================
@@ -156,6 +170,11 @@
 .service-info p {
   font-size: 18px;
   line-height: 1.6;
+<<<<<<< HEAD
+=======
+  text-align: justify;
+  hyphens: auto;
+>>>>>>> 9f6ccb8f4927d08c4d8c331093e4b53e7a6ad05b
 }
 
 /* =======================================================
