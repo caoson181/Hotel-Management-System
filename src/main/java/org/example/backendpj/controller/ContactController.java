@@ -138,21 +138,23 @@ public class ContactController {
         List<Contact> pageData = total == 0 ? List.of() : filtered.subList(start, end);
 
         // ================= SENTIMENT % =================
-        long positive = filtered.stream()
+        long totalAll = all.size();
+
+        long positive = all.stream()
                 .filter(c -> "Positive".equals(c.getSentiment()))
                 .count();
 
-        long negative = filtered.stream()
+        long negative = all.stream()
                 .filter(c -> "Negative".equals(c.getSentiment()))
                 .count();
 
-        long neutral = filtered.stream()
+        long neutral = all.stream()
                 .filter(c -> "Neutral".equals(c.getSentiment()))
                 .count();
 
-        double posPercent = total == 0 ? 0 : (positive * 100.0 / total);
-        double negPercent = total == 0 ? 0 : (negative * 100.0 / total);
-        double neuPercent = total == 0 ? 0 : (neutral * 100.0 / total);
+        double posPercent = totalAll == 0 ? 0 : (positive * 100.0 / totalAll);
+        double negPercent = totalAll == 0 ? 0 : (negative * 100.0 / totalAll);
+        double neuPercent = totalAll == 0 ? 0 : (neutral * 100.0 / totalAll);
 
         // ================= MODEL =================
         model.addAttribute("contacts", pageData);
