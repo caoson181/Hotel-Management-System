@@ -24,11 +24,9 @@
   display: flex;
   justify-content: center;
   gap: 30px;
-
   margin-bottom: 50px;
   position: sticky;
   top: 80px;
-
   background: white;
   padding: 15px;
   z-index: 100;
@@ -51,17 +49,11 @@
 .services-layout {
   display: flex;
   align-items: flex-start;
-  gap: 40px;
+  gap: 35px;
 
-<<<<<<< HEAD
-  max-width: 1400px;
-  margin: auto;
-  padding: 0 20px;
-=======
-  max-width: 1320px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 40px;
->>>>>>> 9f6ccb8f4927d08c4d8c331093e4b53e7a6ad05b
+  padding: 0 50px;
 }
 
 /* =======================================================
@@ -71,12 +63,8 @@
   position: sticky;
   top: 120px;
 
-<<<<<<< HEAD
-  width: 180px;
-=======
-  width: 160px;
->>>>>>> 9f6ccb8f4927d08c4d8c331093e4b53e7a6ad05b
-  min-width: 160px;
+  width: 150px;
+  min-width: 150px;
   height: fit-content;
   flex-shrink: 0;
 
@@ -109,10 +97,7 @@
 ======================================================= */
 .services-content {
   flex: 1;
-<<<<<<< HEAD
-=======
   padding-right: 30px;
->>>>>>> 9f6ccb8f4927d08c4d8c331093e4b53e7a6ad05b
 }
 
 /* =======================================================
@@ -141,7 +126,7 @@
    IMAGE
 ======================================================= */
 .service-image {
-  flex: 0 0 55%;
+  flex: 0 0 52%;
 }
 
 .service-image img {
@@ -155,7 +140,7 @@
 ======================================================= */
 .service-info {
   flex: 1;
-  padding: 30px;
+  padding: 35px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -168,27 +153,24 @@
 }
 
 .service-info p {
-  font-size: 18px;
-  line-height: 1.6;
-<<<<<<< HEAD
-=======
+  font-size: 17px;
+  line-height: 1.7;
   text-align: justify;
-  hyphens: auto;
->>>>>>> 9f6ccb8f4927d08c4d8c331093e4b53e7a6ad05b
+  text-justify: inter-word;
+  hyphens: none;
 }
-
 /* =======================================================
    RESPONSIVE - TABLET
 ======================================================= */
 @media (max-width: 992px) {
   .services-layout {
     flex-direction: column;
+    padding: 0 20px;
   }
 
   .service-sidebar {
     position: relative;
     width: 100%;
-
     flex-direction: row;
     justify-content: center;
   }
