@@ -82,43 +82,90 @@ public class ContactController {
     }
 
     @GetMapping("/reports/view-reports")
-    public String viewReports(Model model) {
+    public String viewReports(
+            @RequestParam(defaultValue = "customer") String type,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sentiment,
+            Model model) {
+
+        int pageSize = 5;
 
         List<Contact> all = contactRepository.findAll();
 
-        long total = all.size();
+        // ================= FILTER TYPE =================
+        List<Contact> filtered;
 
-        long positive = all.stream()
+        if ("customer".equals(type)) {
+            filtered = all.stream()
+                    .filter(c -> c.getCustomer() != null)
+                    .toList();
+        } else {
+            filtered = all.stream()
+                    .filter(c -> c.getCustomer() == null)
+                    .toList();
+        }
+
+        // ================= SEARCH =================
+        if (keyword != null && !keyword.isBlank()) {
+            String key = keyword.toLowerCase();
+
+            filtered = filtered.stream()
+                    .filter(c -> (c.getMessage() != null && c.getMessage().toLowerCase().contains(key)) ||
+                            (c.getSubject() != null && c.getSubject().toLowerCase().contains(key)))
+                    .toList();
+        }
+
+        // ================= FILTER SENTIMENT =================
+        if (sentiment != null && !sentiment.isBlank()) {
+            filtered = filtered.stream()
+                    .filter(c -> sentiment.equalsIgnoreCase(c.getSentiment()))
+                    .toList();
+        }
+
+        // ================= PAGINATION SAFE =================
+        int total = filtered.size();
+        int totalPages = (int) Math.ceil((double) total / pageSize);
+
+        if (page < 1)
+            page = 1;
+        if (page > totalPages && totalPages > 0)
+            page = totalPages;
+
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, total);
+
+        List<Contact> pageData = total == 0 ? List.of() : filtered.subList(start, end);
+
+        // ================= SENTIMENT % =================
+        long positive = filtered.stream()
                 .filter(c -> "Positive".equals(c.getSentiment()))
                 .count();
 
-        long negative = all.stream()
+        long negative = filtered.stream()
                 .filter(c -> "Negative".equals(c.getSentiment()))
                 .count();
 
-        long neutral = all.stream()
+        long neutral = filtered.stream()
                 .filter(c -> "Neutral".equals(c.getSentiment()))
                 .count();
 
-        // tránh chia cho 0
         double posPercent = total == 0 ? 0 : (positive * 100.0 / total);
         double negPercent = total == 0 ? 0 : (negative * 100.0 / total);
         double neuPercent = total == 0 ? 0 : (neutral * 100.0 / total);
 
+        // ================= MODEL =================
+        model.addAttribute("contacts", pageData);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("type", type);
+
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sentiment", sentiment);
+
         model.addAttribute("posPercent", posPercent);
         model.addAttribute("negPercent", negPercent);
         model.addAttribute("neuPercent", neuPercent);
-
-        List<Contact> customers = all.stream()
-                .filter(c -> c.getCustomer() != null)
-                .toList();
-
-        List<Contact> guests = all.stream()
-                .filter(c -> c.getCustomer() == null)
-                .toList();
-
-        model.addAttribute("customerContacts", customers);
-        model.addAttribute("guestContacts", guests);
 
         return "pages/reports/view-reports";
     }

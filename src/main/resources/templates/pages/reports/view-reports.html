@@ -16,103 +16,138 @@
 
   <!-- PAGE CONTENT -->
 
-  <div class="report-summary">
+  <div class="report-container">
+    <div class="report-summary">
 
-    <div class="summary-card positive">
-      <div class="icon">👍</div>
-      <div class="info">
-        <span class="label">Positive</span>
-        <span class="value" th:text="${#numbers.formatDecimal(posPercent,1,1)} + '%'"></span>
+      <div class="summary-card positive">
+        <div class="icon">👍</div>
+        <div class="info">
+          <span class="label">Positive</span>
+          <span class="value" th:text="${#numbers.formatDecimal(posPercent,1,1)} + '%'"></span>
+        </div>
       </div>
+
+      <div class="summary-card negative">
+        <div class="icon">👎</div>
+        <div class="info">
+          <span class="label">Negative</span>
+          <span class="value" th:text="${#numbers.formatDecimal(negPercent,1,1)} + '%'"></span>
+        </div>
+      </div>
+
+      <div class="summary-card neutral">
+        <div class="icon">😐</div>
+        <div class="info">
+          <span class="label">Neutral</span>
+          <span class="value" th:text="${#numbers.formatDecimal(neuPercent,1,1)} + '%'"></span>
+        </div>
+      </div>
+
     </div>
 
-    <div class="summary-card negative">
-      <div class="icon">👎</div>
-      <div class="info">
-        <span class="label">Negative</span>
-        <span class="value" th:text="${#numbers.formatDecimal(negPercent,1,1)} + '%'"></span>
-      </div>
+    <div class="report-tabs">
+
+      <a th:href="@{/reports/view-reports(type='customer', page=1)}" th:classappend="${type == 'customer'} ? 'active'">
+        Customer Feedback
+      </a>
+
+      <a th:href="@{/reports/view-reports(type='guest', page=1)}" th:classappend="${type == 'guest'} ? 'active'">
+        Guest Feedback
+      </a>
+
     </div>
 
-    <div class="summary-card neutral">
-      <div class="icon">😐</div>
-      <div class="info">
-        <span class="label">Neutral</span>
-        <span class="value" th:text="${#numbers.formatDecimal(neuPercent,1,1)} + '%'"></span>
-      </div>
-    </div>
+    <form method="get" action="/reports/view-reports" class="report-toolbar">
 
+      <!-- giữ type -->
+      <input type="hidden" name="type" th:value="${type}" />
+
+      <!-- search -->
+      <input type="text" name="keyword" placeholder="Search message..." th:value="${keyword}" />
+
+      <!-- sentiment filter -->
+      <select name="sentiment">
+        <option value="">All</option>
+        <option value="Positive" th:selected="${sentiment == 'Positive'}">Positive</option>
+        <option value="Negative" th:selected="${sentiment == 'Negative'}">Negative</option>
+        <option value="Neutral" th:selected="${sentiment == 'Neutral'}">Neutral</option>
+      </select>
+
+      <!-- submit -->
+      <button type="submit">Filter</button>
+
+    </form>
+
+    <h2 th:text="${type == 'customer'} ? 'Customer Feedback' : 'Guest Feedback'"></h2>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th th:text="${type == 'customer'} ? 'Name' : 'Guest Name'"></th>
+          <th th:text="${type == 'customer'} ? 'Email' : 'Guest Email'"></th>
+          <th>Subject</th>
+          <th>Message</th>
+          <th>Date</th>
+          <th>Sentiment</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr th:each="c : ${contacts}" th:classappend="${c.sentiment} == 'Negative' ? 'row-negative'">
+
+          <td th:text="${c.contactId}"></td>
+          <td th:text="${type == 'customer' ? c.customer.user.fullName : c.guestName}"></td>
+          <td th:text="${type == 'customer' ? c.customer.user.email : c.guestEmail}"></td>
+          <td th:text="${c.subject}"></td>
+          <td th:text="${c.message}"></td>
+          <td th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy HH:mm')}"></td>
+
+          <td>
+            <span th:text="${c.sentiment}" th:class="'sentiment-badge ' + 
+              (${c.sentiment} == 'Positive' ? 'positive' : 
+              (${c.sentiment} == 'Negative' ? 'negative' : 'neutral'))">
+            </span>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination">
+
+      <!-- PREVIOUS -->
+      <a th:if="${currentPage > 1}" th:href="@{/reports/view-reports(
+    type=${type},
+    page=${currentPage-1},
+    keyword=${keyword},
+    sentiment=${sentiment}
+)}">
+        Previous
+      </a>
+
+      <span th:unless="${currentPage > 1}" class="hidden">Previous</span>
+
+      <!-- PAGE INFO -->
+      <span class="page-info">
+        <span th:text="${currentPage}"></span> /
+        <span th:text="${totalPages}"></span>
+      </span>
+
+      <!-- NEXT -->
+      <a th:if="${currentPage < totalPages}" th:href="@{/reports/view-reports(
+    type=${type},
+    page=${currentPage+1},
+    keyword=${keyword},
+    sentiment=${sentiment}
+)}">
+        Next
+      </a>
+
+      <span th:unless="${currentPage < totalPages}" class="hidden">Next</span>
+
+    </div>
   </div>
-
-  <section class="report-container">
-
-    <h2>Customer Feedback</h2>
-
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Subject</th>
-          <th>Message</th>
-          <th>Date</th>
-          <th>Sentiment</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr th:each="c : ${customerContacts}" th:classappend="${c.sentiment} == 'Negative' ? 'row-negative'">
-          <td th:text="${c.contactId}"></td>
-          <td th:text="${c.customer.user.fullName}"></td>
-          <td th:text="${c.customer.user.email}"></td>
-          <td th:text="${c.subject}"></td>
-          <td th:text="${c.message}"></td>
-          <td th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy HH:mm')}"></td>
-          <td>
-            <span th:text="${c.sentiment}" th:class="'sentiment-badge ' + 
-      (${c.sentiment} == 'Positive' ? 'positive' : 
-      (${c.sentiment} == 'Negative' ? 'negative' : 'neutral'))">
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h2>Guest Feedback</h2>
-
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Guest Name</th>
-          <th>Guest Email</th>
-          <th>Subject</th>
-          <th>Message</th>
-          <th>Date</th>
-          <th>Sentiment</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr th:each="c : ${guestContacts}" th:classappend="${c.sentiment} == 'Negative' ? 'row-negative'">
-          <td th:text="${c.contactId}"></td>
-          <td th:text="${c.guestName}"></td>
-          <td th:text="${c.guestEmail}"></td>
-          <td th:text="${c.subject}"></td>
-          <td th:text="${c.message}"></td>
-          <td th:text="${#temporals.format(c.createdAt,'dd/MM/yyyy HH:mm')}"></td>
-          <td>
-            <span th:text="${c.sentiment}" th:class="'sentiment-badge ' + 
-      (${c.sentiment} == 'Positive' ? 'positive' : 
-      (${c.sentiment} == 'Negative' ? 'negative' : 'neutral'))">
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-  </section>
 
   <!-- MODALS -->
   <div th:replace="~{components/modals :: modals}"></div>
