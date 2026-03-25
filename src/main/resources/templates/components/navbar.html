@@ -1,0 +1,255 @@
+<nav class="navbar" th:fragment="navbar" xmlns:sec="http://www.w3.org/1999/xhtml">
+  <div class="nav-left">
+    <a th:href="@{/index}" class="logo-link">🏨 Hotel Admin</a>
+  </div>
+
+  <div class="nav-right">
+    <div class="menu-item">
+      <span>Room Management ▾</span>
+      <div class="menu-dropdown">
+
+        <!-- Only Admin & Manager -->
+        <a th:href="@{/rooms/view-room-status}" id="viewRoomStatus" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+          View Room Status
+        </a>
+
+        <!-- Other staff can still see these -->
+        <a th:href="@{/rooms/view-room}" id="viewRoom">
+          View Room
+        </a>
+
+        <a th:href="@{/rooms/check-equipment}" id="checkEquipment">
+          Check Equipment
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-item">
+    <span>Staff Management ▾</span>
+    <div class="menu-dropdown">
+
+      <!-- Everyone (staff) can see -->
+      <a th:href="@{/staff/view}" id="viewStaff">View Staff</a>
+
+      <!-- Only Admin & Manager -->
+      <a th:href="@{/staff/manage}" id="manageStaff" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+        Manage Staff
+      </a>
+
+    </div>
+  </div>
+
+  <div class="menu-item" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+
+    <span>User Management ▾</span>
+
+    <div class="menu-dropdown">
+      <a th:href="@{/users/manage}" id="manageUsers">
+        Manage Users
+      </a>
+    </div>
+
+  </div>
+
+  <div class="menu-item" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+    <span>Revenue ▾</span>
+    <div class="menu-dropdown">
+      <a th:href="@{/revenue/view-revenue}" id="viewRevenue">View Revenue</a>
+    </div>
+  </div>
+
+  <div class="menu-item" sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+    <span>Reports ▾</span>
+    <div class="menu-dropdown">
+      <a th:href="@{/reports/view-reports}" id="viewReports">View Reports</a>
+    </div>
+  </div>
+
+  <!-- ACCOUNT -->
+
+  <div class="account" id="accountMenu">
+    <div class="avatar" th:text="${#strings.substring(currentUser.fullName,0,1)}">
+    </div>
+
+    <div class="account-name" th:text="${currentUser.fullName}"></div>
+
+    <div class="dropdown-icon">▼</div>
+
+    <div class="account-dropdown" id="dropdownMenu">
+
+      <a th:href="@{/staff/profile}">Profile</a>
+
+      <a id="changePasswordBtn">Change Password</a>
+
+      <form action="/logout" method="post" style="margin: 0">
+        <button type="submit" style="
+              display: block;
+              width: 100%;
+              padding: 12px 15px;
+              text-align: left;
+              background: none;
+              border: none;
+              color: #333;
+              font-size: 14px;
+              cursor: pointer;
+            ">
+          Logout
+        </button>
+      </form>
+      <button id="secretBtn" style="display: none;">
+        HTMG
+      </button>
+    </div>
+  </div>
+  </div>
+</nav>
+
+<div th:replace="components/modals :: modals"></div>
+
+<!-- ADD SCRIPT HERE -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    // ===== Toggle Password =====
+    document.querySelectorAll(".toggle-password").forEach(icon => {
+      icon.addEventListener("click", () => {
+        const input = document.getElementById(icon.getAttribute("data-target"));
+
+        if (input.type === "password") {
+          input.type = "text";
+          icon.textContent = "🙈";
+        } else {
+          input.type = "password";
+          icon.textContent = "👁";
+        }
+      });
+    });
+
+    // ===== Password Strength =====
+    const newPasswordInput = document.getElementById("newPassword");
+    const strengthText = document.getElementById("passwordStrength");
+
+    if (newPasswordInput && strengthText) {
+      newPasswordInput.addEventListener("input", () => {
+        const value = newPasswordInput.value;
+
+        let strength = "";
+        let color = "";
+
+        if (value.length < 6) {
+          strength = "Weak";
+          color = "red";
+        } else if (
+          value.match(/[A-Z]/) &&
+          value.match(/[0-9]/) &&
+          value.length >= 8
+        ) {
+          strength = "Strong";
+          color = "green";
+        } else {
+          strength = "Medium";
+          color = "orange";
+        }
+
+        strengthText.textContent = "Strength: " + strength;
+        strengthText.style.color = color;
+      });
+    }
+
+    // ===== GET MODALS FIRST =====
+    const passwordModal = document.getElementById("passwordModal");
+    const editModal = document.getElementById("editProfileModal");
+
+    // ===== AUTO OPEN PASSWORD MODAL =====
+    const hasPasswordMessage =
+      document.querySelector(".success-message.password-message") ||
+      document.querySelector(".error-message.password-message");
+
+    if (hasPasswordMessage && passwordModal) {
+      passwordModal.classList.add("show");
+    }
+
+    // ===== EDIT PROFILE MODAL =====
+    const editBtn = document.getElementById("openEditModal");
+    const editClose = document.getElementById("closeEditModal");
+
+    if (editModal && editBtn && editClose) {
+      editBtn.onclick = () => editModal.classList.add("show");
+      editClose.onclick = () => editModal.classList.remove("show");
+    }
+
+    // ===== CLICK OUTSIDE TO CLOSE =====
+    window.addEventListener("click", (e) => {
+      if (passwordModal && e.target === passwordModal) {
+        passwordModal.classList.remove("show");
+      }
+      if (editModal && e.target === editModal) {
+        editModal.classList.remove("show");
+      }
+    });
+
+    // ===== FORM VALIDATION =====
+    const form = document.getElementById("changePasswordForm");
+
+    if (form) {
+      form.addEventListener("submit", function (e) {
+
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        const strengthText = document.getElementById("passwordStrength");
+        const clientError = document.getElementById("clientError");
+
+        if (clientError) clientError.style.display = "none";
+
+        if (strengthText && strengthText.textContent.includes("Weak")) {
+          e.preventDefault();
+          if (clientError) {
+            clientError.textContent = "Password is too weak!";
+            clientError.style.display = "block";
+          }
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          e.preventDefault();
+          if (clientError) {
+            clientError.textContent = "Passwords do not match!";
+            clientError.style.display = "block";
+          }
+          return;
+        }
+
+      });
+    }
+    const secretBtn = document.getElementById("secretBtn");
+
+    if (secretBtn) {
+      secretBtn.addEventListener("click", () => {
+        window.open("https://youtu.be/9gIMZ0WyY88?si=9eZVdRkWb3WH6Sfq", "_blank");
+      });
+    }
+
+    if (secretBtn) {
+      document.addEventListener("keydown", (e) => {
+        if (e.altKey) {
+          secretBtn.style.display = "block";
+        }
+      });
+
+      document.addEventListener("keyup", (e) => {
+        if (!e.altKey) {
+          secretBtn.style.display = "none";
+        }
+      });
+      window.addEventListener("blur", () => {
+        secretBtn.style.display = "none";
+      });
+    }
+    // Hail the Machine God
+    // Praise the Omnissiah
+    // As Pasqal once said: https://youtu.be/6Cdamnz8mf8
+  });
+</script>

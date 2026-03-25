@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us - Gravity Hotel</title>
+
+    <link rel="stylesheet" href="/css/homepage.css" />
+    <link rel="stylesheet" href="/css/contact.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css"
+    />
+  </head>
+
+  <body class="contact-page">
+    <header class="header">
+      <div th:replace="~{homepage/navbar :: navbar}"></div>
+    </header>
+
+    <section class="contact-hero">
+      <div class="overlay"></div>
+      <div class="container hero-content">
+        <h1 class="typing-effect" th:text="#{about.contact}"></h1>
+        <p th:text="#{contact.text1}"></p>
+      </div>
+    </section>
+
+    <section class="contact-section">
+      <div class="container">
+        <div class="contact-wrapper">
+          <div class="contact-info">
+            <h3 th:text="#{contact.text2}"></h3>
+            <div class="info-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <div>
+                <strong th:text="#{contact.text3}"></strong>
+                <p th:text="#{contact.text4}"></p>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-phone-alt"></i>
+              <div>
+                <strong th:text="#{contact.text5}"></strong>
+                <p>+84 123 456 789</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-envelope"></i>
+              <div>
+                <strong th:text="#{contact.text6}"></strong>
+                <p>info@zerogravityhotel.com</p>
+              </div>
+            </div>
+
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+          </div>
+
+          <div class="contact-form">
+            <form action="/contact" method="post">
+              <div th:if="${!#authorization.expression('isAuthenticated()')}">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    name="name"
+                    th:placeholder="#{contact.form1}"
+                    required
+                  />
+                </div>
+
+                <div class="input-group">
+                  <input
+                    type="email"
+                    name="email"
+                    th:placeholder="#{contact.form2}"
+                    required
+                  />
+                </div>
+              </div>
+
+              <!-- Subject -->
+              <div class="input-group">
+                <input
+                  type="text"
+                  name="subject"
+                  th:placeholder="#{contact.form3}"
+                  required
+                />
+              </div>
+
+              <!-- Message -->
+              <div class="input-group">
+                <textarea
+                  name="message"
+                  th:placeholder="#{contact.form4}"
+                  rows="5"
+                  required
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                class="cta-button"
+                th:text="#{contact.form5}"
+              ></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="map-section">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3833.89555142142!2d108.2178991153319!3d16.07092384366914!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142183119100001%3A0x633d6b05988e400!2sDa%20Nang!5e0!3m2!1sen!2svn!4v1647424000000!5m2!1sen!2svn"
+        width="100%"
+        height="450"
+        style="border: 0"
+        allowfullscreen=""
+        loading="lazy"
+      ></iframe>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <p th:text="#{footer.copy}"></p>
+      </div>
+    </footer>
+
+    <script src="/js/homepage.js"></script>
+    <script src="/js/contact.js"></script>
+  </body>
+</html>

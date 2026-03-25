@@ -1,0 +1,40 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background: #e9eef3;
+}
+
+#navbar-container {
+  width: 100%;
+}
+
+/* HERO */
+
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+}
+
+.welcome-box {
+  background: white;
+  padding: 50px 80px;
+  border-radius: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.welcome-box h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.welcome-box p {
+  color: #666;
+}

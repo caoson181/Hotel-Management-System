@@ -1,0 +1,144 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <title>Customer Management</title>
+
+  <link rel="stylesheet" th:href="@{/css/global.css}" />
+  <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/modal.css}" />
+  <link rel="stylesheet" th:href="@{/css/profile.css}" />
+  <link rel="stylesheet" th:href="@{/css/manage-users.css}" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <div th:replace="~{components/navbar :: navbar}"></div>
+
+  <div class="container">
+
+    <!-- HEADER -->
+    <h1>Customer Management</h1>
+
+    <!-- ===== DASHBOARD CARDS ===== -->
+    <div class="cards">
+
+      <div class="card" th:classappend="${status == null or status == ''} ? 'active'"
+        onclick="window.location='?status='">
+        <i class="fas fa-users"></i>
+        <div>
+          <p>Total Customers</p>
+          <h3 th:text="${totalUsers}">0</h3>
+        </div>
+      </div>
+
+      <div class="card active-card" th:classappend="${status == true} ? 'active'"
+        onclick="window.location='?status=true'">
+        <i class="fas fa-user-check"></i>
+        <div>
+          <p>Active</p>
+          <h3 th:text="${activeUsers}">0</h3>
+        </div>
+      </div>
+
+      <div class="card disabled-card" th:classappend="${status == false} ? 'active'"
+        onclick="window.location='?status=false'">
+        <i class="fas fa-user-slash"></i>
+        <div>
+          <p>Disabled</p>
+          <h3 th:text="${disabledUsers}">0</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SEARCH ===== -->
+    <div class="search-box">
+      <form th:action="@{/users/manage}" method="get">
+        <input type="hidden" name="status" th:value="${status}" />
+        <input type="text" name="keyword" th:value="${keyword}" placeholder="Search customer name" />
+        <button type="submit">Search</button>
+      </form>
+    </div>
+
+    <!-- ===== TABLE ===== -->
+    <div class="table-wrapper">
+      <table class="customer-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr th:each="user : ${userList}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.fullName}"></td>
+            <td th:text="${user.email}"></td>
+            <td th:text="${user.phoneNumber}"></td>
+
+            <td>
+              <span th:if="${user.enabled}" class="badge active">Active</span>
+              <span th:unless="${user.enabled}" class="badge disabled">Disabled</span>
+            </td>
+
+            <td class="actions">
+              <a th:if="${user.enabled}" th:href="@{/user/toggle/{id}(id=${user.id})}" class="btn btn-disable"
+                onclick="return confirm('Disable this user?')">
+                Disable
+              </a>
+
+              <a th:unless="${user.enabled}" th:href="@{/user/toggle/{id}(id=${user.id})}" class="btn btn-enable"
+                onclick="return confirm('Enable this user?')">
+                Enable
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== PAGINATION ===== -->
+    <div class="pagination">
+
+      <a th:if="${currentPage > 0}"
+        th:href="@{/users/manage(page=${currentPage-1}, keyword=${keyword}, status=${status})}">
+        Previous
+      </a>
+
+      <span th:unless="${currentPage > 0}" class="hidden">Previous</span>
+
+      <span class="page-info">
+        <span th:text="${(currentPage ?: 0) + 1}"></span> /
+        <span th:text="${totalPages}"></span>
+      </span>
+
+      <a th:if="${currentPage < totalPages-1}"
+        th:href="@{/users/manage(page=${currentPage+1}, keyword=${keyword}, status=${status})}">
+        Next
+      </a>
+
+      <span th:unless="${currentPage < totalPages-1}" class="hidden">Next</span>
+
+    </div>
+
+  </div>
+
+  <!-- JS -->
+  <script th:src="@{/js/main.js}"></script>
+  <script th:src="@{/js/account.js}"></script>
+  <script th:src="@{/js/dropdown.js}"></script>
+  <script th:src="@{/js/role.js}"></script>
+
+</body>
+
+</html>

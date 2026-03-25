@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Housekeeping - Equipment Check</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/global.css}" />
+  <link rel="stylesheet" th:href="@{/css/modal.css}" />
+  <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/profile.css}" />
+  <link rel="stylesheet" th:href="@{/css/check-equipment.css}" />
+
+</head>
+
+<body>
+
+  <div id="navbar-container" th:replace="~{components/navbar :: navbar}"></div>
+
+  <div class="equipment-container">
+    <div class="page-header">
+      <h1><i class="fas fa-clipboard-list"></i> Housekeeping - Equipment Check</h1>
+    </div>
+
+    <div class="stats-section">
+      <div class="stat-item">
+        <span class="stat-label">Total Rooms</span>
+        <span class="stat-number" id="totalRooms">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Has Issues</span>
+        <span class="stat-number issues" id="issueRooms">0</span>
+      </div>
+    </div>
+
+    <div class="filters-bar">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search room number...">
+      </div>
+      <div class="filter-group">
+        <label>Filter:</label>
+        <select id="statusFilter">
+          <option value="all">All Rooms</option>
+          <option value="issues">Has Issues</option>
+        </select>
+      </div>
+      <div class="role-badge" id="roleBadge">
+        <i class="fas fa-user-tag"></i>
+        <span id="userRole">Housekeeper</span>
+      </div>
+    </div>
+
+    <div class="rooms-table-wrapper">
+      <table class="rooms-table">
+        <thead>
+          <tr>
+            <th>Room</th>
+            <th>Bedroom</th>
+            <th>Bathroom</th>
+            <th>Living Room</th>
+            <th>Kitchen</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Equipment Modal -->
+  <div id="equipmentModal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3><i class="fas fa-clipboard-list"></i> <span id="modalTitle">Check Equipment</span></h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" id="saveBtn" onclick="saveCheck()">Save & Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Issue Resolution Modal -->
+  <div id="issueModal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+      <div class="modal-header issue-header">
+        <h3><i class="fas fa-tools"></i> Resolve Issues - Room <span id="issueRoomNumber"></span></h3>
+        <button class="modal-close" onclick="closeIssueModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="issueModalBody"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeIssueModal()">Cancel</button>
+        <button class="btn-danger" id="resolveBtn" onclick="resolveIssues()">Mark as Resolved</button>
+      </div>
+    </div>
+  </div>
+
+  <script th:src="@{/js/check-equipment.js}"></script>
+  <script th:src="@{/js/main.js}"></script>
+  <script th:src="@{/js/account.js}"></script>
+  <script th:src="@{/js/dropdown.js}"></script>
+  <script th:src="@{/js/role.js}"></script>
+</body>
+
+</html>

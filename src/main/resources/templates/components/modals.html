@@ -1,0 +1,83 @@
+<div th:fragment="modals">
+  <div id="passwordModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" id="closeModal">&times;</span>
+
+      <h2>Change Password</h2>
+
+      <!-- PASSWORD MESSAGES -->
+      <div th:if="${successPassword}"
+           class="success-message password-message"
+           th:text="${successPassword}">
+      </div>
+
+      <div th:if="${errorPassword}"
+           class="error-message password-message"
+           th:text="${errorPassword}">
+      </div>
+      <form id="changePasswordForm" th:action="@{/auth/change-password}" method="post">
+
+        <label>Current Password</label>
+        <div class="input-group">
+          <input type="password" name="currentPassword" id="currentPassword" required />
+          <span class="toggle-password" data-target="currentPassword">👁</span>
+        </div>
+
+        <label>New Password</label>
+        <div class="input-group">
+          <input type="password" name="newPassword" id="newPassword" required />
+          <span class="toggle-password" data-target="newPassword">👁</span>
+        </div>
+
+        <div id="passwordStrength" class="strength-text"></div>
+
+        <label>Confirm New Password</label>
+        <div class="input-group">
+          <input type="password" name="confirmPassword" id="confirmPassword" required />
+          <span class="toggle-password" data-target="confirmPassword">👁</span>
+        </div>
+
+        <!-- CLIENT ERROR (JS VALIDATION) -->
+        <div id="clientError" class="error-message" style="display:none;"></div>
+
+        <button type="submit">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= EDIT PROFILE MODAL ================= -->
+  <div id="editProfileModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" id="closeEditModal">&times;</span>
+
+      <h2>Edit Profile</h2>
+
+      <!-- PROFILE MESSAGES -->
+      <div th:if="${successProfileMessage}"
+           class="success-message profile-message"
+           th:text="${successProfileMessage}">
+      </div>
+
+      <div th:if="${errorProfileMessage}"
+           class="error-message profile-message"
+           th:text="${errorProfileMessage}">
+      </div>
+
+      <form id="editProfileForm" th:action="@{/auth/edit-profile}" method="post">
+
+        <label>Full Name</label>
+        <input type="text" name="fullName" required />
+
+        <label>Email</label>
+        <input type="email" name="email" required />
+
+        <label>Phone</label>
+        <input type="text" name="phoneNumber" />
+
+        <button type="submit">Update Profile</button>
+      </form>
+    </div>
+  </div>
+
+</div>

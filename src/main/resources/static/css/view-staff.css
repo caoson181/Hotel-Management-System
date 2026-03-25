@@ -1,0 +1,258 @@
+/* ===================== GLOBAL ===================== */
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f6fa;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ===================== SEARCH BOX ===================== */
+.search-box {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.search-box button {
+    padding: 10px 15px;
+    border-radius: 6px;
+}
+
+/* ===================== INPUT + BUTTON ===================== */
+input[type="text"] {
+    padding: 8px;
+    width: 250px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 8px 15px;
+    border: none;
+    background: #3498db;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+/* ===================== TABLE ===================== */
+.staff-table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.staff-table th,
+.staff-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.staff-table th {
+    background: #1e293b;
+    color: white;
+}
+
+.staff-table tr {
+    transition: 0.2s;
+}
+
+.staff-table tr:hover {
+    background: #f2f2f2;
+}
+
+/* ===================== STATUS ===================== */
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.status-disabled {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* ===================== VIEW BUTTON ===================== */
+.view-btn {
+    background: #2563eb;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.view-btn:hover {
+    background: #1e40af;
+}
+
+/* ===================== PAGINATION ===================== */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.pagination a {
+    padding: 6px 12px;
+    background: #3fa7f4;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.pagination .hidden {
+    visibility: hidden;
+}
+
+.page-info {
+    font-weight: bold;
+}
+
+/* ===================== MODAL ===================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===================== MODAL CONTENT ===================== */
+.modal-content {
+    width: 500px;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+}
+
+/* ===================== MODAL HEADER ===================== */
+.modal-header {
+    background: linear-gradient(135deg, #6366f1, #7c3aed);
+    color: white;
+    padding: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-left i {
+    font-size: 20px;
+}
+
+/* ===================== CLOSE BUTTON ===================== */
+.close {
+    font-size: 22px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.close:hover {
+    opacity: 1;
+}
+
+/* ===================== MODAL BODY ===================== */
+.modal-body {
+    padding: 20px;
+}
+
+/* ===================== INFO GRID ===================== */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* ===================== INFO ITEM ===================== */
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+/* ===================== LABEL ===================== */
+.label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+/* ===================== VALUE ===================== */
+.value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ===================== STATUS BADGE (MODAL) ===================== */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+#m-status.active {
+    background: #22c55e;
+    color: white;
+}
+
+#m-status.disabled {
+    background: #ef4444;
+    color: white;
+}
+
+/* ===================== ANIMATION ===================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,116 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Staff Profile</title>
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <link rel="stylesheet" th:href="@{/css/modal.css}" />
+    <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/profile.css}" />
+    <link rel="stylesheet" th:href="@{/css/profile-staff.css}" />
+</head>
+
+<body>
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeEditModal">&times;</span>
+
+            <h2>Edit Profile</h2>
+
+            <form th:action="@{/staff/profile/manage/update}" method="post">
+                <label>Username</label>
+                <input type="text" name="username" th:value="${user.username}" required />
+
+                <label>Full Name</label>
+                <input type="text" name="fullName" th:value="${user.fullName}" required />
+
+                <label>Gender</label>
+                <select name="gender">
+                    <option value="Male" th:selected="${user.gender == 'Male'}">
+                        Male
+                    </option>
+                    <option value="Female" th:selected="${user.gender == 'Female'}">
+                        Female
+                    </option>
+                    <option value="Other" th:selected="${user.gender == 'Other'}">
+                        Other
+                    </option>
+                </select>
+
+                <label>Date of Birth</label>
+                <input type="date" name="dateOfBirth" th:value="${#temporals.format(user.dateOfBirth, 'yyyy-MM-dd')}" />
+
+                <label>Email</label>
+                <input type="text" th:value="${user.email}" disabled />
+
+                <label>Phone</label>
+                <input type="text" th:value="${user.phoneNumber}" disabled />
+
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <div th:replace="~{components/navbar}"></div>
+
+    <div class="profile-container">
+        <div class="profile-card">
+
+            <!-- AVATAR -->
+            <div class="profile-header">
+                <div class="avatar">
+                    <span th:text="${#strings.substring(user.username,0,1)}">A</span>
+                </div>
+
+                <div>
+                    <h2 th:text="${user.fullName}">Full Name</h2>
+                    <p class="role" th:text="${user.role}">Role</p>
+                </div>
+            </div>
+
+            <!-- INFO GRID -->
+            <div class="profile-grid">
+
+                <div class="info-item">
+                    <label>Username</label>
+                    <span th:text="${user.username}"></span>
+                </div>
+
+                <div class="info-item">
+                    <label>Gender</label>
+                    <span th:text="${user.gender}"></span>
+                </div>
+
+                <div class="info-item">
+                    <label>Date of Birth</label>
+                    <span th:text="${user.dateOfBirth}"></span>
+                </div>
+
+                <div class="info-item">
+                    <label>Email</label>
+                    <span th:text="${user.email}"></span>
+                </div>
+
+                <div class="info-item">
+                    <label>Phone</label>
+                    <span th:text="${user.phoneNumber}"></span>
+                </div>
+
+            </div>
+
+            <!-- ACTION -->
+            <div class="profile-actions">
+                <a th:href="@{/index}" class="btn secondary">Back</a>
+                <button id="openEditModal" class="btn primary">Edit Profile</button>
+            </div>
+
+        </div>
+    </div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/account.js}"></script>
+    <script th:src="@{/js/dropdown.js}"></script>
+    <script th:src="@{/js/role.js}"></script>
+</body>
+
+</html>

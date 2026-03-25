@@ -1,0 +1,182 @@
+/* ===================== GLOBAL ===================== */
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f6fa;
+    margin: 0;
+}
+
+/* ===================== HEADER ===================== */
+h1 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* ===================== SEARCH ===================== */
+.search-box {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 300px;
+}
+
+.search-box button {
+    padding: 10px 15px;
+    border-radius: 6px;
+}
+
+/* ===================== TABLE ===================== */
+.table-wrapper {
+    width: 95%;
+    margin: auto;
+}
+
+.customer-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.customer-table th {
+    background: #334155;
+    color: white;
+    padding: 14px;
+    text-align: center;
+}
+
+.customer-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.customer-table tr:hover {
+    background: #f8fafc;
+}
+
+/* ===================== STATUS ===================== */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge.active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge.disabled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ===================== ACTION ===================== */
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.btn-disable {
+    background: #e74c3c;
+}
+
+.btn-enable {
+    background: #27ae60;
+}
+
+.btn-disable:hover {
+    background: #c0392b;
+}
+
+.btn-enable:hover {
+    background: #1e8449;
+}
+
+/* ===================== PAGINATION ===================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.pagination a {
+    padding: 6px 12px;
+    background: #3fa7f4;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.pagination .hidden {
+    visibility: hidden;
+}
+
+.page-info {
+    font-weight: bold;
+}
+
+/* ===================== CARDS ===================== */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin: 20px;
+}
+
+.card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.card.active {
+    border: 2px solid #3fa7f4;
+    background: #f4f9ff;
+}
+
+.card i {
+    font-size: 20px;
+    padding: 12px;
+    border-radius: 50%;
+    background: #ecf0f1;
+}
+
+.active-card i {
+    background: #d1fae5;
+    color: #27ae60;
+}
+
+.disabled-card i {
+    background: #fee2e2;
+    color: #e74c3c;
+}

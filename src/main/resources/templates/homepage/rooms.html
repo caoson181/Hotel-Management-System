@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gravity Hotel - Room Collection</title>
+
+    <link rel="stylesheet" href="/css/homepage.css" />
+    <link rel="stylesheet" th:href="@{/css/room-homepage.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css"
+    />
+  </head>
+  <body class="rooms-page">
+    <div th:replace="~{homepage/navbar :: navbar}"></div>
+
+    <section class="rooms-hero" data-aos="fade-down">
+      <div class="hero-content">
+        <h1 class="typing-effect">Discover Your Perfect Stay</h1>
+        <p>Five distinct categories • Fifteen unique experiences</p>
+      </div>
+    </section>
+
+    <div class="container" style="padding-top: 130px">
+      <div class="rank-progress-bar">
+        <div class="rank-progress-fill"></div>
+      </div>
+
+      <div class="rank-badge-vertical">
+        <div class="rank-dot" data-rank="standard"></div>
+        <div class="rank-dot" data-rank="superior"></div>
+        <div class="rank-dot" data-rank="deluxe"></div>
+        <div class="rank-dot" data-rank="executive"></div>
+        <div class="rank-dot" data-rank="suite"></div>
+      </div>
+
+      <div class="rooms-container"></div>
+    </div>
+
+    <div class="comparison-toolbar">
+      <button class="compare-btn" id="toggleCompare">
+        <i class="fas fa-balance-scale"></i>
+        <span>Compare Rooms</span>
+        <span class="compare-count">(0)</span>
+      </button>
+    </div>
+
+    <div class="comparison-modal">
+      <div class="comparison-content">
+        <h3><i class="fas fa-balance-scale"></i> Compare Rooms</h3>
+        <button class="close-compare"><i class="fas fa-times"></i></button>
+        <div class="comparison-grid" id="comparisonGrid"></div>
+        <div class="comparison-actions">
+          <button class="btn-clear">Clear All</button>
+          <button class="btn-book">Book Selected</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        © 2025 Gravity Hotel. All rights reserved. | Representative room display
+        for easy browsing.
+      </p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script th:src="@{/js/room-homepage.js}"></script>
+    <script>
+      const header = document.querySelector(".header");
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 50) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
+        }
+      });
+    </script>
+  </body>
+</html>
