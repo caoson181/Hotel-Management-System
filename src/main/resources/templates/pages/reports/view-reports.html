@@ -47,36 +47,34 @@
 
     <div class="report-topbar">
 
-  <div class="report-tabs">
-    <a th:href="@{/reports/view-reports(type='customer', page=1)}"
-       th:classappend="${type == 'customer'} ? 'active'">
-      Customer Feedback
-    </a>
+      <div class="report-tabs">
+        <a th:href="@{/reports/view-reports(type='customer', page=1)}"
+          th:classappend="${type == 'customer'} ? 'active'">
+          Customer Feedback
+        </a>
 
-    <a th:href="@{/reports/view-reports(type='guest', page=1)}"
-       th:classappend="${type == 'guest'} ? 'active'">
-      Guest Feedback
-    </a>
-  </div>
+        <a th:href="@{/reports/view-reports(type='guest', page=1)}" th:classappend="${type == 'guest'} ? 'active'">
+          Guest Feedback
+        </a>
+      </div>
 
-  <form method="get" action="/reports/view-reports" class="report-toolbar">
-    <input type="hidden" name="type" th:value="${type}" />
+      <form method="get" action="/reports/view-reports" class="report-toolbar">
+        <input type="hidden" name="type" th:value="${type}" />
 
-    <input type="text" name="keyword"
-           placeholder="Search message..."
-           th:value="${keyword}" />
+        <input type="text" name="keyword" placeholder="Search message..." th:value="${keyword}" />
 
-    <select name="sentiment">
-      <option value="">All</option>
-      <option value="Positive" th:selected="${sentiment == 'Positive'}">Positive</option>
-      <option value="Negative" th:selected="${sentiment == 'Negative'}">Negative</option>
-      <option value="Neutral" th:selected="${sentiment == 'Neutral'}">Neutral</option>
-    </select>
+        <select name="sentiment">
+          <option value="">All</option>
+          <option value="Positive" th:selected="${sentiment == 'Positive'}">Positive</option>
+          <option value="Negative" th:selected="${sentiment == 'Negative'}">Negative</option>
+          <option value="Neutral" th:selected="${sentiment == 'Neutral'}">Neutral</option>
+        </select>
 
-    <button type="submit">Filter</button>
-  </form>
+        <button type="submit">Filter</button>
+        <a href="/reports/export" class="export-btn">Export Excel</a>
+      </form>
 
-</div>
+    </div>
 
     </form>
 
