@@ -16,6 +16,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.IOException;
 
 @Controller
 public class ContactController {
@@ -170,5 +178,53 @@ public class ContactController {
         model.addAttribute("neuPercent", neuPercent);
 
         return "pages/reports/view-reports";
+    }
+
+    @GetMapping("/reports/export")
+    public void exportExcel(HttpServletResponse response) throws IOException {
+
+        List<Contact> contacts = contactRepository.findAll();
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Feedback");
+
+        // Header
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("ID");
+        header.createCell(1).setCellValue("Name");
+        header.createCell(2).setCellValue("Email");
+        header.createCell(3).setCellValue("Subject");
+        header.createCell(4).setCellValue("Message");
+        header.createCell(5).setCellValue("Date");
+        header.createCell(6).setCellValue("Sentiment");
+
+        int rowNum = 1;
+
+        for (Contact c : contacts) {
+            Row row = sheet.createRow(rowNum++);
+
+            row.createCell(0).setCellValue(c.getContactId());
+
+            String name = c.getCustomer() != null
+                    ? c.getCustomer().getUser().getFullName()
+                    : c.getGuestName();
+
+            String email = c.getCustomer() != null
+                    ? c.getCustomer().getUser().getEmail()
+                    : c.getGuestEmail();
+
+            row.createCell(1).setCellValue(name);
+            row.createCell(2).setCellValue(email);
+            row.createCell(3).setCellValue(c.getSubject());
+            row.createCell(4).setCellValue(c.getMessage());
+            row.createCell(5).setCellValue(c.getCreatedAt().toString());
+            row.createCell(6).setCellValue(c.getSentiment());
+        }
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=report.xlsx");
+
+        workbook.write(response.getOutputStream());
+        workbook.close();
     }
 }
