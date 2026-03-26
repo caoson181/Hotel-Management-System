@@ -4,6 +4,7 @@ import org.example.backendpj.Entity.User;
 import org.example.backendpj.Entity.UserAvatar;
 import org.example.backendpj.Repository.UserAvatarRepository;
 import org.example.backendpj.Repository.UserRepository;
+import org.example.backendpj.Service.AvatarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -76,4 +77,20 @@ public class StaffProfileController {
 
                 return "redirect:/staff/profile";
         }
+
+        @Autowired
+        private AvatarService avatarService;
+
+        @PostMapping("/avatar/select")
+        public String selectAvatar(@RequestParam("avatarId") Integer avatarId,
+                        Principal principal) {
+
+                User user = userRepository.findByUsername(principal.getName())
+                                .orElseThrow();
+
+                avatarService.setCurrentAvatar(user.getId(), avatarId);
+
+                return "redirect:/staff/profile";
+        }
+
 }

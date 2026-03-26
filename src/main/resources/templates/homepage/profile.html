@@ -54,6 +54,20 @@
 
               <div class="profile-name" th:text="${user.fullName}">
               </div>
+
+              <div class="avatar-gallery">
+                <form th:each="ava : ${avatars}" th:action="@{/profile/avatar/select}" method="post">
+
+                  <input type="hidden" name="avatarId" th:value="${ava.id}" />
+
+                  <button type="submit" class="avatar-item" th:classappend="${ava.current} ? 'active'">
+
+                    <img th:src="${ava.url}" />
+
+                  </button>
+
+                </form>
+              </div>
             </div>
 
             <div th:if="${user == null}">

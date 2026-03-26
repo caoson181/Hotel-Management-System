@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 public class PageController {
@@ -144,8 +145,10 @@ public class PageController {
                 .findByUser_IdAndIsCurrentTrue(user.getId())
                 .orElse(null);
 
-        model.addAttribute("avatar", avatar);
+        List<UserAvatar> avatars = avatarRepo.findByUserId(user.getId());
 
+        model.addAttribute("avatar", avatar);
+        model.addAttribute("avatars", avatars);
         model.addAttribute("user", user);
 
         return "homepage/profile";
@@ -163,7 +166,10 @@ public class PageController {
                 .findByUser_IdAndIsCurrentTrue(user.getId())
                 .orElse(null);
 
+        List<UserAvatar> avatars = avatarRepo.findByUserId(user.getId());
+
         model.addAttribute("user", user);
+        model.addAttribute("avatars", avatars);
         model.addAttribute("avatar", avatar);
 
         return "pages/staff/profile";

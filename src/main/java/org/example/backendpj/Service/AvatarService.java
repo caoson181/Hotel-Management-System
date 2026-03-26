@@ -5,6 +5,7 @@ import org.example.backendpj.Entity.UserAvatar;
 import org.example.backendpj.Repository.UserAvatarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -29,6 +30,7 @@ public class AvatarService {
         for (UserAvatar av : avatars) {
             av.setCurrent(false);
         }
+        avatarRepo.saveAll(avatars); // save tắt trước
 
         // 2. upload ảnh mới
         Map result = cloudinary.uploader().upload(
@@ -44,5 +46,24 @@ public class AvatarService {
         newAvatar.setCreatedAt(LocalDateTime.now());
 
         avatarRepo.save(newAvatar);
+    }
+
+    @Transactional
+    public void setCurrentAvatar(Integer userId, Integer avatarId) {
+
+        List<UserAvatar> avatars = avatarRepo.findByUserId(userId);
+
+        for (UserAvatar ava : avatars) {
+            ava.setCurrent(false);
+        }
+
+        avatarRepo.saveAll(avatars); // save tắt trước
+
+        UserAvatar selected = avatarRepo.findById(avatarId)
+                .orElseThrow();
+
+        selected.setCurrent(true);
+
+        avatarRepo.save(selected); // 🔥 BẮT BUỘC
     }
 }

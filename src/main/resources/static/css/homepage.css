@@ -1024,3 +1024,34 @@ header.scrolled .account-btn:hover,
 .language-item:hover {
     background: #f1f5ff;
 }
+
+.avatar-gallery {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.avatar-item {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.avatar-item img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+    transition: 0.2s;
+}
+
+.avatar-item img:hover {
+    transform: scale(1.1);
+    border-color: #4ecdc4;
+}
+
+.avatar-item.active img {
+    border: 2px solid #4ecdc4;
+}

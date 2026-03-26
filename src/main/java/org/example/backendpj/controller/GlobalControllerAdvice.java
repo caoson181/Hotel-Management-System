@@ -1,5 +1,7 @@
 package org.example.backendpj.controller;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.example.backendpj.Service.UserService;
@@ -25,7 +27,17 @@ public class GlobalControllerAdvice {
     public User getCurrentUser(Principal principal) {
         if (principal == null)
             return null;
-        return userService.findByUsernameOrEmail(principal.getName());
+
+        if (principal instanceof UsernamePasswordAuthenticationToken) {
+            return userService.findByUsernameOrEmail(principal.getName());
+        }
+
+        if (principal instanceof OAuth2AuthenticationToken oauth) {
+            String email = oauth.getPrincipal().getAttribute("email");
+            return userService.findByEmail(email);
+        }
+
+        return null;
     }
 
     // 🔥 THÊM ĐOẠN NÀY

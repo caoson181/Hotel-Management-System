@@ -77,17 +77,31 @@
 
             <!-- AVATAR -->
             <div class="profile-header">
-                <form th:action="@{/staff/profile/avatar/upload}" method="post" enctype="multipart/form-data">
+                <div id="openAvatarModal" style="cursor:pointer;">
+                    <div class="avatar">
+                        <img th:if="${avatar != null}" th:src="${avatar.url}" />
+                        <span th:if="${avatar == null}" th:text="${#strings.substring(user.username,0,1)}"></span>
+                    </div>
+                </div>
 
-                    <label for="avatarInput" style="cursor:pointer;">
-                        <div class="avatar">
-                            <img th:if="${avatar != null}" th:src="${avatar.url}" />
-                            <span th:if="${avatar == null}" th:text="${#strings.substring(user.username,0,1)}"></span>
-                        </div>
-                    </label>
+                <div class="avatar-gallery avatar-popup" id="avatarModal">
+                    <form th:action="@{/staff/profile/avatar/upload}" method="post" enctype="multipart/form-data">
+                        <label class="avatar-upload">
+                            ⬆
+                            <input type="file" name="file" hidden onchange="this.form.submit()" />
+                        </label>
+                    </form>
+                    <form th:each="ava : ${avatars}" th:action="@{/staff/profile/manage/avatar/select}" method="post">
 
-                    <input type="file" id="avatarInput" name="file" hidden onchange="this.form.submit()" />
-                </form>
+                        <input type="hidden" name="avatarId" th:value="${ava.id}" />
+
+                        <button type="submit" class="avatar-item" th:classappend="${ava.current} ? 'active'">
+
+                            <img th:src="${ava.url}" />
+
+                        </button>
+                    </form>
+                </div>
 
                 <div>
                     <h2 th:text="${user.fullName}">Full Name</h2>
@@ -137,6 +151,19 @@
     <script th:src="@{/js/account.js}"></script>
     <script th:src="@{/js/dropdown.js}"></script>
     <script th:src="@{/js/role.js}"></script>
+    <script>
+        const avatarBtn = document.getElementById("openAvatarModal");
+        const avatarModal = document.getElementById("avatarModal");
+
+        avatarBtn.onclick = (e) => {
+            e.stopPropagation();
+            avatarModal.classList.toggle("active");
+        };
+
+        document.addEventListener("click", () => {
+            avatarModal.classList.remove("active");
+        });
+    </script>
 </body>
 
 </html>

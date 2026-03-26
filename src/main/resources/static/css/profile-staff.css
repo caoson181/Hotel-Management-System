@@ -299,6 +299,92 @@ body::before {
   box-shadow: 0 10px 20px rgba(79, 70, 229, 0.5);
 }
 
+/* ===== AVATAR GALLERY ===== */
+.avatar-gallery {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* từng item */
+.avatar-item {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  transition: all 0.25s ease;
+}
+
+/* ảnh bên trong */
+.avatar-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* hover */
+.avatar-item:hover {
+  transform: scale(1.1);
+  border-color: #3fa7f4;
+}
+
+/* avatar đang chọn */
+.avatar-item.active {
+  border-color: #3fa7f4;
+  box-shadow: 0 0 0 2px rgba(63, 167, 244, 0.3);
+}
+
+/* click effect */
+.avatar-item:active {
+  transform: scale(0.95);
+}
+
+/* ===== POPUP AVATAR ===== */
+.avatar-popup {
+  position: absolute;
+  top: 90px;
+  left: 20px;
+
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+  display: none;
+  z-index: 100;
+}
+
+/* show */
+.avatar-popup.active {
+  display: flex;
+}
+
+/* upload button */
+.avatar-upload {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px dashed #4f46e5;
+  color: #4f46e5;
+  cursor: pointer;
+}
+
+.avatar-upload:hover {
+  background: #4f46e5;
+  color: white;
+}
+
 /* responsive */
 @media (max-width: 500px) {
   .profile-grid {

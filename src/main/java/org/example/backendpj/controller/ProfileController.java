@@ -73,4 +73,23 @@ public class ProfileController {
         return "redirect:/profile";
     }
 
+    @PostMapping("/avatar/select")
+    public String selectAvatar(@RequestParam("avatarId") Integer avatarId,
+            Authentication authentication) {
+
+        Object principal = authentication.getPrincipal();
+        User user;
+
+        if (principal instanceof OAuth2User oauthUser) {
+            String email = oauthUser.getAttribute("email");
+            user = userService.findByEmail(email);
+        } else {
+            user = userService.findByUsernameOrEmail(authentication.getName());
+        }
+
+        avatarService.setCurrentAvatar(user.getId(), avatarId);
+
+        return "redirect:/profile";
+    }
+
 }
