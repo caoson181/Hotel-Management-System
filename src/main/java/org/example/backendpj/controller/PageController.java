@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
 import org.springframework.security.core.Authentication;
 import org.example.backendpj.Entity.User;
+import org.example.backendpj.Entity.UserAvatar;
 import org.example.backendpj.Repository.UserRepository;
 import org.example.backendpj.Repository.RoomRepository;
+import org.example.backendpj.Repository.UserAvatarRepository;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -137,17 +140,35 @@ public class PageController {
                 .findByUsernameOrEmail(login, login)
                 .orElse(null);
 
+        UserAvatar avatar = avatarRepo
+                .findByUser_IdAndIsCurrentTrue(user.getId())
+                .orElse(null);
+
+        model.addAttribute("avatar", avatar);
+
         model.addAttribute("user", user);
 
         return "homepage/profile";
     }
 
+    @Autowired
+    private UserAvatarRepository avatarRepo;
+
     @GetMapping("/staff/profile")
     public String staffProfile(Model model, Principal principal) {
+
         User user = userService.findByUsername(principal.getName());
+
+        UserAvatar avatar = avatarRepo
+                .findByUser_IdAndIsCurrentTrue(user.getId())
+                .orElse(null);
+
         model.addAttribute("user", user);
+        model.addAttribute("avatar", avatar);
+
         return "pages/staff/profile";
     }
+
     // ================= REVENUE =================
 
     @GetMapping("/revenue/view-revenue")

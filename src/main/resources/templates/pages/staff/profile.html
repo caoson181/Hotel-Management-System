@@ -77,9 +77,17 @@
 
             <!-- AVATAR -->
             <div class="profile-header">
-                <div class="avatar">
-                    <span th:text="${#strings.substring(user.fullName,0,1)}">A</span>
-                </div>
+                <form th:action="@{/staff/profile/avatar/upload}" method="post" enctype="multipart/form-data">
+
+                    <label for="avatarInput" style="cursor:pointer;">
+                        <div class="avatar">
+                            <img th:if="${avatar != null}" th:src="${avatar.url}" />
+                            <span th:if="${avatar == null}" th:text="${#strings.substring(user.username,0,1)}"></span>
+                        </div>
+                    </label>
+
+                    <input type="file" id="avatarInput" name="file" hidden onchange="this.form.submit()" />
+                </form>
 
                 <div>
                     <h2 th:text="${user.fullName}">Full Name</h2>
