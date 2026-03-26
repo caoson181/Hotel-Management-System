@@ -11,42 +11,60 @@
 </head>
 
 <body>
-    <div id="editProfileModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeEditModal">&times;</span>
+    <div id="editProfileModal" class="modal profile-modal">
+        <div class="modal-overlay"></div>
+
+        <div class="modal-box">
+            <button class="close-btn" id="closeEditModal">&times;</button>
 
             <h2>Edit Profile</h2>
+            <p class="subtitle">Update your personal information</p>
 
             <form th:action="@{/staff/profile/manage/update}" method="post">
-                <label>Username</label>
-                <input type="text" name="username" th:value="${user.username}" required />
 
-                <label>Full Name</label>
-                <input type="text" name="fullName" th:value="${user.fullName}" required />
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" th:value="${user.username}" required />
+                </div>
 
-                <label>Gender</label>
-                <select name="gender">
-                    <option value="Male" th:selected="${user.gender == 'Male'}">
-                        Male
-                    </option>
-                    <option value="Female" th:selected="${user.gender == 'Female'}">
-                        Female
-                    </option>
-                    <option value="Other" th:selected="${user.gender == 'Other'}">
-                        Other
-                    </option>
-                </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="fullName" th:value="${user.fullName}" required />
+                    </div>
 
-                <label>Date of Birth</label>
-                <input type="date" name="dateOfBirth" th:value="${#temporals.format(user.dateOfBirth, 'yyyy-MM-dd')}" />
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select name="gender">
+                            <option value="Male" th:selected="${user.gender == 'Male'}">Male</option>
+                            <option value="Female" th:selected="${user.gender == 'Female'}">Female</option>
+                            <option value="Other" th:selected="${user.gender == 'Other'}">Other</option>
+                        </select>
+                    </div>
+                </div>
 
-                <label>Email</label>
-                <input type="text" th:value="${user.email}" disabled />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" name="dateOfBirth"
+                            th:value="${#temporals.format(user.dateOfBirth, 'yyyy-MM-dd')}" />
+                    </div>
 
-                <label>Phone</label>
-                <input type="text" th:value="${user.phoneNumber}" disabled />
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" th:value="${user.email}" disabled />
+                    </div>
+                </div>
 
-                <button type="submit" class="save-btn">Save Changes</button>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" th:value="${user.phoneNumber}" disabled />
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn cancel" id="cancelEdit">Cancel</button>
+                    <button type="submit" class="btn save">Save Changes</button>
+                </div>
             </form>
         </div>
     </div>
@@ -60,7 +78,7 @@
             <!-- AVATAR -->
             <div class="profile-header">
                 <div class="avatar">
-                    <span th:text="${#strings.substring(user.username,0,1)}">A</span>
+                    <span th:text="${#strings.substring(user.fullName,0,1)}">A</span>
                 </div>
 
                 <div>
@@ -84,7 +102,7 @@
 
                 <div class="info-item">
                     <label>Date of Birth</label>
-                    <span th:text="${user.dateOfBirth}"></span>
+                    <span th:text="${#temporals.format(user.dateOfBirth, 'dd/MM/yyyy')}"></span>
                 </div>
 
                 <div class="info-item">
