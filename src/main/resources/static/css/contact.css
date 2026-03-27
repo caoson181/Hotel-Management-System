@@ -208,6 +208,7 @@
    5. RESPONSIVE
    ========================================================================== */
 @media (max-width: 992px) {
+
   .contact-wrapper,
   .profile-wrapper {
     flex-direction: column;
@@ -498,51 +499,58 @@
 }
 
 .map-info-wrapper {
-    display: flex;
-    width: 100%;
-    min-height: 450px;
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  /* đảm bảo 2 bên bằng nhau */
 }
 
 .map-container {
-    width: 48%;
+  width: 48%;
 }
 
 .map-container iframe {
-    width: 100%;
-    height: 100%;
-    display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 450px;
+  /* giữ chiều cao tối thiểu */
+  display: block;
 }
 
 .location-info {
-    width: 50%;
-    background: white;
-    padding: 40px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    height: 450px;
-    align-items: stretch;
+  width: 50%;
+  background: white;
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+
+  /* ❌ XÓA dòng này */
+  /* height: 450px; */
+
+  min-height: 450px;
+  /* ✅ thay bằng min-height */
 }
 
 .info-column {
-    background: #fafafa;
-    padding: 30px;
-    border-radius: 18px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  background: #fafafa;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
 
 .info-column h3 {
-    font-size: 24px;
-    margin-bottom: 20px;
+  font-size: 24px;
+  margin-bottom: 20px;
 }
 
 .info-column p {
-    font-size: 17px;
-    line-height: 1.8;
-    margin-bottom: 14px;
-    color: #555;
+  font-size: 17px;
+  line-height: 1.8;
+  margin-bottom: 14px;
+  color: #555;
 }
