@@ -367,14 +367,13 @@ function initBooking() {
 
     if (bookBtn) {
         bookBtn.onclick = () => {
-            const params = new URLSearchParams(window.location.search);
-            const rank = params.get("rank");
-            const type = params.get("type");
+        const params = new URLSearchParams(window.location.search);
 
-            bookNow(type, rank);
+        params.set("checkin", document.getElementById('checkin').value);
+        params.set("checkout", document.getElementById('checkout').value);
 
-            showToast(`✓ Room booked! ${rank} ${type}`);
-        };
+        window.location.href = `/confirm-booking?${params.toString()}`;
+    };
     }
     calculateTotal();
     }
