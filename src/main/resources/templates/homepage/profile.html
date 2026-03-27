@@ -34,28 +34,25 @@
             <div class="profile-chip">Gold Member</div>
 
             <div th:if="${user != null}">
-              <form th:action="@{/profile/avatar/upload}" method="post" enctype="multipart/form-data">
+              <div id="openAvatarModal" style="cursor:pointer;">
+                <div class="profile-avatar-large">
 
-                <label for="avatarInput" style="cursor:pointer;">
-                  <div class="profile-avatar-large">
+                  <img th:if="${avatar != null}" th:src="${avatar.url}" />
+                  <span th:if="${avatar == null}" th:text="${#strings.substring(user.fullName,0,1)}"></span>
 
-                    <!-- nếu có avatar -->
-                    <img th:if="${avatar != null}" th:src="${avatar.url}" />
-
-                    <!-- fallback -->
-                    <span th:if="${avatar == null}" th:text="${#strings.substring(user.fullName,0,1)}"></span>
-
-                  </div>
-                </label>
-
-                <input type="file" id="avatarInput" name="file" hidden onchange="this.form.submit()" />
-
-              </form>
+                </div>
+              </div>
 
               <div class="profile-name" th:text="${user.fullName}">
               </div>
 
-              <div class="avatar-gallery">
+              <div class="avatar-gallery avatar-popup" id="avatarModal">
+                <form th:action="@{/profile/avatar/upload}" method="post" enctype="multipart/form-data">
+                  <label class="avatar-upload">
+                    ⬆
+                    <input type="file" name="file" hidden onchange="this.form.submit()" />
+                  </label>
+                </form>
                 <form th:each="ava : ${avatars}" th:action="@{/profile/avatar/select}" method="post">
 
                   <input type="hidden" name="avatarId" th:value="${ava.id}" />
