@@ -3,17 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <h2>Confirm Booking</h2>
+    <link rel="stylesheet" href="/css/confirm-booking.css" />
 
-    <p>Room: <span id="roomInfo"></span></p>
-    <p>Check-in: <span id="checkin"></span></p>
-    <p>Check-out: <span id="checkout"></span></p>
-
-    <button id="confirmBtn">Confirm</button>
-    <button onclick="history.back()">Cancel</button>
 </head>
 <body>
+<div class="container">
 
+
+    <!-- LEFT PANEL -->
+    <div class="left">
+        <h2>Confirm Booking</h2>
+
+        <div class="info-box">
+            <p><strong>Room:</strong> <span id="roomInfo"></span></p>
+            <p><strong>Check-in:</strong> <span id="checkin"></span></p>
+            <p><strong>Check-out:</strong> <span id="checkout"></span></p>
+        </div>
+
+        <div class="actions">
+            <button id="confirmBtn" class="btn primary">Confirm</button>
+            <button onclick="history.back()" class="btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right">
+        <h3>Available Rooms</h3>
+        <div id="roomList" class="room-grid"></div>
+    </div>
+</div>
 </body>
 <script src="/js/confirm-booking.js"></script>
 </html>

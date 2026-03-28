@@ -20,6 +20,8 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
 
     List<Room> findByRoomTypeContainingIgnoreCase(String roomType);
 
+    List<Room> findByRoomTypeAndRoomRank(String roomType, String roomRank);
+
     @Query("""
     SELECT r FROM Room r
     WHERE CAST(r.roomNumber AS string) LIKE CONCAT('%', :keyword, '%')

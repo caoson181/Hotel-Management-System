@@ -153,4 +153,22 @@ public class RoomController {
         roomService.assignRoomToCustomer(roomId, customerId);
         return ResponseEntity.ok().build();
     }
+
+    // ===============================
+// Filter rooms by type + rank
+// ===============================
+
+
+    @GetMapping("/api/filter")
+    @ResponseBody
+
+    public List<Room> getRoomsByTypeAndRank(
+            @RequestParam String type,
+            @RequestParam String rank
+
+    )
+
+    {
+        return roomRepository.findByRoomTypeAndRoomRank(type, rank);
+    }
 }

@@ -9,6 +9,10 @@ document.getElementById("roomInfo").textContent = `${rank} - ${type}`;
 document.getElementById("checkin").textContent = checkin;
 document.getElementById("checkout").textContent = checkout;
 
+fetch(`/rooms/api/filter?type=${type}&rank=${rank}`)
+    .then(res => res.json())
+    .then(data => renderRooms(data));
+
 document.getElementById("confirmBtn").onclick = () => {
     fetch("/api/bookings", {
         method: "POST",
@@ -29,4 +33,35 @@ document.getElementById("confirmBtn").onclick = () => {
             window.location.href = "/";
         })
         .catch(err => console.error(err));
+
+
 };
+function renderRooms(rooms) {
+    const container = document.getElementById("roomList");
+    container.innerHTML = "";
+
+    rooms.forEach(room => {
+        const div = document.createElement("div");
+        div.className = "room-card";
+
+        div.textContent = room.roomNumber;
+
+        if (room.status.toUpperCase() === "AVAILABLE") {
+            div.classList.add("available");
+
+            div.onclick = () => {
+                selectedRoomId = room.id;
+
+                document.querySelectorAll(".room-card")
+                    .forEach(el => el.classList.remove("selected"));
+
+                div.classList.add("selected");
+            };
+
+        } else {
+            div.classList.add("unavailable");
+        }
+
+        container.appendChild(div);
+    });
+}
