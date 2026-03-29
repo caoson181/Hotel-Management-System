@@ -36,6 +36,7 @@ public class SecurityConfig {
                                 "/",
                                 "/index",
                                 "/about",
+                                "/gravity-news",
                                 "/rooms",
                                 "/services",
                                 "/contact",

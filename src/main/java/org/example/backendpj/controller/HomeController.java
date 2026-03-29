@@ -57,6 +57,11 @@ public class HomeController {
         return "homepage/services";
     }
 
+    @GetMapping("/gravity-news")
+    public String gravityNews() {
+        return "homepage/gravity-news";
+    }
+
     @GetMapping("/contact")
     public String contact() {
         return "homepage/contact";

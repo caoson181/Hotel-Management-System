@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Gravity Hotel | Achievement Solar System</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css"/>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css"
+    />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/homepage.css" />
+    <link rel="stylesheet" th:href="@{/css/gravity-news.css}" /></head>
+<body>
+<div th:replace="~{homepage/navbar :: navbar}"></div>
+
+<div class="solar-cosmic-bg"></div>
+<div class="solar-stars" id="solarStarsContainer"></div>
+<div class="solar-scroll-progress" id="solarScrollProgress"></div>
+
+<div class="solar-header-section">
+    <h1><i class="fas fa-gravity"></i> ACHIEVEMENT SYSTEM</h1>
+    <p>Planets of excellence orbiting Gravity Hotel</p>
+</div>
+
+<div class="solar-control-wrapper">
+    <button class="solar-pause-play-btn" id="solarToggleOrbitBtn">
+        <i class="fas fa-pause"></i> Pause Orbits
+    </button>
+</div>
+
+<div class="solar-system-container">
+    <div class="solar-orbit-boundary">
+        <div class="solar-orbit-system" id="solarOrbitSystem">
+            <div class="solar-gravity-center">
+                <i class="fas fa-hotel"></i>
+                <h3>GRAVITY</h3>
+                <p>HOTEL</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="solar-news-section">
+    <div class="solar-filter-bar">
+        <button class="solar-filter-btn active" data-filter="all"><i class="fas fa-globe"></i> All</button>
+        <button class="solar-filter-btn" data-filter="achievement"><i class="fas fa-trophy"></i> Achievements</button>
+        <button class="solar-filter-btn" data-filter="news"><i class="fas fa-newspaper"></i> News</button>
+        <button class="solar-filter-btn" data-filter="event"><i class="fas fa-calendar-alt"></i> Events</button>
+    </div>
+    <div class="solar-news-grid" id="solarNewsGrid"></div>
+</div>
+
+<div id="solarDetailModal" class="solar-detail-overlay">
+    <div class="solar-detail-container">
+        <button class="solar-close-detail" id="solarCloseModalBtn"><i class="fas fa-times"></i></button>
+        <div id="solarDetailDynamicContent"></div>
+    </div>
+</div>
+
+<footer class="solar-footer">
+    <i class="fas fa-gravity"></i> Gravity Hotel — Where achievements orbit around excellence
+</footer>
+
+<!-- Custom JS -->
+    <script th:src="@{/js/gravity-news.js}"></script>
+    <script th:src="@{/js/homepage.js}"></script>
+</body>
+</html>
