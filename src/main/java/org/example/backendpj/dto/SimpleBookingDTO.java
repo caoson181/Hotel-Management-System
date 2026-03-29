@@ -7,6 +7,7 @@ public class SimpleBookingDTO {
     private String roomType;
     private String roomRank;
 
+
     private LocalDate checkIn;
     private LocalDate checkOut;
 

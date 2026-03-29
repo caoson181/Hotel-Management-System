@@ -3,6 +3,7 @@ package org.example.backendpj.controller;
 import org.example.backendpj.Entity.User;
 import org.example.backendpj.Repository.UserRepository;
 
+import org.example.backendpj.dto.UserDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -131,5 +132,36 @@ public class UserController {
         userRepository.save(user);
 
         return ResponseEntity.ok("Password changed successfully");
+    }
+    @GetMapping("/api/users/me")
+    @ResponseBody
+    public UserDTO getCurrentUser(Authentication authentication) {
+
+        User user;
+
+        if (authentication.getPrincipal() instanceof OAuth2User oauthUser) {
+            String email = oauthUser.getAttribute("email");
+
+            user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+        } else {
+            String username = authentication.getName();
+
+            user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+        }
+
+        // ✅ map sang DTO
+        UserDTO dto = new UserDTO();
+        dto.fullName = user.getFullName();
+        dto.gender = user.getGender();
+        dto.dateOfBirth = user.getDateOfBirth() != null
+                ? user.getDateOfBirth().toString()
+                : "";
+        dto.phoneNumber = user.getPhoneNumber();
+        dto.email = user.getEmail();
+
+        return dto;
     }
 }

@@ -65,3 +65,27 @@ function renderRooms(rooms) {
         container.appendChild(div);
     });
 }
+fetch("/api/users/me")
+    .then(res => res.json())
+    .then(user => {
+        document.getElementById("fullName").textContent = user.fullName;
+        document.getElementById("gender").textContent = user.gender;
+        document.getElementById("dob").textContent = formatDate(user.dateOfBirth);
+        document.getElementById("phone").textContent = user.phoneNumber;
+        document.getElementById("email").textContent = user.email;
+    })
+    .catch(err => console.error(err));
+
+function formatDate(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("vi-VN");
+}
+document.addEventListener("DOMContentLoaded", () => {
+    const total = localStorage.getItem("bookingTotal") || "$0";
+
+    const el = document.getElementById("totalPrice");
+    if (el) {
+        el.innerText = total;
+    }
+});

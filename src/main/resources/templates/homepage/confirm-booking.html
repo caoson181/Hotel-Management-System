@@ -8,16 +8,29 @@
 </head>
 <body>
 <div class="container">
+<div class="left">
+    <div class="bill-card">
+        <h2>Booking Summary</h2>
 
+        <div class="section">
+            <p class="section-title">Customer</p>
+            <p><span>Full Name</span><strong id="fullName"></strong></p>
+            <p><span>Gender</span><strong id="gender"></strong></p>
+            <p><span>Date of Birth</span><strong id="dob"></strong></p>
+            <p><span>Phone</span><strong id="phone"></strong></p>
+            <p><span>Email</span><strong id="email"></strong></p>
+        </div>
 
-    <!-- LEFT PANEL -->
-    <div class="left">
-        <h2>Confirm Booking</h2>
+        <hr>
 
-        <div class="info-box">
-            <p><strong>Room:</strong> <span id="roomInfo"></span></p>
-            <p><strong>Check-in:</strong> <span id="checkin"></span></p>
-            <p><strong>Check-out:</strong> <span id="checkout"></span></p>
+        <div class="section">
+            <p class="section-title">Booking</p>
+            <p><span>Room</span><strong id="roomInfo"></strong></p>
+            <p><span>Check-in</span><strong id="checkin"></strong></p>
+            <p><span>Check-out</span><strong id="checkout"></strong></p>
+            <p>
+                <strong id="totalPrice">$0</strong>
+            </p>
         </div>
 
         <div class="actions">
@@ -25,11 +38,14 @@
             <button onclick="history.back()" class="btn">Cancel</button>
         </div>
     </div>
-
+</div>
     <!-- RIGHT PANEL -->
     <div class="right">
         <h3>Available Rooms</h3>
-        <div id="roomList" class="room-grid"></div>
+
+        <div class="room-wrapper">
+            <div id="roomList" class="room-grid"></div>
+        </div>
     </div>
 </div>
 </body>

@@ -471,3 +471,13 @@ function bookNow(roomType, roomRank) {
     })
     .catch(err => console.error(err));
 }
+document.getElementById("bookNowBtn").addEventListener("click", () => {
+    const totalText = document.querySelector(".total-price").innerText;
+
+    console.log("Saving total:", totalText); // test
+
+    localStorage.setItem("bookingTotal", totalText);
+
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = `/confirm-booking?${params.toString()}`;
+});

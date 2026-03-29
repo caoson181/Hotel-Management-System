@@ -6,27 +6,43 @@ body {
 
 /* layout */
 .container {
-    display: flex;
-    gap: 40px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
     padding: 40px;
+    align-items: start;
 }
 
 /* LEFT PANEL */
 .left {
-    width: 260px;
+    width: 100%;
     background: white;
     padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
 
 .left h2 {
     margin-bottom: 20px;
+    font-size: 22px;
 }
 
+/* label + value tách rõ */
 .info-box p {
-    margin: 12px 0;
-    color: #444;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.info-box strong {
+    color: #888;
+    font-weight: 500;
+}
+
+.info-box span {
+    color: #111;
+    font-weight: 600;
 }
 
 /* buttons */
@@ -59,9 +75,10 @@ body {
 
 /* RIGHT */
 .right {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-
 .right h3 {
     margin-bottom: 20px;
     color: #333;
@@ -70,35 +87,28 @@ body {
 /* GRID */
 .room-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, 60px);
+    gap: 10px;
+    justify-content: center;
 }
 
 /* ROOM CARD */
 .room-card {
-    aspect-ratio: 1 / 1;
-    background: white;
-    border-radius: 12px;
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+
     display: flex;
     justify-content: center;
     align-items: center;
 
     font-weight: 600;
     font-size: 14px;
-
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    border: 1px solid #eee;
 }
-
 /* hover nhẹ thôi */
 .room-card:hover {
-    background: #f9fafb;
-    border-color: #22c55e;
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
-
 /* selected */
 .room-card.selected {
     background: #22c55e;
@@ -128,4 +138,150 @@ body {
 .room-card.unavailable {
     cursor: not-allowed;
     opacity: 0.7;
+}
+.bill {
+    width: 280px;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* title */
+.bill h2 {
+    margin-bottom: 20px;
+}
+
+/* section */
+.bill-section {
+    margin-bottom: 15px;
+}
+
+.bill-section .label {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.bill-section .sub {
+    font-size: 13px;
+    color: #999;
+}
+
+/* divider */
+.divider {
+    height: 1px;
+    background: #eee;
+    margin: 15px 0;
+}
+
+/* total */
+.total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total h3 {
+    color: #22c55e;
+    margin: 0;
+}
+
+/* button full width */
+.btn.full {
+    width: 100%;
+    margin-top: 15px;
+}
+.actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+.bill-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    width: 280px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.bill-card h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.section {
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #555;
+    font-size: 14px;
+}
+
+.section p {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.section span {
+    color: #888;
+}
+
+.section strong {
+    color: #222;
+}
+
+hr {
+    border: none;
+    border-top: 1px dashed #ddd;
+    margin: 10px 0;
+}
+
+.actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn.primary {
+    background: #22c55e;
+    color: white;
+}
+
+.btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: #eee;
+}
+.room-wrapper {
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 1 / 1;
+
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+
+    overflow: auto;
 }
