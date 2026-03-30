@@ -1,6 +1,8 @@
 package org.example.backendpj.controller;
 
+import org.example.backendpj.Entity.Customer;
 import org.example.backendpj.Entity.User;
+import org.example.backendpj.Repository.CustomerRepository;
 import org.example.backendpj.Repository.UserRepository;
 
 import org.example.backendpj.dto.UserDTO;
@@ -25,10 +27,12 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CustomerRepository customerRepository;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, CustomerRepository customerRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.customerRepository = customerRepository;
     }
 
     @GetMapping("/users/manage")
@@ -135,9 +139,12 @@ public class UserController {
     }
     @GetMapping("/api/users/me")
     @ResponseBody
+
     public UserDTO getCurrentUser(Authentication authentication) {
 
         User user;
+
+
 
         if (authentication.getPrincipal() instanceof OAuth2User oauthUser) {
             String email = oauthUser.getAttribute("email");
@@ -151,7 +158,7 @@ public class UserController {
             user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
         }
-
+        Customer customer = user.getCustomer();
         // ✅ map sang DTO
         UserDTO dto = new UserDTO();
         dto.fullName = user.getFullName();
@@ -162,6 +169,9 @@ public class UserController {
         dto.phoneNumber = user.getPhoneNumber();
         dto.email = user.getEmail();
 
+        if (customer != null) {
+            dto.setCustomerId(customer.getCustomerId());
+        }
         return dto;
     }
 }

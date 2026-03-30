@@ -4,6 +4,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.example.backendpj.Entity.Customer;
+import org.example.backendpj.Repository.CustomerRepository;
 import org.example.backendpj.Repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -18,9 +20,11 @@ import java.nio.charset.StandardCharsets;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepo;
+    private final CustomerRepository customerRepo;
 
-    public OAuth2LoginSuccessHandler(UserRepository userRepo) {
+    public OAuth2LoginSuccessHandler(UserRepository userRepo, CustomerRepository customerRepo) {
         this.userRepo = userRepo;
+        this.customerRepo = customerRepo;
     }
 
     @Override
@@ -33,7 +37,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         String email = oauthUser.getAttribute("email");
         String name = oauthUser.getAttribute("name");
-
 
 
         if (email == null) {
@@ -54,12 +57,21 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             return;
         }
         var user = userRepo.findByEmail(email).orElse(null);
+        if (user != null) {
 
-        if (user != null && user.getRole().equalsIgnoreCase("Customer")) {
-            response.sendRedirect("/homepage");
-        } else {
-            response.sendRedirect("/index");
+            // ✅ CHECK nếu chưa có Customer thì tạo
+            if (user.getCustomer() == null) {
+                Customer customer = new Customer();
+                customer.setUser(user);
+                customerRepo.save(customer);
+            }
+
+            if (user != null && user.getRole().equalsIgnoreCase("Customer")) {
+                response.sendRedirect("/homepage");
+            } else {
+                response.sendRedirect("/index");
+            }
+
         }
-
     }
 }
