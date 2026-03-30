@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 roomInfo.description = selectedRoom.description;
             }
         }
+
     }
 
     initRoomData();
@@ -376,6 +377,10 @@ function initBooking() {
     };
     }
     calculateTotal();
+
+    window.addEventListener("pageshow", () => {
+        calculateTotal();
+    });
     }
 
 // ===== TOAST NOTIFICATION =====
