@@ -14,6 +14,12 @@ fetch(`/rooms/api/filter?type=${type}&rank=${rank}`)
     .then(data => renderRooms(data));
 
 document.getElementById("confirmBtn").onclick = () => {
+    if (!currentUser) {
+        alert("User not loaded yet!");
+        return;
+    }
+
+    const totalText = document.getElementById("totalPrice").innerText.replace("$", "");
     fetch("/api/bookings", {
         method: "POST",
         headers: {
@@ -21,10 +27,20 @@ document.getElementById("confirmBtn").onclick = () => {
         },
         body: JSON.stringify({
             customerId: window.customerId,
+
+            customerName: currentUser.fullName,
+            email: currentUser.email,
+            phone: currentUser.phoneNumber,
+
+            totalAmount: Number(totalText),
+
             roomType: type,
             roomRank: rank,
-            checkIn: checkin,
-            checkOut: checkout
+
+            checkInTime: checkin,
+            checkOutTime: checkout,
+
+            bookingTime: new Date().toISOString()
         })
     })
         .then(res => res.json())
@@ -65,9 +81,11 @@ function renderRooms(rooms) {
         container.appendChild(div);
     });
 }
+let currentUser = null;
 fetch("/api/users/me")
     .then(res => res.json())
     .then(user => {
+        currentUser = user;
         document.getElementById("fullName").textContent = user.fullName;
         document.getElementById("gender").textContent = user.gender;
         document.getElementById("dob").textContent = formatDate(user.dateOfBirth);
