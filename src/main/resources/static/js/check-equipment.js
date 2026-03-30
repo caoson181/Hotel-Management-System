@@ -8,154 +8,49 @@ let rooms = [];
 // Equipment by rank - đầy đủ cho các rank mới
 const equipment = {
   Standard: {
-    bedroom: ["Single Bed", "Wardrobe", "Nightstand", "Lamp", "Desk", "Chair"],
-    bathroom: ["Towels (2)", "Soap", "Shampoo", "Toilet Paper", "Hairdryer"],
-    living: ["TV", "AC", "Sofa", "Coffee Table"],
-    kitchen: ["Water (2)", "Coffee Set", "Mini Fridge"],
+    bedroom1: ["Single Bed", "Wardrobe", "Nightstand", "Lamp", "Desk", "Chair", "TV 32\"", "AC"],
+    bathroom1: ["Towels (2)", "Soap", "Shampoo", "Toilet Paper", "Hairdryer"],
+    bedroom2: [],
+    bathroom2: [],
+    living: [],
+    kitchen: [],
+    bar: [],
   },
   Superior: {
-    bedroom: [
-      "Queen Bed",
-      "Wardrobe",
-      "Nightstand (2)",
-      "Lamp (2)",
-      "Desk",
-      "Chair",
-      "Vanity Mirror",
-    ],
-    bathroom: [
-      "Towels (4)",
-      "Soap",
-      "Shampoo",
-      "Conditioner",
-      "Toilet Paper",
-      "Hairdryer",
-      "Bathrobe",
-    ],
-    living: ["TV (2)", "AC", "Sofa", "Armchair", "Coffee Table"],
-    kitchen: ["Water (4)", "Coffee Set", "Tea Set", "Mini Fridge"],
+    bedroom1: ["Queen Bed", "Wardrobe", "Nightstand (2)", "Lamp (2)", "Desk", "Chair", "Vanity Mirror", "Smart TV 43\"", "AC", "Safe Box"],
+    bathroom1: ["Towels (4)", "Soap", "Shampoo", "Conditioner", "Body Lotion", "Toilet Paper", "Hairdryer", "Bathrobe", "Slippers", "Rain Shower"],
+    bedroom2: [],
+    bathroom2: [],
+    living: [],
+    kitchen: [],
+    bar: [],
   },
   Deluxe: {
-    bedroom: [
-      "King Bed",
-      "Wardrobe (2)",
-      "Nightstand (2)",
-      "Lamp (2)",
-      "Desk",
-      "Chair (2)",
-      "Vanity Table",
-      "Safe Box",
-    ],
-    bathroom: [
-      "Towels (4)",
-      "Soap",
-      "Shampoo",
-      "Conditioner",
-      "Body Lotion",
-      "Toilet Paper",
-      "Hairdryer",
-      "Bathrobe (2)",
-      "Slippers",
-    ],
-    living: [
-      "TV (2)",
-      "AC",
-      "Sofa",
-      "Armchair (2)",
-      "Coffee Table",
-      "Mini Bar",
-    ],
-    kitchen: ["Water (4)", "Coffee Set", "Tea Set", "Mini Fridge", "Microwave"],
+    bedroom1: ["King Bed", "Wardrobe (2)", "Nightstand (2)", "Lamp (2)", "Desk", "Chair (2)", "Vanity Table", "Safe Box", "Smart TV 55\"", "AC", "Blackout Curtains"],
+    bathroom1: ["Towels (4)", "Soap", "Shampoo", "Conditioner", "Body Lotion", "Toilet Paper", "Hairdryer", "Bathrobe (2)", "Slippers (2)", "Scale", "Rain Shower"],
+    bedroom2: [],
+    bathroom2: [],
+    living: ["Sofa", "Armchair (2)", "Coffee Table", "Smart TV 55\"", "AC", "Mini Bar", "Welcome Drink"],
+    kitchen: ["Water (4)", "Coffee Machine", "Tea Set", "Mini Fridge", "Microwave", "Kettle", "Glassware (4)"],
+    bar: [],
   },
   Executive: {
-    bedroom: [
-      "King Bed (2)",
-      "Wardrobe (2)",
-      "Nightstand (2)",
-      "Lamp (3)",
-      "Desk",
-      "Chair (2)",
-      "Vanity Table",
-      "Safe Box",
-      "Workstation",
-    ],
-    bathroom: [
-      "Towels (6)",
-      "Soap",
-      "Shampoo",
-      "Conditioner",
-      "Body Lotion",
-      "Toilet Paper",
-      "Hairdryer",
-      "Bathrobe (2)",
-      "Slippers",
-      "Scale",
-    ],
-    living: [
-      "TV (2)",
-      "AC",
-      "Sofa",
-      "Armchair (2)",
-      "Coffee Table",
-      "Mini Bar",
-      "Sound System",
-      "Meeting Table",
-    ],
-    kitchen: [
-      "Water (6)",
-      "Coffee Set",
-      "Tea Set",
-      "Mini Fridge",
-      "Microwave",
-      "Dishwasher",
-    ],
+    bedroom1: ["King Bed", "Wardrobe (2)", "Nightstand (2)", "Lamp (3)", "Executive Desk", "Ergonomic Chair", "Vanity Table", "Safe Box", "Workstation", "Smart TV 65\"", "AC", "Blackout Curtains", "Air Purifier"],
+    bathroom1: ["Towels (6)", "Soap", "Shampoo", "Conditioner", "Body Lotion", "Toilet Paper", "Hairdryer", "Bathrobe (2)", "Slippers (2)", "Scale", "Jacuzzi", "Rain Shower", "Premium Toiletries"],
+    bedroom2: [],
+    bathroom2: [],
+    living: ["L-Shaped Sofa", "Armchair (2)", "Coffee Table", "Smart TV 55\"", "AC", "Sound System", "Meeting Table", "Mini Bar", "Work Desk"],
+    kitchen: ["Water (6)", "Premium Coffee Machine", "Tea Set", "Mini Fridge", "Microwave", "Dishwasher", "Wine Glasses (4)", "Kettle", "Snack Basket"],
+    bar: ["Wine Glasses (4)", "Whiskey Glasses (4)", "Ice Bucket", "Cocktail Shaker", "Premium Spirits (4)", "Mini Bar", "Bar Counter"],
   },
   Suite: {
-    bedroom: [
-      "King Bed (2)",
-      "Wardrobe (3)",
-      "Nightstand (2)",
-      "Lamp (4)",
-      "Desk",
-      "Chair (2)",
-      "Vanity Table",
-      "Safe Box",
-      "Walk-in Closet",
-    ],
-    bathroom: [
-      "Towels (8)",
-      "Soap",
-      "Shampoo",
-      "Conditioner",
-      "Body Lotion",
-      "Toilet Paper",
-      "Hairdryer",
-      "Bathrobe (2)",
-      "Slippers",
-      "Scale",
-      "Jacuzzi",
-    ],
-    living: [
-      "TV (3)",
-      "AC",
-      "Sofa",
-      "Armchair (3)",
-      "Coffee Table",
-      "Mini Bar",
-      "Sound System",
-      "Dining Table",
-      "Piano",
-    ],
-    kitchen: [
-      "Water (8)",
-      "Coffee Set",
-      "Tea Set",
-      "Mini Fridge",
-      "Microwave",
-      "Dishwasher",
-      "Oven",
-      "Wine Cooler",
-    ],
+    bedroom1: ["King Bed", "Walk-in Closet", "Nightstand (2)", "Lamp (3)", "Desk", "Chair", "Vanity Table", "Safe Box", "Smart TV 65\"", "AC", "Blackout Curtains", "Air Purifier", "Butler Call Button"],
+    bedroom2: ["Queen Bed", "Wardrobe", "Nightstand (2)", "Lamp (2)", "Desk", "Chair", "Vanity Table", "Smart TV 55\"", "AC"],
+    bathroom1: ["Towels (8)", "Soap", "Shampoo", "Conditioner", "Body Lotion", "Toilet Paper", "Hairdryer", "Bathrobe (4)", "Slippers (4)", "Scale", "Jacuzzi", "Steam Shower", "Bidet", "Premium Toiletries", "Aromatherapy"],
+    bathroom2: ["Towels (4)", "Soap", "Shampoo", "Conditioner", "Toilet Paper", "Hairdryer", "Bathrobe (2)", "Slippers (2)", "Rain Shower"],
+    living: ["Grand Sofa", "Armchair (3)", "Coffee Table", "Smart TV 75\"", "AC", "Premium Sound System", "Dining Table (4 seats)", "Mini Bar", "Welcome Champagne", "Fresh Flowers"],
+    kitchen: ["Water (8)", "Premium Coffee Machine", "Tea Set", "Full-size Fridge", "Microwave", "Dishwasher", "Oven", "Cookware Set", "Glassware (8)", "Kettle", "Snack Basket"],
+    bar: ["Wine Glasses (6)", "Whiskey Glasses (6)", "Champagne Flutes (4)", "Ice Bucket", "Premium Cocktail Set", "Premium Spirits (8)", "Wine Cooler", "Bar Counter", "Bar Stools (2)", "Mini Bar"],
   },
 };
 
@@ -183,8 +78,7 @@ function renderTable() {
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML =
-      '<tr><td colspan="6" class="empty-state">No rooms found</td></tr>';
+    tbody.innerHTML = '|<td colspan="9" class="empty-state">No rooms found</td>|';
     return;
   }
 
@@ -195,18 +89,21 @@ function renderTable() {
       if (room.status === "issues") rowClass = "has-issues";
 
       return `
-            <tr class="${rowClass}">
-                <td style="text-align:left">
-                    <div class="room-number">${room.number}</div>
-                    <div class="room-type-badge">${room.type} - ${room.rank}</div>
-                </td>
-                <td>${renderButton(room, "bedroom")}</td>
-                <td>${renderButton(room, "bathroom")}</td>
-                <td>${renderButton(room, "living")}</td>
-                <td>${renderButton(room, "kitchen")}</td>
-                <td>${renderAction(room)}</td>
-            </tr>
-        `;
+        <tr class="${rowClass}">
+          <td style="text-align:left">
+            <div class="room-number">${room.number}</div>
+            <div class="room-type-badge">${room.type} - ${room.rank}</div>
+           </td>
+           <td>${renderButton(room, "bedroom1")}</td>
+           <td>${renderButton(room, "bedroom2")}</td>
+           <td>${renderButton(room, "bathroom1")}</td>
+           <td>${renderButton(room, "bathroom2")}</td>
+           <td>${renderButton(room, "living")}</td>
+           <td>${renderButton(room, "kitchen")}</td>
+           <td>${renderButton(room, "bar")}</td>
+           <td>${renderAction(room)}</td>
+        </tr>
+      `;
     })
     .join("");
 
@@ -214,7 +111,21 @@ function renderTable() {
 }
 
 function renderButton(room, area) {
+  // Kiểm tra xem area này có trong equipment của rank không và có vật dụng không
+  const areaExists = equipment[room.rank] && 
+                     equipment[room.rank][area] && 
+                     equipment[room.rank][area].length > 0;
+  
+  // Nếu area không tồn tại trong equipment, hiển thị dấu gạch ngang
+  if (!areaExists) {
+    return '<span style="color: #cbd5e1;">—</span>';
+  }
+  
   const data = room[area];
+  if (!data) {
+    return '<span style="color: #cbd5e1;">—</span>';
+  }
+  
   if (!data.checked) {
     return `<button class="check-btn" onclick="openModal(${room.id}, '${area}')">Check</button>`;
   } else if (data.missing.length > 0) {
@@ -225,16 +136,16 @@ function renderButton(room, area) {
 }
 
 function renderAction(room) {
-  const allChecked =
-    room.bedroom.checked &&
-    room.bathroom.checked &&
-    room.living.checked &&
-    room.kitchen.checked;
-  const hasIssues =
-    room.bedroom.missing.length > 0 ||
-    room.bathroom.missing.length > 0 ||
-    room.living.missing.length > 0 ||
-    room.kitchen.missing.length > 0;
+  // Lấy danh sách các area thực sự tồn tại trong equipment của rank này
+  const existingAreas = Object.keys(equipment[room.rank] || {}).filter(
+    area => equipment[room.rank][area] && equipment[room.rank][area].length > 0
+  );
+  
+  // Kiểm tra tất cả các area tồn tại đã được check chưa
+  const allChecked = existingAreas.every(area => room[area]?.checked === true);
+  
+  // Kiểm tra có issue ở bất kỳ area nào không
+  const hasIssues = existingAreas.some(area => room[area]?.missing?.length > 0);
 
   if (!allChecked) {
     return `<button class="action-btn pending" disabled>⏳ In Progress</button>`;
@@ -253,11 +164,15 @@ function openModal(roomId, area) {
   currentArea = area;
 
   const areaName = {
-    bedroom: "Bedroom",
-    bathroom: "Bathroom",
+    bedroom1: "Bedroom 1",
+    bedroom2: "Bedroom 2",
+    bathroom1: "Bathroom 1",
+    bathroom2: "Bathroom 2",
     living: "Living Room",
     kitchen: "Kitchen",
+    bar: "Bar Area",
   }[area];
+
   const equipmentList = equipment[room.rank][area];
   const savedItems = room[area].items || [];
   const savedMissing = room[area].missing || [];
@@ -272,40 +187,39 @@ function openModal(roomId, area) {
   modalBody.innerHTML = `
         <div class="equipment-list" id="equipmentList">
             ${equipmentList
-              .map((item) => {
-                const isChecked = tempItems.includes(item);
-                const isReported = tempMissing.includes(item);
-                let itemClass = "";
-                if (isReported) itemClass = "reported";
-                else if (isChecked) itemClass = "checked";
+      .map((item) => {
+        const isChecked = tempItems.includes(item);
+        const isReported = tempMissing.includes(item);
+        let itemClass = "";
+        if (isReported) itemClass = "reported";
+        else if (isChecked) itemClass = "checked";
 
-                return `
+        return `
                     <div class="equipment-item ${itemClass}" data-item="${item}">
                         <input type="checkbox" ${isChecked ? "checked" : ""} ${isReported ? "disabled" : ""}>
                         <label>${item}</label>
                         ${isReported ? '<i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>' : ""}
                     </div>
                 `;
-              })
-              .join("")}
+      })
+      .join("")}
         </div>
         <div class="issue-section">
             <h4>⚠️ Report Issues</h4>
             <div id="missingList">
-                ${
-                  tempMissing.length > 0
-                    ? tempMissing
-                        .map(
-                          (item) => `
+                ${tempMissing.length > 0
+      ? tempMissing
+        .map(
+          (item) => `
                     <div class="missing-item">
                         <span>${item}</span>
                         <button class="remove-issue" onclick="removeIssue('${item.replace(/'/g, "\\'")}')">✖</button>
                     </div>
                 `,
-                        )
-                        .join("")
-                    : "<small>No issues reported</small>"
-                }
+        )
+        .join("")
+      : "<small>No issues reported</small>"
+    }
             </div>
             <select id="issueSelect">
                 <option value="">Select item to report...</option>
@@ -483,6 +397,14 @@ function saveCheck() {
   }
 
   const equipmentList = equipment[currentRoom.rank][currentArea];
+  
+  // Nếu equipmentList rỗng (area không tồn tại), không cần check
+  if (!equipmentList || equipmentList.length === 0) {
+    alert("This area is not available for this room type!");
+    closeModal();
+    return;
+  }
+  
   const allItemsHandled = equipmentList.every(
     (item) => tempItems.includes(item) || tempMissing.includes(item),
   );
@@ -496,16 +418,13 @@ function saveCheck() {
   currentRoom[currentArea].missing = [...tempMissing];
   currentRoom[currentArea].checked = true;
 
-  const allChecked =
-    currentRoom.bedroom.checked &&
-    currentRoom.bathroom.checked &&
-    currentRoom.living.checked &&
-    currentRoom.kitchen.checked;
-  const hasIssues =
-    currentRoom.bedroom.missing.length > 0 ||
-    currentRoom.bathroom.missing.length > 0 ||
-    currentRoom.living.missing.length > 0 ||
-    currentRoom.kitchen.missing.length > 0;
+  // Lấy danh sách các area tồn tại
+  const existingAreas = Object.keys(equipment[currentRoom.rank] || {}).filter(
+    area => equipment[currentRoom.rank][area] && equipment[currentRoom.rank][area].length > 0
+  );
+  
+  const allChecked = existingAreas.every(area => currentRoom[area]?.checked === true);
+  const hasIssues = existingAreas.some(area => currentRoom[area]?.missing?.length > 0);
 
   if (!allChecked) {
     currentRoom.status = "pending";
@@ -519,15 +438,17 @@ function saveCheck() {
   renderTable();
 
   const areaName = {
-    bedroom: "Bedroom",
-    bathroom: "Bathroom",
+    bedroom1: "Bedroom 1",
+    bedroom2: "Bedroom 2",
+    bathroom1: "Bathroom 1",
+    bathroom2: "Bathroom 2",
     living: "Living Room",
     kitchen: "Kitchen",
+    bar: "Bar Area",
   }[currentArea];
+  
   if (tempMissing.length > 0) {
-    alert(
-      `✓ ${areaName} checked! Found ${tempMissing.length} issue(s) that need attention.`,
-    );
+    alert(`✓ ${areaName} checked! Found ${tempMissing.length} issue(s) that need attention.`);
   } else {
     alert(`✓ ${areaName} checked! All equipment is present.`);
   }
@@ -554,39 +475,49 @@ function viewIssues(roomId) {
   currentResolveRoom = room;
 
   let issues = [];
-  if (room.bedroom.missing.length)
-    issues.push({ area: "Bedroom", items: [...room.bedroom.missing] });
-  if (room.bathroom.missing.length)
-    issues.push({ area: "Bathroom", items: [...room.bathroom.missing] });
-  if (room.living.missing.length)
-    issues.push({ area: "Living Room", items: [...room.living.missing] });
-  if (room.kitchen.missing.length)
-    issues.push({ area: "Kitchen", items: [...room.kitchen.missing] });
+  
+  // Chỉ thêm các area có missing items
+  const areas = ['bedroom1', 'bedroom2', 'bathroom1', 'bathroom2', 'living', 'kitchen', 'bar'];
+  const areaNames = {
+    bedroom1: "Bedroom 1",
+    bedroom2: "Bedroom 2", 
+    bathroom1: "Bathroom 1",
+    bathroom2: "Bathroom 2",
+    living: "Living Room",
+    kitchen: "Kitchen",
+    bar: "Bar Area"
+  };
+  
+  areas.forEach(area => {
+    if (room[area]?.missing?.length > 0) {
+      issues.push({ area: areaNames[area], items: [...room[area].missing] });
+    }
+  });
 
   const modalBody = document.getElementById("issueModalBody");
   document.getElementById("issueRoomNumber").textContent = room.number;
 
-  modalBody.innerHTML = `
-        <div style="margin-bottom: 20px;">
-            <h4 style="color: #dc3545; margin-bottom: 15px;">Missing/Damaged Items:</h4>
-            ${issues
-              .map(
-                (issue) => `
-                <div style="margin-bottom: 20px;">
-                    <strong>📌 ${issue.area}:</strong>
-                    <div style="margin-top: 8px;">
-                        ${issue.items.map((item) => `<span class="missing-tag">${item}</span>`).join("")}
-                    </div>
-                </div>
-            `,
-              )
-              .join("")}
-        </div>
-        <div style="margin-top: 15px;">
-            <label>Resolution Notes:</label>
-            <textarea id="resolutionNotes" rows="3" placeholder="Describe what was done to resolve these issues..." style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 5px;"></textarea>
-        </div>
+  if (issues.length === 0) {
+    modalBody.innerHTML = '<p>No issues found in this room.</p>';
+  } else {
+    modalBody.innerHTML = `
+      <div style="margin-bottom: 20px;">
+        <h4 style="color: #dc3545; margin-bottom: 15px;">Missing/Damaged Items:</h4>
+        ${issues.map((issue) => `
+          <div style="margin-bottom: 20px;">
+            <strong>📌 ${issue.area}:</strong>
+            <div style="margin-top: 8px;">
+              ${issue.items.map((item) => `<span class="missing-tag">${item}</span>`).join("")}
+            </div>
+          </div>
+        `).join("")}
+      </div>
+      <div style="margin-top: 15px;">
+        <label>Resolution Notes:</label>
+        <textarea id="resolutionNotes" rows="3" placeholder="Describe what was done to resolve these issues..." style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 5px;"></textarea>
+      </div>
     `;
+  }
 
   document.getElementById("issueModal").style.display = "flex";
 }
@@ -596,15 +527,14 @@ function resolveIssues() {
 
   const notes = document.getElementById("resolutionNotes")?.value || "";
 
-  if (
-    confirm(
-      `Resolve all issues in Room ${currentResolveRoom.number}?\n\nNotes: ${notes || "No notes provided"}`,
-    )
-  ) {
-    currentResolveRoom.bedroom.missing = [];
-    currentResolveRoom.bathroom.missing = [];
-    currentResolveRoom.living.missing = [];
-    currentResolveRoom.kitchen.missing = [];
+  if (confirm(`Resolve all issues in Room ${currentResolveRoom.number}?\n\nNotes: ${notes || "No notes provided"}`)) {
+    // Reset missing items cho tất cả các area
+    const areas = ['bedroom1', 'bedroom2', 'bathroom1', 'bathroom2', 'living', 'kitchen', 'bar'];
+    areas.forEach(area => {
+      if (currentResolveRoom[area]) {
+        currentResolveRoom[area].missing = [];
+      }
+    });
     currentResolveRoom.status = "completed";
 
     closeIssueModal();
@@ -637,17 +567,20 @@ async function loadRooms() {
     const response = await fetch("/rooms/api?status=Housekeeping");
     const data = await response.json();
 
-    // Map backend -> frontend structure
+    // Map backend -> frontend structure với 7 khu vực
     rooms = data.map((r) => ({
       id: r.id,
       number: r.roomNumber,
       type: r.roomType,
-      rank: r.roomRank,
+      rank: r.roomRank, // Standard, Superior, Deluxe, Executive, Suite
 
-      bedroom: { checked: false, items: [], missing: [] },
-      bathroom: { checked: false, items: [], missing: [] },
+      bedroom1: { checked: false, items: [], missing: [] },
+      bedroom2: { checked: false, items: [], missing: [] },
+      bathroom1: { checked: false, items: [], missing: [] },
+      bathroom2: { checked: false, items: [], missing: [] },
       living: { checked: false, items: [], missing: [] },
       kitchen: { checked: false, items: [], missing: [] },
+      bar: { checked: false, items: [], missing: [] },
 
       status: "pending",
     }));
