@@ -18,7 +18,9 @@
           View Room
         </a>
 
-        <a th:href="@{/rooms/check-equipment}" id="checkEquipment">
+        <a th:href="@{/rooms/check-equipment}"
+           id="checkEquipment"
+           sec:authorize="hasAnyRole('HOUSEKEEPER','MANAGER')">
           Check Equipment
         </a>
 
@@ -255,6 +257,6 @@
     }
     // Hail the Machine God
     // Praise the Omnissiah
-    // As Pasqal once said: https://youtu.be/6Cdamnz8mf8
+    // When someone ask me to explain how i done the code: https://youtu.be/6Cdamnz8mf8
   });
 </script>
