@@ -22,18 +22,26 @@
 <body>
 <div th:replace="~{homepage/navbar :: navbar}"></div>
 
+
+
 <div class="solar-cosmic-bg"></div>
 <div class="solar-stars" id="solarStarsContainer"></div>
 <div class="solar-scroll-progress" id="solarScrollProgress"></div>
 
 <div class="solar-header-section">
-    <h1><i class="fas fa-gravity"></i> ACHIEVEMENT SYSTEM</h1>
-    <p>Planets of excellence orbiting Gravity Hotel</p>
-</div>
+    <h1>
+        <i class="fas fa-gravity"></i>
+        <span th:text="#{solar.title}">ACHIEVEMENT SYSTEM</span>
+    </h1>
+    <p th:text="#{solar.subtitle}">
+        Planets of excellence orbiting Gravity Hotel
+    </p>
 
 <div class="solar-control-wrapper">
     <button class="solar-pause-play-btn" id="solarToggleOrbitBtn">
-        <i class="fas fa-pause"></i> Pause Orbits
+        <i class="fas fa-pause"></i>
+    <span th:text="#{solar.pause}">Pause Orbits</span>
+
     </button>
 </div>
 
@@ -51,10 +59,25 @@
 
 <div class="solar-news-section">
     <div class="solar-filter-bar">
-        <button class="solar-filter-btn active" data-filter="all"><i class="fas fa-globe"></i> All</button>
-        <button class="solar-filter-btn" data-filter="achievement"><i class="fas fa-trophy"></i> Achievements</button>
-        <button class="solar-filter-btn" data-filter="news"><i class="fas fa-newspaper"></i> News</button>
-        <button class="solar-filter-btn" data-filter="event"><i class="fas fa-calendar-alt"></i> Events</button>
+        <button class="solar-filter-btn active" data-filter="all">
+  <i class="fas fa-globe"></i>
+  <span th:text="#{filter.all}">All</span>
+</button>
+
+<button class="solar-filter-btn" data-filter="achievement">
+  <i class="fas fa-trophy"></i>
+  <span th:text="#{filter.achievement}">Achievements</span>
+</button>
+
+<button class="solar-filter-btn" data-filter="news">
+  <i class="fas fa-newspaper"></i>
+  <span th:text="#{filter.news}">News</span>
+</button>
+
+<button class="solar-filter-btn" data-filter="event">
+  <i class="fas fa-calendar-alt"></i>
+  <span th:text="#{filter.event}">Events</span>
+</button>
     </div>
     <div class="solar-news-grid" id="solarNewsGrid"></div>
 </div>
@@ -67,8 +90,52 @@
 </div>
 
 <footer class="solar-footer">
-    <i class="fas fa-gravity"></i> Gravity Hotel — Where achievements orbit around excellence
+    <i class="fas fa-gravity"></i> <span th:text="#{solar.footer}">
+        Gravity Hotel — Where achievements orbit around excellence
+    </span>
 </footer>
+
+<!-- I18N for JS -->
+<script th:inline="javascript">
+    const i18n = {
+        achievement: /*[[#{filter.achievement}]]*/ "Achievements",
+        news: /*[[#{filter.news}]]*/ "News",
+        event: /*[[#{filter.event}]]*/ "Events",
+
+        readMore: /*[[#{news.readMore}]]*/ "Read More",
+        explore: /*[[#{news.explore}]]*/ "Explore...",
+
+        pause: /*[[#{solar.pause}]]*/ "Pause Orbits",
+        play: /*[[#{solar.play}]]*/ "Start Orbits",
+
+        modalFooter: /*[[#{solar.modalFooter}]]*/ "Where excellence defies gravity"
+    };
+    const i18nArticles = {
+        "article.1.title": /*[[#{article.1.title}]]*/ "",
+        "article.1.excerpt": /*[[#{article.1.excerpt}]]*/ "",
+        "article.1.content": /*[[#{article.1.content}]]*/ "",
+
+        "article.2.title": /*[[#{article.2.title}]]*/ "",
+        "article.2.excerpt": /*[[#{article.2.excerpt}]]*/ "",
+        "article.2.content": /*[[#{article.2.content}]]*/ "",
+
+        "article.3.title": /*[[#{article.3.title}]]*/ "",
+        "article.3.excerpt": /*[[#{article.3.excerpt}]]*/ "",
+        "article.3.content": /*[[#{article.3.content}]]*/ "",
+
+        "article.4.title": /*[[#{article.4.title}]]*/ "",
+        "article.4.excerpt": /*[[#{article.4.excerpt}]]*/ "",
+        "article.4.content": /*[[#{article.4.content}]]*/ "",
+
+        "article.5.title": /*[[#{article.5.title}]]*/ "",
+        "article.5.excerpt": /*[[#{article.5.excerpt}]]*/ "",
+        "article.5.content": /*[[#{article.5.content}]]*/ "",
+
+        "article.6.title": /*[[#{article.6.title}]]*/ "",
+        "article.6.excerpt": /*[[#{article.6.excerpt}]]*/ "",
+        "article.6.content": /*[[#{article.6.content}]]*/ ""
+    };
+</script>
 
 <!-- Custom JS -->
     <script th:src="@{/js/gravity-news.js}"></script>
