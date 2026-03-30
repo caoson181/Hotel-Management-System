@@ -134,9 +134,7 @@ public class RoomController {
                     .badRequest()
                     .body("Room not found");
         }
-
         roomRepository.deleteById(id);
-
         return ResponseEntity.ok("Deleted successfully");
     }
 
@@ -155,20 +153,12 @@ public class RoomController {
     }
 
     // ===============================
-// Filter rooms by type + rank
-// ===============================
-
-
+    // Filter rooms by type + rank
+    // ===============================
     @GetMapping("/api/filter")
     @ResponseBody
-
     public List<Room> getRoomsByTypeAndRank(
             @RequestParam String type,
-            @RequestParam String rank
-
-    )
-
-    {
-        return roomRepository.findByRoomTypeAndRoomRank(type, rank);
-    }
+            @RequestParam String rank)
+    {return roomRepository.findByRoomTypeAndRoomRank(type, rank);}
 }

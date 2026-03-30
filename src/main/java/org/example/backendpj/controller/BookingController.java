@@ -28,8 +28,8 @@ public class BookingController {
 
         Booking booking = new Booking();
 
-        booking.setCheckInDate(dto.getCheckIn());
-        booking.setCheckOutDate(dto.getCheckOut());
+        booking.setCheckInDate(dto.getCheckInTime());
+        booking.setCheckOutDate(dto.getCheckOutTime());
         booking.setStatus("PENDING");
 
         return bookingRepository.save(booking);

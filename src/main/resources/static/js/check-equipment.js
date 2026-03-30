@@ -3,182 +3,7 @@ let userRole = "housekeeper";
 let currentResolveRoom = null;
 
 // Room data với đầy đủ type và rank
-let rooms = [
-  // Single rooms
-  {
-    id: 101,
-    number: "101",
-    type: "Single",
-    rank: "Standard",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 102,
-    number: "102",
-    type: "Single",
-    rank: "Superior",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 103,
-    number: "103",
-    type: "Single",
-    rank: "Deluxe",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-
-  // Double rooms
-  {
-    id: 201,
-    number: "201",
-    type: "Double",
-    rank: "Standard",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 202,
-    number: "202",
-    type: "Double",
-    rank: "Superior",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 203,
-    number: "203",
-    type: "Double",
-    rank: "Executive",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-
-  // Twin rooms
-  {
-    id: 301,
-    number: "301",
-    type: "Twin",
-    rank: "Standard",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 302,
-    number: "302",
-    type: "Twin",
-    rank: "Superior",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 303,
-    number: "303",
-    type: "Twin",
-    rank: "Deluxe",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-
-  // Triple rooms
-  {
-    id: 401,
-    number: "401",
-    type: "Triple",
-    rank: "Standard",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 402,
-    number: "402",
-    type: "Triple",
-    rank: "Superior",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 403,
-    number: "403",
-    type: "Triple",
-    rank: "Executive",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-
-  // Family rooms
-  {
-    id: 501,
-    number: "501",
-    type: "Family",
-    rank: "Standard",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 502,
-    number: "502",
-    type: "Family",
-    rank: "Superior",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-  {
-    id: 503,
-    number: "503",
-    type: "Family",
-    rank: "Suite",
-    bedroom: { checked: false, items: [], missing: [] },
-    bathroom: { checked: false, items: [], missing: [] },
-    living: { checked: false, items: [], missing: [] },
-    kitchen: { checked: false, items: [], missing: [] },
-    status: "pending",
-  },
-];
+let rooms = [];
 
 // Equipment by rank - đầy đủ cho các rank mới
 const equipment = {
@@ -806,6 +631,33 @@ function closeIssueModal() {
   document.getElementById("issueModal").style.display = "none";
 }
 
+//Get list room status = Housekeeping
+async function loadRooms() {
+  try {
+    const response = await fetch("/rooms/api?status=Housekeeping");
+    const data = await response.json();
+
+    // Map backend -> frontend structure
+    rooms = data.map((r) => ({
+      id: r.id,
+      number: r.roomNumber,
+      type: r.roomType,
+      rank: r.roomRank,
+
+      bedroom: { checked: false, items: [], missing: [] },
+      bathroom: { checked: false, items: [], missing: [] },
+      living: { checked: false, items: [], missing: [] },
+      kitchen: { checked: false, items: [], missing: [] },
+
+      status: "pending",
+    }));
+
+    renderTable();
+  } catch (error) {
+    console.error("Error loading rooms:", error);
+  }
+}
+
 // Event listeners
 document
   .getElementById("searchInput")
@@ -822,7 +674,9 @@ document.querySelectorAll(".modal-overlay").forEach((overlay) => {
 });
 
 // Initial render
-renderTable();
+document.addEventListener("DOMContentLoaded", () => {
+  loadRooms();
+});
 
 // Make functions global
 window.openModal = openModal;
