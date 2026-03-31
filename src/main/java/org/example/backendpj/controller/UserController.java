@@ -143,22 +143,21 @@ public class UserController {
     public UserDTO getCurrentUser(Authentication authentication) {
 
         User user;
-
-
-
         if (authentication.getPrincipal() instanceof OAuth2User oauthUser) {
             String email = oauthUser.getAttribute("email");
+            System.out.println("GOOGLE EMAIL: " + email);
 
             user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
-
+            System.out.println("USER ID: " + user.getId());
         } else {
             String username = authentication.getName();
 
             user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
         }
-        Customer customer = user.getCustomer();
+        Customer customer = customerRepository.findByUser_Id(user.getId());
+        System.out.println("CUSTOMER: " + customer);
         // ✅ map sang DTO
         UserDTO dto = new UserDTO();
         dto.fullName = user.getFullName();
@@ -171,6 +170,9 @@ public class UserController {
 
         if (customer != null) {
             dto.setCustomerId(customer.getCustomerId());
+        }
+        else {
+            dto.setCustomerId(null);
         }
         return dto;
     }

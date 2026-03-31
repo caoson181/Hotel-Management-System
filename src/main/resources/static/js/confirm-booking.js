@@ -26,7 +26,7 @@ document.getElementById("confirmBtn").onclick = () => {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            customerId: window.customerId,
+            customerId: currentUser.customerId,
 
             customerName: currentUser.fullName,
             email: currentUser.email,

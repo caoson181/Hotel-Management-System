@@ -717,7 +717,9 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <div class="booking-detail-item">
                 <label>Customer ID</label>
-                <div class="detail-value">${escapeHtml(booking.customerId || "N/A")}</div>
+                <div class="detail-value">
+  ${escapeHtml(booking.customer?.customerId || "N/A")}
+</div>
             </div>
             <div class="booking-detail-item">
                 <label>Customer Name</label>
