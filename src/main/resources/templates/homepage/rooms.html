@@ -21,8 +21,8 @@
 
     <section class="rooms-hero" data-aos="fade-down">
       <div class="hero-content">
-        <h1 class="typing-effect">Discover Your Perfect Stay</h1>
-        <p>Five distinct categories • Fifteen unique experiences</p>
+        <h1 class="typing-effect" th:text="#{room.hero.title}">Discover Your Perfect Stay</h1>
+        <p th:text="#{room.hero.desc}">Five distinct categories • Fifteen unique experiences</p>
       </div>
     </section>
 
@@ -45,7 +45,7 @@
     <div class="comparison-toolbar">
       <button class="compare-btn" id="toggleCompare">
         <i class="fas fa-balance-scale"></i>
-        <span>Compare Rooms</span>
+        <span th:text="#{room.compare.room}">Compare Rooms</span>
         <span class="compare-count">(0)</span>
       </button>
     </div>
@@ -56,14 +56,14 @@
         <button class="close-compare"><i class="fas fa-times"></i></button>
         <div class="comparison-grid" id="comparisonGrid"></div>
         <div class="comparison-actions">
-          <button class="btn-clear">Clear All</button>
-          <button class="btn-book">Book Selected</button>
+          <button class="btn-clear" th:text="#{room.clear.all}">Clear All</button>
+          <button class="btn-book" th:text="#{room.select.book}">Book Selected</button>
         </div>
       </div>
     </div>
 
     <footer>
-      <p>
+      <p th:text="#{room.footer}">
         © 2026 Gravity Hotel. All rights reserved. | Representative room display
         for easy browsing.
       </p>
