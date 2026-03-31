@@ -3,7 +3,7 @@ package org.example.backendpj.Entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "Booking", schema = "dbo")
 public class Booking {
@@ -13,8 +13,9 @@ public class Booking {
     @Column(name = "booking_id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnore
     private Customer customer;
 
     @Column(name = "check_in_date", nullable = true)

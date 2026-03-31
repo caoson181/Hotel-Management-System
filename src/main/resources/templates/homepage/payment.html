@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment</title>
+    <link rel="stylesheet" href="/css/payment.css">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- LEFT -->
+    <div class="left">
+        <div class="section">
+        <h2>PAYMENT METHOD</h2>
+
+        <label>Payment Method</label>
+        <select id="method">
+            <option value="VISA">Visa</option>
+            <option value="MASTERCARD">MasterCard</option>
+        </select>
+
+        <div class="row">
+            <div>
+                <label>Card number</label>
+                <input type="text" placeholder="1234 5678 9012 3456">
+            </div>
+        </div>
+
+        <div class="row">
+            <div>
+                <label>Expiration</label>
+                <input type="text" placeholder="MM/YY">
+            </div>
+            <div>
+                <label>CVV</label>
+                <input type="text" placeholder="123">
+            </div>
+        </div>
+        </div>
+        <div class="section">
+        <h2>BILLING INFO</h2>
+
+        <div class="row">
+            <input type="text" placeholder="First name">
+            <input type="text" placeholder="Last name">
+        </div>
+            <div class="row">
+        <input type="text" placeholder="Address">
+        <input type="text" placeholder="City">
+            </div>
+        <div class="row">
+            <input type="text" placeholder="Zip code">
+            <input type="text" placeholder="Phone">
+        </div>
+
+        <button id="payBtn">Pay Now</button>
+            <button id="vnpayBtn" style="margin-top:10px;">
+                Pay with VNPay
+            </button>
+    </div>
+    </div>
+    <!-- RIGHT -->
+    <div class="right">
+        <h3>PAYMENT SUMMARY</h3>
+        <p>Total:</p>
+        <p>
+            <strong id="totalPrice">$0</strong>
+        </p>
+
+        <div class="cards">
+            <img src="https://img.icons8.com/color/48/visa.png"/>
+            <img src="https://img.icons8.com/color/48/mastercard.png"/>
+        </div>
+    </div>
+
+</div>
+
+<script th:src="@{/js/payment.js}"></script>
+</body>
+</html>

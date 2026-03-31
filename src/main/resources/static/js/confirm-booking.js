@@ -51,6 +51,34 @@ document.getElementById("confirmBtn").onclick = () => {
         .catch(err => console.error(err));
 
 
+
+    const payload = {
+        customerName: currentUser?.fullName || "",
+        email: currentUser?.email || "",
+        phone: currentUser?.phoneNumber || "",
+        totalAmount: Number(totalText) || 0,
+        roomType: type || "",
+        roomRank: rank || "",
+        checkInTime: checkin,
+        checkOutTime: checkout,
+        bookingTime: new Date().toISOString().slice(0, 19)
+    };
+
+    console.log("PAYLOAD:", payload);
+
+    fetch("/api/bookings/preview", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    })
+        .then(res => res.json())
+        .then(data => {
+            const bookingId = data.id || data.bookingId;
+            window.location.href = `/homepage/payment?bookingId=${bookingId}&total=${totalText}`;
+        })
+        .catch(err => console.error(err));
 };
 function renderRooms(rooms) {
     const container = document.getElementById("roomList");
@@ -107,3 +135,4 @@ document.addEventListener("DOMContentLoaded", () => {
         el.innerText = total;
     }
 });
+

@@ -1,5 +1,6 @@
 package org.example.backendpj.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.backendpj.Entity.Room;
 import org.example.backendpj.Service.UserService;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -191,5 +193,16 @@ public class PageController {
     @GetMapping("/confirm-booking")
     public String confirmBookingPage() {
         return "homepage/confirm-booking";
+    }
+    @GetMapping("/homepage/payment")
+    public String paymentPage() {
+        return "homepage/payment";
+    }
+    @GetMapping("/vnpay")
+    public void goVNPay(@RequestParam Long bookingId,
+                        HttpServletResponse response) throws IOException {
+
+        // redirect luôn sang create-payment
+        response.sendRedirect("/create-payment?bookingId=" + bookingId);
     }
 }
