@@ -586,10 +586,10 @@ function initComparison() {
             rank: card.dataset.rank,
             type: card.dataset.type,
           });
-          showNotification(`Added "${roomName}" to comparison`);
+          showNotification(t("compare.added").replace("{0}", roomName));
         } else {
           e.target.checked = false;
-          showNotification("You can compare up to 3 rooms at a time");
+          showNotification(t("compare.limit"));
         }
       } else {
         // Xóa khỏi danh sách so sánh
@@ -597,7 +597,9 @@ function initComparison() {
         if (index !== -1) {
           const removedRoom = compareList[index];
           compareList.splice(index, 1);
-          showNotification(`Removed "${removedRoom.name}" from comparison`);
+          showNotification(
+            t("compare.removed").replace("{0}", removedRoom.name),
+          );
         }
       }
 
@@ -620,7 +622,7 @@ function initComparison() {
   // Hiển thị modal
   compareBtn.addEventListener("click", () => {
     if (compareList.length < 2) {
-      showNotification("Please select at least 2 rooms to compare");
+      showNotification(t("compare.min"));
       return;
     }
 
@@ -644,7 +646,7 @@ function initComparison() {
     compareList = [];
     updateCompareButton();
     modal.classList.remove("active");
-    showNotification("Cleared all comparisons");
+    showNotification(t("compare.cleared"));
   });
 
   // Đặt phòng
@@ -681,8 +683,11 @@ function updateComparisonGrid() {
   if (!grid) return;
 
   if (compareList.length === 0) {
-    grid.innerHTML =
-      '<p style="text-align: center; padding: 2rem; color: var(--text-light);">No rooms selected for comparison</p>';
+    grid.innerHTML = `
+  <p style="text-align: center; padding: 2rem; color: var(--text-light);">
+    ${t("compare.empty")}
+  </p>
+`;
     return;
   }
 
@@ -695,7 +700,7 @@ function updateComparisonGrid() {
             <div class="room-meta">${room.meta}</div>
             <div class="price-tag">${room.price}</div>
             <button class="btn-detail remove-compare-btn" data-id="${room.id}">
-                <i class="fas fa-trash"></i> Remove
+                <i class="fas fa-trash"></i> ${t("room.remove")}
             </button>
         </div>
     `,
@@ -799,8 +804,13 @@ function showRoomDetails(rank, type) {
   if (!room) return;
 
   showNotification(
-    `Viewing ${rankData.title} ${room.type} - $${room.price}/night`,
+    t("room.viewing")
+      .replace("{0}", t(rankData.title))
+      .replace("{1}", t(room.type))
+      .replace("{2}", room.price)
+      .replace("{3}", t("room.night")),
   );
+
   // console.log('Room details:', { rank, type, room });
   window.location.href = `/room-detail?rank=${rank}&type=${room.type}`;
 }

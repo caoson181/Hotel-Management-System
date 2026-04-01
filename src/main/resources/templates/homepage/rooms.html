@@ -21,8 +21,12 @@
 
     <section class="rooms-hero" data-aos="fade-down">
       <div class="hero-content">
-        <h1 class="typing-effect" th:text="#{room.hero.title}">Discover Your Perfect Stay</h1>
-        <p th:text="#{room.hero.desc}">Five distinct categories • Fifteen unique experiences</p>
+        <h1 class="typing-effect" th:text="#{room.hero.title}">
+          Discover Your Perfect Stay
+        </h1>
+        <p th:text="#{room.hero.desc}">
+          Five distinct categories • Fifteen unique experiences
+        </p>
       </div>
     </section>
 
@@ -45,19 +49,26 @@
     <div class="comparison-toolbar">
       <button class="compare-btn" id="toggleCompare">
         <i class="fas fa-balance-scale"></i>
-        <span th:text="#{room.compare.room}">Compare Rooms</span>
+        <span th:text="#{room.compare}">Compare Rooms</span>
         <span class="compare-count">(0)</span>
       </button>
     </div>
 
     <div class="comparison-modal">
       <div class="comparison-content">
-        <h3><i class="fas fa-balance-scale"></i> Compare Rooms</h3>
+        <h3>
+          <i class="fas fa-balance-scale"></i>
+          <span th:text="#{room.compare}">Compare Rooms</span>
+        </h3>
         <button class="close-compare"><i class="fas fa-times"></i></button>
         <div class="comparison-grid" id="comparisonGrid"></div>
         <div class="comparison-actions">
-          <button class="btn-clear" th:text="#{room.clear.all}">Clear All</button>
-          <button class="btn-book" th:text="#{room.select.book}">Book Selected</button>
+          <button class="btn-clear" th:text="#{room.clear.all}">
+            Clear All
+          </button>
+          <button class="btn-book" th:text="#{room.select.book}">
+            Book Selected
+          </button>
         </div>
       </div>
     </div>
@@ -69,124 +80,134 @@
       </p>
     </footer>
 
-<script th:inline="javascript">
-/* ================= GLOBAL UI ================= */
-const i18n = {
-    flip: /*[[#{ui.flip}]]*/ "Click to flip",
-    addCompare: /*[[#{ui.add.compare}]]*/ "Add to compare",
-    viewDetail: /*[[#{ui.view.detail}]]*/ "View Details",
-    roomServices: /*[[#{ui.room.services}]]*/ "Room Services",
+    <script th:inline="javascript">
+      /* ================= GLOBAL UI ================= */
+      const i18n = {
+        flip: /*[[#{ui.flip}]]*/ "Click to flip",
+        addCompare: /*[[#{ui.add.compare}]]*/ "Add to compare",
+        viewDetail: /*[[#{ui.view.detail}]]*/ "View Details",
+        roomServices: /*[[#{ui.room.services}]]*/ "Room Services",
+        "room.remove": /*[[#{room.remove}]]*/ "",
+        "room.viewing": /*[[#{room.viewing}]]*/ "",
+        "room.night": /*[[#{room.night}]]*/ "",
+        "compare.added": /*[[#{compare.added}]]*/ "",
+        "compare.removed": /*[[#{compare.removed}]]*/ "",
+        "compare.limit": /*[[#{compare.limit}]]*/ "",
+        "compare.min": /*[[#{compare.min}]]*/ "",
+        "compare.cleared": /*[[#{compare.cleared}]]*/ "",
+        "compare.empty": /*[[#{compare.empty}]]*/ "",
 
-    guest: /*[[#{ui.guest}]]*/ "Guest",
-    guests: /*[[#{ui.guests}]]*/ "Guests",
-    perNight: /*[[#{ui.perNight}]]*/ "/night",
+        guest: /*[[#{ui.guest}]]*/ "Guest",
+        guests: /*[[#{ui.guests}]]*/ "Guests",
+        perNight: /*[[#{ui.perNight}]]*/ "/night",
 
-    howToBook: /*[[#{ui.howToBook}]]*/ "How to Book Your Perfect Room",
+        howToBook: /*[[#{ui.howToBook}]]*/ "How to Book Your Perfect Room",
 
-    step1: /*[[#{ui.step1}]]*/ "Step 1:",
-    step1desc: /*[[#{ui.step1.desc}]]*/ "",
-    step2: /*[[#{ui.step2}]]*/ "Step 2:",
-    step2desc: /*[[#{ui.step2.desc}]]*/ "",
-    step3: /*[[#{ui.step3}]]*/ "Step 3:",
-    step3desc: /*[[#{ui.step3.desc}]]*/ "",
-    step4: /*[[#{ui.step4}]]*/ "Step 4:",
-    step4desc: /*[[#{ui.step4.desc}]]*/ "",
-    step5: /*[[#{ui.step5}]]*/ "Step 5:",
-    step5desc: /*[[#{ui.step5.desc}]]*/ "",
+        step1: /*[[#{ui.step1}]]*/ "Step 1:",
+        step1desc: /*[[#{ui.step1.desc}]]*/ "",
+        step2: /*[[#{ui.step2}]]*/ "Step 2:",
+        step2desc: /*[[#{ui.step2.desc}]]*/ "",
+        step3: /*[[#{ui.step3}]]*/ "Step 3:",
+        step3desc: /*[[#{ui.step3.desc}]]*/ "",
+        step4: /*[[#{ui.step4}]]*/ "Step 4:",
+        step4desc: /*[[#{ui.step4.desc}]]*/ "",
+        step5: /*[[#{ui.step5}]]*/ "Step 5:",
+        step5desc: /*[[#{ui.step5.desc}]]*/ "",
 
-    note: /*[[#{ui.note}]]*/ "Note:",
-    notedesc: /*[[#{ui.note.desc}]]*/ ""
-};
+        note: /*[[#{ui.note}]]*/ "Note:",
+        notedesc: /*[[#{ui.note.desc}]]*/ "",
+      };
 
-/* ================= ROOM TEXT ================= */
-const i18nRooms = {
+      /* ================= ROOM TEXT ================= */
+      const i18nRooms = {
+        /* ===== STANDARD ===== */
+        "room.standard.title": /*[[#{room.standard.title}]]*/ "",
+        "room.standard.tagline": /*[[#{room.standard.tagline}]]*/ "",
+        "room.standard.single.desc": /*[[#{room.standard.single.desc}]]*/ "",
+        "room.standard.double.desc": /*[[#{room.standard.double.desc}]]*/ "",
+        "room.standard.twin.desc": /*[[#{room.standard.twin.desc}]]*/ "",
 
-    /* ===== STANDARD ===== */
-    "room.standard.title": /*[[#{room.standard.title}]]*/ "",
-    "room.standard.tagline": /*[[#{room.standard.tagline}]]*/ "",
-    "room.standard.single.desc": /*[[#{room.standard.single.desc}]]*/ "",
-    "room.standard.double.desc": /*[[#{room.standard.double.desc}]]*/ "",
-    "room.standard.twin.desc": /*[[#{room.standard.twin.desc}]]*/ "",
+        /* ===== SUPERIOR ===== */
+        "room.superior.title": /*[[#{room.superior.title}]]*/ "",
+        "room.superior.tagline": /*[[#{room.superior.tagline}]]*/ "",
+        "room.superior.single.desc": /*[[#{room.superior.single.desc}]]*/ "",
+        "room.superior.double.desc": /*[[#{room.superior.double.desc}]]*/ "",
+        "room.superior.twin.desc": /*[[#{room.superior.twin.desc}]]*/ "",
+        "room.superior.triple.desc": /*[[#{room.superior.triple.desc}]]*/ "",
 
-    /* ===== SUPERIOR ===== */
-    "room.superior.title": /*[[#{room.superior.title}]]*/ "",
-    "room.superior.tagline": /*[[#{room.superior.tagline}]]*/ "",
-    "room.superior.single.desc": /*[[#{room.superior.single.desc}]]*/ "",
-    "room.superior.double.desc": /*[[#{room.superior.double.desc}]]*/ "",
-    "room.superior.twin.desc": /*[[#{room.superior.twin.desc}]]*/ "",
-    "room.superior.triple.desc": /*[[#{room.superior.triple.desc}]]*/ "",
+        /* ===== DELUXE ===== */
+        "room.deluxe.title": /*[[#{room.deluxe.title}]]*/ "",
+        "room.deluxe.tagline": /*[[#{room.deluxe.tagline}]]*/ "",
+        "room.deluxe.double.desc": /*[[#{room.deluxe.double.desc}]]*/ "",
+        "room.deluxe.twin.desc": /*[[#{room.deluxe.twin.desc}]]*/ "",
+        "room.deluxe.family.desc": /*[[#{room.deluxe.family.desc}]]*/ "",
 
-    /* ===== DELUXE ===== */
-    "room.deluxe.title": /*[[#{room.deluxe.title}]]*/ "",
-    "room.deluxe.tagline": /*[[#{room.deluxe.tagline}]]*/ "",
-    "room.deluxe.double.desc": /*[[#{room.deluxe.double.desc}]]*/ "",
-    "room.deluxe.twin.desc": /*[[#{room.deluxe.twin.desc}]]*/ "",
-    "room.deluxe.family.desc": /*[[#{room.deluxe.family.desc}]]*/ "",
+        /* ===== EXECUTIVE ===== */
+        "room.executive.title": /*[[#{room.executive.title}]]*/ "",
+        "room.executive.tagline": /*[[#{room.executive.tagline}]]*/ "",
+        "room.executive.double.desc": /*[[#{room.executive.double.desc}]]*/ "",
+        "room.executive.twin.desc": /*[[#{room.executive.twin.desc}]]*/ "",
 
-    /* ===== EXECUTIVE ===== */
-    "room.executive.title": /*[[#{room.executive.title}]]*/ "",
-    "room.executive.tagline": /*[[#{room.executive.tagline}]]*/ "",
-    "room.executive.double.desc": /*[[#{room.executive.double.desc}]]*/ "",
-    "room.executive.twin.desc": /*[[#{room.executive.twin.desc}]]*/ "",
+        /* ===== SUITE ===== */
+        "room.suite.title": /*[[#{room.suite.title}]]*/ "",
+        "room.suite.tagline": /*[[#{room.suite.tagline}]]*/ "",
+        "room.suite.junior.desc": /*[[#{room.suite.junior.desc}]]*/ "",
+        "room.suite.presidential.desc":
+          /*[[#{room.suite.presidential.desc}]]*/ "",
+        "room.suite.junior.name": /*[[#{room.suite.junior.name}]]*/ "",
+        "room.suite.presidential.name":
+          /*[[#{room.suite.presidential.name}]]*/ "",
+      };
 
-    /* ===== SUITE ===== */
-    "room.suite.title": /*[[#{room.suite.title}]]*/ "",
-    "room.suite.tagline": /*[[#{room.suite.tagline}]]*/ "",
-    "room.suite.junior.desc": /*[[#{room.suite.junior.desc}]]*/ "",
-    "room.suite.presidential.desc": /*[[#{room.suite.presidential.desc}]]*/ "",
-    "room.suite.junior.name": /*[[#{room.suite.junior.name}]]*/ "",
-    "room.suite.presidential.name": /*[[#{room.suite.presidential.name}]]*/ ""
-};
+      /* ================= ROOM TYPE ================= */
+      const i18nRoomType = {
+        "room.type.single": /*[[#{room.type.single}]]*/ "",
+        "room.type.double": /*[[#{room.type.double}]]*/ "",
+        "room.type.twin": /*[[#{room.type.twin}]]*/ "",
+        "room.type.triple": /*[[#{room.type.triple}]]*/ "",
+        "room.type.family": /*[[#{room.type.family}]]*/ "",
+      };
 
-/* ================= ROOM TYPE ================= */
-const i18nRoomType = {
-    "room.type.single": /*[[#{room.type.single}]]*/ "",
-    "room.type.double": /*[[#{room.type.double}]]*/ "",
-    "room.type.twin": /*[[#{room.type.twin}]]*/ "",
-    "room.type.triple": /*[[#{room.type.triple}]]*/ "",
-    "room.type.family": /*[[#{room.type.family}]]*/ ""
-};
-
-/* ================= AMENITIES ================= */
-const i18nAmenities = {
-    "amenity.wifi": /*[[#{amenity.wifi}]]*/ "",
-    "amenity.tv": /*[[#{amenity.tv}]]*/ "",
-    "amenity.tv2": /*[[#{amenity.tv2}]]*/ "",
-    "amenity.tv55": /*[[#{amenity.tv55}]]*/ "",
-    "amenity.nespresso": /*[[#{amenity.nespresso}]]*/ "",
-    "amenity.desk": /*[[#{amenity.desk}]]*/ "",
-    "amenity.shower": /*[[#{amenity.shower}]]*/ "",
-    "amenity.fridge": /*[[#{amenity.fridge}]]*/ "",
-    "amenity.family": /*[[#{amenity.family}]]*/ "",
-    "amenity.coffee": /*[[#{amenity.coffee}]]*/ "",
-    "amenity.closet": /*[[#{amenity.closet}]]*/ "",
-    "amenity.minibar": /*[[#{amenity.minibar}]]*/ "",
-    "amenity.living": /*[[#{amenity.living}]]*/ "",
-    "amenity.panorama": /*[[#{amenity.panorama}]]*/ "",
-    "amenity.bar": /*[[#{amenity.bar}]]*/ "",
-    "amenity.call": /*[[#{amenity.call}]]*/ "",
-    "amenity.work": /*[[#{amenity.work}]]*/ "",
-    "amenity.work2": /*[[#{amenity.work2}]]*/ "",
-    "amenity.printer": /*[[#{amenity.printer}]]*/ "",
-    "amenity.meeting": /*[[#{amenity.meeting}]]*/ "",
-    "amenity.kitchen": /*[[#{amenity.kitchen}]]*/ "",
-    "amenity.cityview": /*[[#{amenity.cityview}]]*/ "",
-    "amenity.skyview": /*[[#{amenity.skyview}]]*/ "",
-    "amenity.seating": /*[[#{amenity.seating}]]*/ "",
-    "amenity.bedroom": /*[[#{amenity.bedroom}]]*/ "",
-    "amenity.kingbed": /*[[#{amenity.kingbed}]]*/ "",
-    "amenity.king2single": /*[[#{amenity.king2single}]]*/ "",
-    "amenity.queenbed": /*[[#{amenity.queenbed}]]*/ "",
-    "amenity.queen2": /*[[#{amenity.queen2}]]*/ "",
-    "amenity.longbed": /*[[#{amenity.longbed}]]*/ "",
-    "amenity.jacuzzi": /*[[#{amenity.jacuzzi}]]*/ "",
-    "amenity.lounge": /*[[#{amenity.lounge}]]*/ "",
-    "amenity.dining": /*[[#{amenity.dining}]]*/ "",
-    "amenity.butler": /*[[#{amenity.butler}]]*/ "",
-    "amenity.luxbath": /*[[#{amenity.luxbath}]]*/ "",
-    "amenity.lux": /*[[#{amenity.lux}]]*/ ""
-};
-</script>
+      /* ================= AMENITIES ================= */
+      const i18nAmenities = {
+        "amenity.wifi": /*[[#{amenity.wifi}]]*/ "",
+        "amenity.tv": /*[[#{amenity.tv}]]*/ "",
+        "amenity.tv2": /*[[#{amenity.tv2}]]*/ "",
+        "amenity.tv55": /*[[#{amenity.tv55}]]*/ "",
+        "amenity.nespresso": /*[[#{amenity.nespresso}]]*/ "",
+        "amenity.desk": /*[[#{amenity.desk}]]*/ "",
+        "amenity.shower": /*[[#{amenity.shower}]]*/ "",
+        "amenity.fridge": /*[[#{amenity.fridge}]]*/ "",
+        "amenity.family": /*[[#{amenity.family}]]*/ "",
+        "amenity.coffee": /*[[#{amenity.coffee}]]*/ "",
+        "amenity.closet": /*[[#{amenity.closet}]]*/ "",
+        "amenity.minibar": /*[[#{amenity.minibar}]]*/ "",
+        "amenity.living": /*[[#{amenity.living}]]*/ "",
+        "amenity.panorama": /*[[#{amenity.panorama}]]*/ "",
+        "amenity.bar": /*[[#{amenity.bar}]]*/ "",
+        "amenity.call": /*[[#{amenity.call}]]*/ "",
+        "amenity.work": /*[[#{amenity.work}]]*/ "",
+        "amenity.work2": /*[[#{amenity.work2}]]*/ "",
+        "amenity.printer": /*[[#{amenity.printer}]]*/ "",
+        "amenity.meeting": /*[[#{amenity.meeting}]]*/ "",
+        "amenity.kitchen": /*[[#{amenity.kitchen}]]*/ "",
+        "amenity.cityview": /*[[#{amenity.cityview}]]*/ "",
+        "amenity.skyview": /*[[#{amenity.skyview}]]*/ "",
+        "amenity.seating": /*[[#{amenity.seating}]]*/ "",
+        "amenity.bedroom": /*[[#{amenity.bedroom}]]*/ "",
+        "amenity.kingbed": /*[[#{amenity.kingbed}]]*/ "",
+        "amenity.king2single": /*[[#{amenity.king2single}]]*/ "",
+        "amenity.queenbed": /*[[#{amenity.queenbed}]]*/ "",
+        "amenity.queen2": /*[[#{amenity.queen2}]]*/ "",
+        "amenity.longbed": /*[[#{amenity.longbed}]]*/ "",
+        "amenity.jacuzzi": /*[[#{amenity.jacuzzi}]]*/ "",
+        "amenity.lounge": /*[[#{amenity.lounge}]]*/ "",
+        "amenity.dining": /*[[#{amenity.dining}]]*/ "",
+        "amenity.butler": /*[[#{amenity.butler}]]*/ "",
+        "amenity.luxbath": /*[[#{amenity.luxbath}]]*/ "",
+        "amenity.lux": /*[[#{amenity.lux}]]*/ "",
+      };
+    </script>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script th:src="@{/js/room-homepage.js}"></script>
