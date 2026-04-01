@@ -1,7 +1,6 @@
 // User role - change to 'manager' to test manager features
-let userRole = "housekeeper";
 let currentResolveRoom = null;
-
+let currentEquipmentList = [];
 // Room data với đầy đủ type và rank
 let rooms = [];
 
@@ -60,11 +59,24 @@ let tempItems = [];
 let tempMissing = [];
 
 // Set role display
-document.getElementById("userRole").textContent =
-  userRole === "manager" ? "Manager" : "Housekeeper";
+// 1. Get the element and the data-role attribute from Thymeleaf
+const roleElement = document.getElementById("userRole");
+const userRole = roleElement ? roleElement.dataset.role : "housekeeper";
+
+// 2. Check the element exists before trying to modify it
+if (roleElement && roleElement.textContent.trim() !== "") {
+  // Role already set by Thymeleaf → do nothing
+} else if (roleElement) {
+  // fallback if Thymeleaf fails for some reason
+  roleElement.textContent = "Housekeeper";
+}
+
+// 3. Apply the Manager-specific styling
 if (userRole === "manager") {
-  document.getElementById("roleBadge").style.background =
-    "linear-gradient(135deg, #dc3545, #c82333)";
+  const badge = document.getElementById("roleBadge");
+  if (badge) {
+    badge.style.background = "linear-gradient(135deg, #dc3545, #c82333)";
+  }
 }
 
 function renderTable() {
@@ -111,21 +123,15 @@ function renderTable() {
 }
 
 function renderButton(room, area) {
-  // Kiểm tra xem area này có trong equipment của rank không và có vật dụng không
-  const areaExists = equipment[room.rank] && 
-                     equipment[room.rank][area] && 
-                     equipment[room.rank][area].length > 0;
-  
-  // Nếu area không tồn tại trong equipment, hiển thị dấu gạch ngang
+  // CHECK FROM DATABASE (equipmentMap)
+  const areaExists = room.equipmentMap && room.equipmentMap[area];
+
   if (!areaExists) {
     return '<span style="color: #cbd5e1;">—</span>';
   }
-  
+
   const data = room[area];
-  if (!data) {
-    return '<span style="color: #cbd5e1;">—</span>';
-  }
-  
+
   if (!data.checked) {
     return `<button class="check-btn" onclick="openModal(${room.id}, '${area}')">Check</button>`;
   } else if (data.missing.length > 0) {
@@ -136,16 +142,14 @@ function renderButton(room, area) {
 }
 
 function renderAction(room) {
-  // Lấy danh sách các area thực sự tồn tại trong equipment của rank này
-  const existingAreas = Object.keys(equipment[room.rank] || {}).filter(
-    area => equipment[room.rank][area] && equipment[room.rank][area].length > 0
-  );
-  
-  // Kiểm tra tất cả các area tồn tại đã được check chưa
-  const allChecked = existingAreas.every(area => room[area]?.checked === true);
-  
-  // Kiểm tra có issue ở bất kỳ area nào không
-  const hasIssues = existingAreas.some(area => room[area]?.missing?.length > 0);
+  const areas = Object.keys(room.equipmentMap || {});
+
+  const allChecked = areas.every(area => room[area]?.checked === true);
+  const hasIssues = areas.some(area => room[area]?.missing?.length > 0);
+
+  if (areas.length === 0) {
+    return `<span style="color:#cbd5e1;">—</span>`;
+  }
 
   if (!allChecked) {
     return `<button class="action-btn pending" disabled>⏳ In Progress</button>`;
@@ -156,12 +160,32 @@ function renderAction(room) {
   }
 }
 
-function openModal(roomId, area) {
+async function openModal(roomId, area) {
   const room = rooms.find((r) => r.id === roomId);
   if (!room) return;
 
   currentRoom = room;
   currentArea = area;
+
+  const response = await fetch(`/api/equipment/${roomId}`);
+  const data = await response.json();
+
+  currentEquipmentList = data[area] || [];
+
+  if (currentEquipmentList.length === 0) {
+    alert("No equipment for this area!");
+    return;
+  }
+
+  const equipmentNames = currentEquipmentList.map(e => e.name);
+
+  tempItems = currentEquipmentList
+    .filter(e => e.checked)
+    .map(e => e.name);
+
+  tempMissing = currentEquipmentList
+    .filter(e => e.missing)
+    .map(e => e.name);
 
   const areaName = {
     bedroom1: "Bedroom 1",
@@ -173,63 +197,57 @@ function openModal(roomId, area) {
     bar: "Bar Area",
   }[area];
 
-  const equipmentList = equipment[room.rank][area];
-  const savedItems = room[area].items || [];
-  const savedMissing = room[area].missing || [];
-
-  tempItems = [...savedItems];
-  tempMissing = [...savedMissing];
-
   document.getElementById("modalTitle").innerHTML =
     `Room ${room.number} - ${areaName}`;
 
   const modalBody = document.getElementById("modalBody");
-  modalBody.innerHTML = `
-        <div class="equipment-list" id="equipmentList">
-            ${equipmentList
-      .map((item) => {
-        const isChecked = tempItems.includes(item);
-        const isReported = tempMissing.includes(item);
-        let itemClass = "";
-        if (isReported) itemClass = "reported";
-        else if (isChecked) itemClass = "checked";
 
-        return `
-                    <div class="equipment-item ${itemClass}" data-item="${item}">
-                        <input type="checkbox" ${isChecked ? "checked" : ""} ${isReported ? "disabled" : ""}>
-                        <label>${item}</label>
-                        ${isReported ? '<i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>' : ""}
-                    </div>
-                `;
-      })
-      .join("")}
-        </div>
-        <div class="issue-section">
-            <h4>⚠️ Report Issues</h4>
-            <div id="missingList">
-                ${tempMissing.length > 0
-      ? tempMissing
-        .map(
-          (item) => `
-                    <div class="missing-item">
-                        <span>${item}</span>
-                        <button class="remove-issue" onclick="removeIssue('${item.replace(/'/g, "\\'")}')">✖</button>
-                    </div>
-                `,
-        )
-        .join("")
-      : "<small>No issues reported</small>"
-    }
+    modalBody.innerHTML = `
+      <div class="equipment-list">
+        ${equipmentNames.map(item => {
+          const isChecked = tempItems.includes(item);
+          const isReported = tempMissing.includes(item);
+
+          let itemClass = "";
+          if (isReported) itemClass = "reported";
+          else if (isChecked) itemClass = "checked";
+
+          return `
+            <div class="equipment-item ${itemClass}">
+              <input type="checkbox" ${isChecked ? "checked" : ""} ${isReported ? "disabled" : ""}>
+              <label>${item}</label>
             </div>
-            <select id="issueSelect">
-                <option value="">Select item to report...</option>
-                ${equipmentList.map((item) => `<option value="${item}">${item}</option>`).join("")}
-            </select>
-            <button class="btn-secondary" onclick="addIssue()" style="margin-top: 10px; width: 100%;">+ Report Missing/Damaged</button>
+          `;
+        }).join("")}
+      </div>
+      <div class="issue-section">
+        <h4>⚠️ Report Issues</h4>
+
+        <div id="missingList">
+          ${
+            tempMissing.length > 0
+              ? tempMissing.map(item => `
+                <div class="missing-item">
+                  <span>${item}</span>
+                  <button onclick="removeIssue('${item.replace(/'/g, "\\'")}')">✖</button>
+                </div>
+              `).join("")
+              : "<small>No issues reported</small>"
+          }
         </div>
+
+        <select id="issueSelect">
+          <option value="">Select item...</option>
+          ${equipmentNames.map(item => `<option value="${item}">${item}</option>`).join("")}
+        </select>
+
+        <button class="btn-secondary" onclick="addIssue()" style="margin-top:10px; width:100%;">
+          + Report Missing/Damaged
+        </button>
+      </div>
     `;
 
-  // Add click handlers
+  document.getElementById("equipmentModal").style.display = "flex";
   document.querySelectorAll(".equipment-item").forEach((el) => {
     el.onclick = (e) => {
       if (e.target.type !== "checkbox") {
@@ -251,17 +269,16 @@ function openModal(roomId, area) {
       };
     }
   });
-
-  updateSaveButtonState(equipmentList);
-  document.getElementById("equipmentModal").style.display = "flex";
 }
 
-function updateSaveButtonState(equipmentList) {
+function updateSaveButtonState() {
   const saveBtn = document.getElementById("saveBtn");
   if (!saveBtn) return;
 
-  const allItemsHandled = equipmentList.every(
-    (item) => tempItems.includes(item) || tempMissing.includes(item),
+  const equipmentNames = currentEquipmentList.map(e => e.name);
+
+  const allItemsHandled = equipmentNames.every(
+    item => tempItems.includes(item) || tempMissing.includes(item)
   );
 
   saveBtn.disabled = !allItemsHandled;
@@ -278,7 +295,7 @@ function toggleItem(item) {
     tempItems.push(item);
   }
 
-  const equipmentList = equipment[currentRoom.rank][currentArea];
+  updateSaveButtonState();
 
   document.querySelectorAll(".equipment-item").forEach((el) => {
     const label = el.querySelector("label");
@@ -302,7 +319,7 @@ function toggleItem(item) {
     }
   });
 
-  updateSaveButtonState(equipmentList);
+  updateSaveButtonState();
 }
 
 function addIssue() {
@@ -345,8 +362,7 @@ function addIssue() {
 
     select.value = "";
 
-    const equipmentList = equipment[currentRoom.rank][currentArea];
-    updateSaveButtonState(equipmentList);
+    updateSaveButtonState();
   } else {
     alert("Already reported");
   }
@@ -385,28 +401,38 @@ function removeIssue(item) {
       }
     });
 
-    const equipmentList = equipment[currentRoom.rank][currentArea];
-    updateSaveButtonState(equipmentList);
+    updateSaveButtonState();
   }
 }
 
-function saveCheck() {
+async function saveCheck() {
   if (!currentRoom || !currentArea) {
     alert("No room selected");
     return;
   }
 
-  const equipmentList = equipment[currentRoom.rank][currentArea];
-  
-  // Nếu equipmentList rỗng (area không tồn tại), không cần check
-  if (!equipmentList || equipmentList.length === 0) {
+  let data = {};
+  try {
+    const response = await fetch(`/api/equipment/${currentRoom.id}`);
+    if (!response.ok) throw new Error();
+    data = await response.json();
+  } catch (e) {
+    alert("Failed to load equipment!");
+    return;
+  }
+  const equipmentList = data[currentArea] || [];
+
+  if (currentEquipmentList.length === 0) {
     alert("This area is not available for this room type!");
     closeModal();
     return;
   }
-  
-  const allItemsHandled = equipmentList.every(
-    (item) => tempItems.includes(item) || tempMissing.includes(item),
+
+  // Extract only names
+  const equipmentNames = equipmentList.map(e => e.name);
+
+  const allItemsHandled = equipmentNames.every(
+    (item) => tempItems.includes(item) || tempMissing.includes(item)
   );
 
   if (!allItemsHandled) {
@@ -414,15 +440,42 @@ function saveCheck() {
     return;
   }
 
+  // CALL BACKEND API
+  try {
+    const res = await fetch("/api/equipment/check", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        roomId: currentRoom.id,
+        area: currentArea,
+        checkedItems: tempItems,
+        missingItems: tempMissing
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to save");
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("Error saving data!");
+    return;
+  }
+
+  // UPDATE UI (keep logic)
   currentRoom[currentArea].items = [...tempItems];
   currentRoom[currentArea].missing = [...tempMissing];
   currentRoom[currentArea].checked = true;
 
-  // Lấy danh sách các area tồn tại
-  const existingAreas = Object.keys(equipment[currentRoom.rank] || {}).filter(
-    area => equipment[currentRoom.rank][area] && equipment[currentRoom.rank][area].length > 0
+  // IMPORTANT: We can’t use old equipment object anymore
+  const existingAreas = Object.keys(currentRoom).filter(
+    key =>
+      ["bedroom1","bedroom2","bathroom1","bathroom2","living","kitchen","bar"].includes(key)
   );
-  
+
   const allChecked = existingAreas.every(area => currentRoom[area]?.checked === true);
   const hasIssues = existingAreas.some(area => currentRoom[area]?.missing?.length > 0);
 
@@ -446,80 +499,105 @@ function saveCheck() {
     kitchen: "Kitchen",
     bar: "Bar Area",
   }[currentArea];
-  
+
   if (tempMissing.length > 0) {
-    alert(`✓ ${areaName} checked! Found ${tempMissing.length} issue(s) that need attention.`);
+    alert(`✓ ${areaName} checked! Found ${tempMissing.length} issue(s).`);
   } else {
     alert(`✓ ${areaName} checked! All equipment is present.`);
   }
 }
 
-function markComplete(roomId) {
-  const room = rooms.find((r) => r.id === roomId);
-  if (room && confirm(`Mark Room ${room.number} as Clean & Complete?`)) {
-    room.status = "completed";
-    renderTable();
-    alert(`Room ${room.number} marked as Clean & Complete!`);
+async function markComplete(roomId) {
+  try {
+    const response = await fetch(`/api/equipment/${roomId}/complete`, {
+      method: "DELETE"
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to complete cleaning");
+    }
+
+    alert("Room cleaned & data cleared!");
+    await loadRooms(); // reload fresh data
+
+  } catch (error) {
+    console.error(error);
+    alert("Update failed!");
   }
 }
 
-function viewIssues(roomId) {
-  const room = rooms.find((r) => r.id === roomId);
-  if (!room) return;
-
-  if (userRole !== "manager") {
-    alert("Only manager can view and resolve issues!");
-    return;
-  }
-
-  currentResolveRoom = room;
-
-  let issues = [];
-  
-  // Chỉ thêm các area có missing items
-  const areas = ['bedroom1', 'bedroom2', 'bathroom1', 'bathroom2', 'living', 'kitchen', 'bar'];
-  const areaNames = {
-    bedroom1: "Bedroom 1",
-    bedroom2: "Bedroom 2", 
-    bathroom1: "Bathroom 1",
-    bathroom2: "Bathroom 2",
-    living: "Living Room",
-    kitchen: "Kitchen",
-    bar: "Bar Area"
-  };
-  
-  areas.forEach(area => {
-    if (room[area]?.missing?.length > 0) {
-      issues.push({ area: areaNames[area], items: [...room[area].missing] });
+async function viewIssues(roomId) {
+    if (userRole !== "manager") {
+        alert("Access Denied: Only managers can resolve issues.");
+        return;
     }
-  });
 
-  const modalBody = document.getElementById("issueModalBody");
-  document.getElementById("issueRoomNumber").textContent = room.number;
+    // 1. Find the room from our local array
+    const room = rooms.find(r => r.id === roomId);
+    if (!room) return;
 
-  if (issues.length === 0) {
-    modalBody.innerHTML = '<p>No issues found in this room.</p>';
-  } else {
-    modalBody.innerHTML = `
-      <div style="margin-bottom: 20px;">
-        <h4 style="color: #dc3545; margin-bottom: 15px;">Missing/Damaged Items:</h4>
-        ${issues.map((issue) => `
-          <div style="margin-bottom: 20px;">
-            <strong>📌 ${issue.area}:</strong>
-            <div style="margin-top: 8px;">
-              ${issue.items.map((item) => `<span class="missing-tag">${item}</span>`).join("")}
-            </div>
-          </div>
-        `).join("")}
-      </div>
-      <div style="margin-top: 15px;">
-        <label>Resolution Notes:</label>
-        <textarea id="resolutionNotes" rows="3" placeholder="Describe what was done to resolve these issues..." style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; margin-top: 5px;"></textarea>
-      </div>
-    `;
-  }
+    // 2. Fetch the latest equipment data from the server
+    const response = await fetch(`/api/equipment/${roomId}`);
+    const equipmentMap = await response.json();
 
-  document.getElementById("issueModal").style.display = "flex";
+    const modalBody = document.getElementById("issueModalBody");
+    document.getElementById("issueRoomNumber").textContent = room.number;
+
+    let issueHtml = "";
+    let hasIssues = false;
+
+    // 3. Loop through each area to find missing items
+    for (const [area, items] of Object.entries(equipmentMap)) {
+        const missingItems = items.filter(item => item.missing === true);
+
+        if (missingItems.length > 0) {
+            hasIssues = true;
+            issueHtml += `
+                <div class="issue-group" style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <h4 style="color: #dc3545; text-transform: capitalize; margin-bottom: 10px;">
+                        <i class="fas fa-map-marker-alt"></i> ${area.replace(/([A-Z])/g, ' $1')}
+                    </h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        ${missingItems.map(item => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #fff5f5; padding: 10px; border-radius: 6px;">
+                                <span><strong>${item.name}</strong> (Missing/Damaged)</span>
+                                <button class="btn-danger" style="padding: 5px 15px; font-size: 0.85rem;"
+                                        onclick="resolveSingleItem(${roomId}, '${area}', '${item.name.replace(/'/g, "\\'")}')">
+                                    Resolve
+                                </button>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    // 4. Inject content and show the modal
+    modalBody.innerHTML = hasIssues ? issueHtml : "<p style='text-align:center; padding: 20px;'>All issues have been resolved!</p>";
+    document.getElementById("issueModal").style.display = "flex";
+}
+
+async function resolveSingleItem(roomId, area, itemName) {
+    if (!confirm(`Are you sure you want to resolve "${itemName}" in ${area}?`)) return;
+
+    try {
+        // Calling the endpoint we discussed for the Controller
+        const response = await fetch(`/api/equipment/resolve-specific?roomId=${roomId}&area=${area}&name=${encodeURIComponent(itemName)}`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            // Refresh the specific modal view to show remaining issues
+            await viewIssues(roomId);
+            // Refresh the main table in the background
+            await loadRooms();
+        } else {
+            alert("Failed to resolve issue. Please check the server logs.");
+        }
+    } catch (error) {
+        console.error("Resolution error:", error);
+    }
 }
 
 function resolveIssues() {
@@ -567,29 +645,114 @@ async function loadRooms() {
     const response = await fetch("/rooms/api?status=Housekeeping");
     const data = await response.json();
 
-    // Map backend -> frontend structure với 7 khu vực
-    rooms = data.map((r) => ({
-      id: r.id,
-      number: r.roomNumber,
-      type: r.roomType,
-      rank: r.roomRank, // Standard, Superior, Deluxe, Executive, Suite
+    // We use Promise.all to fetch equipment for all rooms in parallel
+    rooms = await Promise.all(data.map(async (r) => {
+      // 1. Fetch the specific equipment status from your EquipmentController
+      const res = await fetch(`/api/equipment/${r.id}`);
+      const equipmentMap = await res.json();
 
-      bedroom1: { checked: false, items: [], missing: [] },
-      bedroom2: { checked: false, items: [], missing: [] },
-      bathroom1: { checked: false, items: [], missing: [] },
-      bathroom2: { checked: false, items: [], missing: [] },
-      living: { checked: false, items: [], missing: [] },
-      kitchen: { checked: false, items: [], missing: [] },
-      bar: { checked: false, items: [], missing: [] },
+      const roomObj = {
+        id: r.id,
+        number: r.roomNumber,
+        type: r.roomType,
+        rank: r.roomRank,
+        equipmentMap: equipmentMap, // Store the raw map from DB
+        status: "pending"
+      };
 
-      status: "pending",
+      // 2. Define the areas we need to check
+      const areas = ['bedroom1', 'bedroom2', 'bathroom1', 'bathroom2', 'living', 'kitchen', 'bar'];
+
+      areas.forEach(area => {
+        const areaData = equipmentMap[area] || [];
+
+        // Logic: An area is "checked" if it HAS items and ALL items are handled
+        // (either marked as checked OR marked as missing)
+        const hasItems = areaData.length > 0;
+        const allHandled = hasItems && areaData.every(item => item.checked || item.missing);
+
+        const missingList = areaData.filter(item => item.missing).map(item => item.name);
+
+        // This replaces the "empty" default state with the real DB state
+        roomObj[area] = {
+          checked: allHandled,
+          items: areaData.filter(item => item.checked).map(item => item.name),
+          missing: missingList
+        };
+      });
+
+      // 3. Determine the overall room status for the Action column
+      const hasAnyIssues = areas.some(a => roomObj[a].missing.length > 0);
+      const allDone = areas.every(a => {
+          // If the area exists in the template, it must be 'checked'
+          return (equipmentMap[a] && equipmentMap[a].length > 0) ? roomObj[a].checked : true;
+      });
+
+      if (hasAnyIssues) {
+          roomObj.status = "issues";
+      } else if (allDone) {
+          roomObj.status = "completed";
+      }
+
+      return roomObj;
     }));
 
-    renderTable();
+    renderTable(); // Update the UI with the loaded data
   } catch (error) {
     console.error("Error loading rooms:", error);
   }
 }
+
+// Load missing equipment issues
+async function loadIssues() {
+  try {
+    const response = await fetch("/api/equipment/issues");
+    const issues = await response.json();
+
+    const issueBox = document.getElementById("issue-box");
+    const issueList = document.getElementById("issue-list");
+
+    issueList.innerHTML = "";
+
+    if (issues.length === 0) {
+      issueBox.style.display = "none";
+      return;
+    }
+
+    issueBox.style.display = "block";
+
+    issues.forEach(issue => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        Room ${issue.roomId} - ${issue.area}: ${issue.equipmentName}
+        <button onclick="resolveIssue(${issue.id})">Resolve</button>
+      `;
+      issueList.appendChild(li);
+    });
+
+  } catch (error) {
+    console.error(error);
+    alert("Failed to load issues!");
+  }
+}
+
+// Resolve single issue
+async function resolveIssue(issueId) {
+  try {
+    const response = await fetch(`/api/equipment/issues/${issueId}/resolve`, {
+      method: "POST"
+    });
+    if (!response.ok) throw new Error("Failed to resolve issue");
+
+    alert("Issue resolved!");
+    loadIssues();
+  } catch (error) {
+    console.error(error);
+    alert("Failed to resolve issue!");
+  }
+}
+// Call this after page load if user is manager
+// loadIssues();
 
 // Event listeners
 document
