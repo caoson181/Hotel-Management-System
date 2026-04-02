@@ -2,6 +2,26 @@
 function t(key) {
   return i18nRooms?.[key] || i18nAmenities?.[key] || i18n?.[key] || key || "";
 }
+
+async function fetchRoomPrice(type, rank) {
+  try {
+    const res = await fetch(
+      `/api/rooms/representative?type=${type}&rank=${rank}`,
+    );
+    if (!res.ok) throw new Error("API error");
+
+    const data = await res.json();
+    return data.price;
+  } catch (e) {
+    console.error("Fetch price error:", e);
+    return null;
+  }
+}
+
+function formatVND(number) {
+  return Number(number).toLocaleString("vi-VN") + " đ";
+}
+
 // ===== ROOM DATA CONFIGURATION =====
 window.roomData = {
   standard: {
@@ -13,7 +33,6 @@ window.roomData = {
         guests: 1,
         size: 18,
         description: "room.standard.single.desc",
-        price: 89,
         amenities: [
           "amenity.wifi",
           "amenity.tv",
@@ -28,7 +47,6 @@ window.roomData = {
         guests: 2,
         size: 22,
         description: "room.standard.double.desc",
-        price: 109,
         amenities: [
           "amenity.wifi",
           "amenity.tv",
@@ -43,7 +61,6 @@ window.roomData = {
         guests: 2,
         size: 24,
         description: "room.standard.twin.desc",
-        price: 119,
         amenities: [
           "amenity.wifi",
           "amenity.tv2",
@@ -65,7 +82,6 @@ window.roomData = {
         guests: 1,
         size: 22,
         description: "room.superior.single.desc",
-        price: 129,
         amenities: [
           "amenity.wifi",
           "amenity.tv55",
@@ -80,7 +96,6 @@ window.roomData = {
         guests: 2,
         size: 28,
         description: "room.superior.double.desc",
-        price: 149,
         amenities: [
           "amenity.wifi",
           "amenity.queenbed",
@@ -95,7 +110,6 @@ window.roomData = {
         guests: 2,
         size: 30,
         description: "room.superior.twin.desc",
-        price: 159,
         amenities: [
           "amenity.wifi",
           "amenity.longbed",
@@ -109,7 +123,6 @@ window.roomData = {
         guests: 3,
         size: 35,
         description: "room.superior.triple.desc",
-        price: 189,
         amenities: [
           "amenity.wifi",
           "amenity.family",
@@ -131,7 +144,6 @@ window.roomData = {
         guests: 2,
         size: 32,
         description: "room.deluxe.double.desc",
-        price: 199,
         amenities: [
           "amenity.kingbed",
           "amenity.jacuzzi",
@@ -146,7 +158,6 @@ window.roomData = {
         guests: 2,
         size: 34,
         description: "room.deluxe.twin.desc",
-        price: 209,
         amenities: [
           "amenity.queen2",
           "amenity.shower",
@@ -161,7 +172,6 @@ window.roomData = {
         guests: 4,
         size: 45,
         description: "room.deluxe.family.desc",
-        price: 279,
         amenities: [
           "amenity.king2single",
           "amenity.living",
@@ -183,7 +193,6 @@ window.roomData = {
         guests: 2,
         size: 38,
         description: "room.executive.double.desc",
-        price: 249,
         amenities: [
           "amenity.lounge",
           "amenity.work",
@@ -198,7 +207,6 @@ window.roomData = {
         guests: 2,
         size: 38,
         description: "room.executive.twin.desc",
-        price: 259,
         amenities: [
           "amenity.work2",
           "amenity.lounge",
@@ -216,11 +224,10 @@ window.roomData = {
     tagline: "room.suite.tagline",
     rooms: [
       {
-        type: "junior",
+        type: "double",
         guests: 2,
         size: 50,
         description: "room.suite.junior.desc",
-        price: 349,
         displayName: "room.suite.junior.name",
         amenities: [
           "amenity.butler",
@@ -232,11 +239,10 @@ window.roomData = {
           "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       },
       {
-        type: "presidential",
+        type: "family",
         guests: 5,
         size: 80,
         description: "room.suite.presidential.desc",
-        price: 599,
         displayName: "room.suite.presidential.name",
         amenities: [
           "amenity.bedroom",
@@ -328,8 +334,8 @@ function loadRooms() {
                                 <p class="room-description">${t(room.description)}</p>
 
                                 <div class="room-footer">
-                                    <span class="price-tag">
-                                        $${room.price} <small>${t("perNight")}</small>
+                                    <span class="price-tag" id="price-${rankKey}-${room.type}">
+                                        Loading...
                                     </span>
 
                                     <a href="/room-detail?rank=${rankKey}&type=${room.type}" 
@@ -402,6 +408,16 @@ function loadRooms() {
     `;
 
   container.innerHTML = html;
+  Object.entries(roomData).forEach(([rankKey, rankValue]) => {
+    rankValue.rooms.forEach(async (room) => {
+      const price = await fetchRoomPrice(room.type, rankKey);
+
+      const el = document.getElementById(`price-${rankKey}-${room.type}`);
+      if (el && price) {
+        el.innerHTML = `${formatVND(price)} <small>/night</small>`;
+      }
+    });
+  });
 
   // ✅ GIỮ NGUYÊN
   setTimeout(() => {
@@ -570,7 +586,10 @@ function initComparison() {
       const roomId = e.target.dataset.id;
       const card = e.target.closest(".room-card");
       const roomName = card.querySelector("h3").textContent;
-      const roomPrice = card.querySelector(".price-tag").textContent;
+      const roomPriceEl = card.querySelector(".price-tag");
+      const roomPrice = roomPriceEl?.textContent.includes("Loading")
+        ? "N/A"
+        : roomPriceEl.textContent;
       const roomMeta = card.querySelector(".room-meta").innerHTML;
       const roomImage = card.querySelector(".room-image-content").innerHTML;
 
@@ -780,37 +799,54 @@ function showNotification(message) {
   }, 3000);
 }
 
-// ===== VIEW DETAILS HANDLER =====
-document.addEventListener("click", (e) => {
-  const detailBtn = e.target.closest(".view-detail-btn");
-  if (detailBtn) {
-    e.preventDefault();
-    e.stopPropagation();
+document.addEventListener("click", function (e) {
+  const btn = e.target.closest(".view-detail-btn");
+  if (!btn) return;
 
-    const rank = detailBtn.dataset.rank;
-    const type = detailBtn.dataset.type;
+  e.preventDefault();
 
-    showRoomDetails(rank, type);
+  const loading = document.getElementById("page-loading");
+  if (loading) {
+    loading.classList.remove("hidden");
   }
+
+  const url = btn.getAttribute("href");
+
+  setTimeout(() => {
+    window.location.href = url;
+  }, 400); // delay nhẹ cho đẹp
 });
 
-function showRoomDetails(rank, type) {
-  const rankData = roomData[rank];
-  if (!rankData) return;
+// ===== VIEW DETAILS HANDLER =====
+// document.addEventListener("click", (e) => {
+//   const detailBtn = e.target.closest(".view-detail-btn");
+//   if (detailBtn) {
+//     e.preventDefault();
+//     e.stopPropagation();
 
-  const room = rankData.rooms.find(
-    (r) => r.type.toLowerCase() === type.toLowerCase(),
-  );
-  if (!room) return;
+//     const rank = detailBtn.dataset.rank;
+//     const type = detailBtn.dataset.type;
 
-  showNotification(
-    t("room.viewing")
-      .replace("{0}", t(rankData.title))
-      .replace("{1}", t(room.type))
-      .replace("{2}", room.price)
-      .replace("{3}", t("room.night")),
-  );
+//     showRoomDetails(rank, type);
+//   }
+// });
 
-  // console.log('Room details:', { rank, type, room });
-  window.location.href = `/room-detail?rank=${rank}&type=${room.type}`;
-}
+// function showRoomDetails(rank, type) {
+//   const rankData = roomData[rank];
+//   if (!rankData) return;
+
+//   const room = rankData.rooms.find(
+//     (r) => r.type.toLowerCase() === type.toLowerCase(),
+//   );
+//   if (!room) return;
+
+//   showNotification(
+//     t("room.viewing")
+//       .replace("{0}", t(rankData.title))
+//       .replace("{1}", t(room.type))
+//       .replace("{3}", t("room.night")),
+//   );
+
+//   // console.log('Room details:', { rank, type, room });
+//   window.location.href = `/room-detail?rank=${rank}&type=${room.type}`;
+// }

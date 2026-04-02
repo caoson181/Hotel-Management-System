@@ -4,6 +4,57 @@
 function t(key) {
   return i18nRooms?.[key] || i18nAmenities?.[key] || i18n?.[key] || key || "";
 }
+
+async function fetchRoomPrice(type, rank) {
+  try {
+    const res = await fetch(
+      `/api/rooms/representative?type=${type}&rank=${rank}`,
+    );
+    if (!res.ok) throw new Error("API error");
+
+    const data = await res.json();
+    return data.price;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
+async function loadPriceFromDB(type, rank) {
+  const price = await fetchRoomPrice(type, rank);
+
+  if (!price) return;
+
+  // set giá
+  const priceValue = document.getElementById("priceValue");
+  if (priceValue) {
+    priceValue.innerHTML = `${formatVND(price)}`;
+  }
+
+  // update lại total luôn
+  roomInfo.price = price;
+  updateTotal();
+}
+
+function updateTotal() {
+  const checkin = document.getElementById("checkin")?.value;
+  const checkout = document.getElementById("checkout")?.value;
+
+  if (!checkin || !checkout) return;
+
+  const nights = Math.ceil(
+    (new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24),
+  );
+
+  const total = nights * roomInfo.price;
+
+  document.getElementById("totalPrice").textContent = formatVND(total);
+}
+
+function formatVND(number) {
+  return Number(number).toLocaleString("vi-VN") + " đ";
+}
+
 const galleryImages = [
   {
     url: "https://media.leonardo-hotels.com/static.leonardo-hotels.com/image/leonardohotelbucharestcitycenter_room_comfortdouble2_2022_4000x2600_7e18f254bc75491965d36cc312e8111f.jpg",
@@ -96,7 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const rank = params.get("rank")?.toLowerCase();
   const type = params.get("type")?.toLowerCase();
-
+  loadPriceFromDB(type, rank);
+  loadSimilarPrices();
   if (window.roomData && rank && type) {
     const rankData = window.roomData[rank];
 
@@ -108,7 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (selectedRoom) {
         roomInfo.guests = selectedRoom.guests;
         roomInfo.size = selectedRoom.size;
-        roomInfo.price = selectedRoom.price;
         roomInfo.amenities = selectedRoom.amenities;
         roomInfo.description = selectedRoom.description;
       }
@@ -166,11 +217,10 @@ function initRoomData() {
 
   // Update price
 
-
-  const priceValue = document.getElementById("priceValue");
-  if (priceValue) {
-    priceValue.textContent = roomInfo.price;
-  }
+  // const priceValue = document.getElementById("priceValue");
+  // if (priceValue) {
+  //   priceValue.textContent = roomInfo.price;
+  // }
 }
 
 // Get icon for amenity
@@ -375,7 +425,7 @@ function initBooking() {
         (new Date(checkout.value) - new Date(checkin.value)) /
           (1000 * 60 * 60 * 24),
       );
-      totalPriceSpan.textContent = `$${nights * roomInfo.price}`;
+      totalPriceSpan.textContent = formatVND(nights * roomInfo.price);
     }
   }
 
@@ -518,3 +568,27 @@ document.getElementById("bookNowBtn").addEventListener("click", () => {
   const params = new URLSearchParams(window.location.search);
   window.location.href = `/confirm-booking?${params.toString()}`;
 });
+
+async function loadSimilarPrices() {
+  const list = [
+    { rank: "superior", type: "twin" },
+    { rank: "executive", type: "double" },
+    { rank: "suite", type: "family" },
+  ];
+
+  for (const item of list) {
+    try {
+      const res = await fetch(
+        `/api/rooms/representative?type=${item.type}&rank=${item.rank}`,
+      );
+      const data = await res.json();
+
+      const el = document.getElementById(`price-${item.rank}-${item.type}`);
+      if (el) {
+        el.textContent = formatVND(data.price) + " /night";
+      }
+    } catch (e) {
+      console.error("Error loading similar price", e);
+    }
+  }
+}

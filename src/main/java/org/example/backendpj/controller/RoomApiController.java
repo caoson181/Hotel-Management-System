@@ -27,11 +27,10 @@ public class RoomApiController {
     public Map<String, Object> searchRooms(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page,
-    @RequestParam(defaultValue = "roomNumber") String sortField,
-    @RequestParam(defaultValue = "asc") String sortDir)
-        {
+            @RequestParam(defaultValue = "roomNumber") String sortField,
+            @RequestParam(defaultValue = "asc") String sortDir) {
 
-        Page<Room> roomPage = roomService.search(keyword, page,sortField, sortDir);
+        Page<Room> roomPage = roomService.search(keyword, page, sortField, sortDir);
 
         Map<String, Object> response = new HashMap<>();
         response.put("rooms", roomPage.getContent());
@@ -39,6 +38,7 @@ public class RoomApiController {
 
         return response;
     }
+
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateRoomStatus(
             @PathVariable Integer id,
@@ -49,5 +49,19 @@ public class RoomApiController {
         Room updatedRoom = roomService.updateStatus(id, newStatus);
 
         return ResponseEntity.ok(updatedRoom);
+    }
+
+    @GetMapping("/representative")
+    public ResponseEntity<?> getRepresentativeRoom(
+            @RequestParam String type,
+            @RequestParam String rank) {
+
+        Room room = roomService.getRepresentativeRoom(type, rank);
+
+        if (room == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(room);
     }
 }

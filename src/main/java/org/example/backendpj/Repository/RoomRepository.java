@@ -12,27 +12,31 @@ import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<Room, Integer> {
 
-    Optional<Room> findByRoomNumber(String roomNumber);
+        Optional<Room> findByRoomNumber(String roomNumber);
 
-    List<Room> findByStatus(String status);
+        List<Room> findByStatus(String status);
 
-    List<Room> findByRoomNumberContainingIgnoreCase(String roomNumber);
+        List<Room> findByRoomNumberContainingIgnoreCase(String roomNumber);
 
-    List<Room> findByRoomTypeContainingIgnoreCase(String roomType);
+        List<Room> findByRoomTypeContainingIgnoreCase(String roomType);
 
-    List<Room> findByRoomTypeAndRoomRank(String roomType, String roomRank);
+        List<Room> findByRoomTypeAndRoomRank(String roomType, String roomRank);
 
-    @Query("""
-    SELECT r FROM Room r
-    WHERE CAST(r.roomNumber AS string) LIKE CONCAT('%', :keyword, '%')
-       OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', :keyword, '%'))
-""")
-    Page<Room> search(@Param("keyword") String keyword, Pageable pageable);
-    Page<Room> findByRoomNumberContainingIgnoreCaseOrRoomTypeContainingIgnoreCase(
-            String roomNumber,
-            String roomType,
-            Pageable pageable
-    );
+        @Query("""
+                            SELECT r FROM Room r
+                            WHERE CAST(r.roomNumber AS string) LIKE CONCAT('%', :keyword, '%')
+                               OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                        """)
+        Page<Room> search(@Param("keyword") String keyword, Pageable pageable);
 
-    Room findByRoomRankIgnoreCaseAndRoomTypeIgnoreCase(String rank, String type);
+        Page<Room> findByRoomNumberContainingIgnoreCaseOrRoomTypeContainingIgnoreCase(
+                        String roomNumber,
+                        String roomType,
+                        Pageable pageable);
+
+        Room findByRoomRankIgnoreCaseAndRoomTypeIgnoreCase(String rank, String type);
+
+        @Query("SELECT r FROM Room r WHERE r.roomType = :type AND r.roomRank = :rank ORDER BY r.id ASC")
+        List<Room> findByTypeAndRank(@Param("type") String type,
+                        @Param("rank") String rank);
 }
