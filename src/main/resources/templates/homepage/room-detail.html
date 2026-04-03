@@ -198,12 +198,30 @@
               <i class="fas fa-check-circle"></i>
               <span th:text="#{room.booknow}">Book Now</span>
             </button>
+
+            <button id="addRoomBtn" class="add-btn">
+              ➕ Add Room
+            </button>
+
+
             <div class="secure-text">
               <i class="fas fa-lock"></i>
               <span th:text="#{room.secure.booking}"
                 >Secure booking • Free cancellation</span
               >
             </div>
+
+          </div>
+        </div>
+
+        <div id="floatingCart">
+          <div id="cartIcon">
+            ➕ <span id="cartCount">0</span>
+          </div>
+
+          <div id="cartPopup" class="hidden">
+            <div id="cartItems"></div>
+            <button id="goConfirm">Book Now</button>
           </div>
         </div>
 

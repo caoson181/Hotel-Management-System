@@ -624,3 +624,53 @@ h1, h2, h3, h4 {
         font-size: 0.9rem;
     }
 }
+
+
+
+.add-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    background: #f4b400;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+#floatingCart {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+}
+
+#cartIcon {
+    background: #f4b400;
+    padding: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+#cartPopup {
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    width: 250px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.hidden {
+    display: none;
+}
+#cartPopup {
+    width: 280px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+#cartItems p {
+    font-size: 14px;
+}

@@ -592,3 +592,168 @@ async function loadSimilarPrices() {
     }
   }
 }
+
+document.getElementById("addRoomBtn").onclick = () => {
+
+  const params = new URLSearchParams(window.location.search);
+
+  const type = params.get("type");
+  const rank = params.get("rank");
+
+  const priceText = document.getElementById("totalPrice").innerText;
+
+  const price = Number(
+      priceText
+          .replace(/[^\d]/g, "")
+
+
+  );
+
+  const checkin = document.getElementById("checkin").value;
+  const checkout = document.getElementById("checkout").value;
+  const guests = Number(
+      document.getElementById("guestCount").innerText
+  );
+  const guestCountEl = document.getElementById("guestCount");
+
+  document.getElementById("incrementGuest").onclick = () => {
+    let value = Number(guestCountEl.innerText);
+    guestCountEl.innerText = value + 1;
+  };
+
+  document.getElementById("decrementGuest").onclick = () => {
+    let value = Number(guestCountEl.innerText);
+    if (value > 1) {
+      guestCountEl.innerText = value - 1;
+    }
+  };
+
+  const nights = Math.ceil(
+      (new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24)
+  );
+  const room = {
+    id: Date.now(),
+    name: `${type} ${rank}`,
+    price: price,
+    checkin,
+    checkout,
+    guests,
+    nights
+  };
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  cart.push(room);
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  loadCartUI();
+
+  alert("✅ Added to cart");
+};
+function loadCartUI() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  const count = document.getElementById("cartCount");
+  if (count) count.innerText = cart.length;
+
+  const container = document.getElementById("cartItems");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  let total = 0;
+
+  cart.forEach(room => {
+    total += Number(room.price);
+
+    const div = document.createElement("div");
+    div.style.border = "1px solid #eee";
+    div.style.borderRadius = "10px";
+    div.style.padding = "10px";
+    div.style.marginBottom = "10px";
+    div.style.background = "#fafafa";
+
+    div.innerHTML = `
+  <div style="display:flex; justify-content:space-between; gap:10px;">
+    
+    <div>
+      <p style="margin:0; font-weight:600;">
+        🏨 ${room.name}
+      </p>
+      
+      <small style="color:#666;">
+        📅 ${room.checkin} → ${room.checkout} (${room.nights} nights)
+      </small><br/>
+      
+      <small style="color:#666;">
+        👤 ${room.guests} guests
+      </small><br/>
+      
+      <small style="color:#999;">
+        💰 ${formatVND(room.price)}
+      </small>
+    </div>
+
+    <button onclick="removeRoom(${room.id})"
+      style="color:red;border:none;background:none;cursor:pointer;font-size:16px">
+      ❌
+    </button>
+
+  </div>
+`;
+
+    container.appendChild(div);
+  });
+
+  // ✅ total
+  const totalDiv = document.createElement("div");
+  totalDiv.innerHTML = `
+  <div style="
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #ddd;
+    font-size:16px;
+  ">
+    🧾 <b>Total: ${formatVND(total)}</b>
+  </div>
+`;
+
+  container.appendChild(totalDiv);
+}
+function removeRoom(id) {
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  cart = cart.filter(r => r.id != id);
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  loadCartUI(); // ✅ update lại UI ngay
+}
+document.addEventListener("DOMContentLoaded", loadCartUI);
+document.getElementById("cartIcon").onclick = () => {
+  document.getElementById("cartPopup").classList.toggle("hidden");
+};
+document.getElementById("goConfirm").onclick = () => {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  if (cart.length === 0) {
+    alert("⚠️ Cart is empty!");
+    return;
+  }
+
+  // ✅ lấy room đầu tiên (hoặc bạn có thể xử lý nhiều room sau)
+  const firstRoom = cart[0];
+
+  const params = new URLSearchParams();
+
+  params.set("type", firstRoom.name.split(" ")[0]);
+  params.set("rank", firstRoom.name.split(" ")[1]);
+  params.set("checkin", firstRoom.checkin);
+  params.set("checkout", firstRoom.checkout);
+
+  // lưu cart
+  localStorage.setItem("bookingCart", JSON.stringify(cart));
+
+  window.location.href = `/confirm-booking?${params.toString()}`;
+};
