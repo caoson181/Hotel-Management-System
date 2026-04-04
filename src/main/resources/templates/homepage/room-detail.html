@@ -214,14 +214,23 @@
           </div>
         </div>
 
-        <div id="floatingCart">
-          <div id="cartIcon">
-            ➕ <span id="cartCount">0</span>
-          </div>
+        <div id="floatingCart" class="floating-cart">
+          <button id="cartIcon" class="cart-btn">
+            <span>🛒</span>
+            <span id="cartCount" class="cart-badge">0</span>
+          </button>
 
-          <div id="cartPopup" class="hidden">
-            <div id="cartItems"></div>
-            <button id="goConfirm">Book Now</button>
+          <div id="cartPopup" class="cart-popup hidden">
+            <div class="cart-header">
+              <h4>Your Cart</h4>
+              <span id="cartTotalText"></span>
+            </div>
+
+            <div id="cartItems" class="cart-items"></div>
+
+            <div class="cart-footer">
+              <button id="goConfirm" class="cart-confirm-btn">Book Now</button>
+            </div>
           </div>
         </div>
 

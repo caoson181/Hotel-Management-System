@@ -23,7 +23,7 @@
 
         <hr>
 
-        <div class="section">
+        <div class="section" id="singleBookingSection">
             <p class="section-title">Booking</p>
             <p><span>Room</span><strong id="roomInfo"></strong></p>
             <p><span>Check-in</span><strong id="checkin"></strong></p>
@@ -33,6 +33,10 @@
             </p>
         </div>
 
+        <div id="multiBookingSection" style="display:none;">
+            <p class="section-title">Your Rooms</p>
+            <div id="bookingSummary"></div>
+        </div>
         <div class="actions">
             <button id="confirmBtn" class="btn primary">Confirm</button>
             <button onclick="history.back()" class="btn">Cancel</button>

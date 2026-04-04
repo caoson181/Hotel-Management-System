@@ -734,6 +734,22 @@ document.addEventListener("DOMContentLoaded", loadCartUI);
 document.getElementById("cartIcon").onclick = () => {
   document.getElementById("cartPopup").classList.toggle("hidden");
 };
+
+document.getElementById("bookNowBtn").onclick = () => {
+  const params = new URLSearchParams(window.location.search);
+
+  params.set("checkin", document.getElementById("checkin").value);
+  params.set("checkout", document.getElementById("checkout").value);
+
+  params.set("mode", "single"); // ✅ QUAN TRỌNG
+
+  // ❌ clear multi cũ
+  localStorage.removeItem("bookingCart");
+
+  localStorage.setItem("bookingMode", "single");
+
+  window.location.href = `/confirm-booking?${params.toString()}`;
+};
 document.getElementById("goConfirm").onclick = () => {
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
@@ -742,18 +758,63 @@ document.getElementById("goConfirm").onclick = () => {
     return;
   }
 
-  // ✅ lấy room đầu tiên (hoặc bạn có thể xử lý nhiều room sau)
   const firstRoom = cart[0];
 
   const params = new URLSearchParams();
-
   params.set("type", firstRoom.name.split(" ")[0]);
   params.set("rank", firstRoom.name.split(" ")[1]);
   params.set("checkin", firstRoom.checkin);
   params.set("checkout", firstRoom.checkout);
 
-  // lưu cart
+  // ✅ lưu cart
   localStorage.setItem("bookingCart", JSON.stringify(cart));
 
-  window.location.href = `/confirm-booking?${params.toString()}`;
+  // ✅ set mode
+  localStorage.setItem("bookingMode", "multi");
+
+  window.location.href = `/confirm-booking?mode=multi`;
 };
+window.addEventListener("pageshow", () => {
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get("mode") === "single") {
+    localStorage.removeItem("bookingCart");
+  }
+});
+function renderCart() {
+  const cart = JSON.parse(localStorage.getItem("bookingCart")) || [];
+  const cartItems = document.getElementById("cartItems");
+  const cartCount = document.getElementById("cartCount");
+  const cartTotalText = document.getElementById("cartTotalText");
+
+  cartItems.innerHTML = "";
+
+  let total = 0;
+
+  cart.forEach((item, index) => {
+    total += Number(item.price);
+
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `
+      <button class="remove-item" onclick="removeCartItem(${index})">×</button>
+      <div class="cart-item-title">${item.name}</div>
+      <div class="cart-item-meta">
+        📅 ${formatDate(item.checkin)} → ${formatDate(item.checkout)}<br>
+        👤 ${item.guests} guests
+      </div>
+      <div class="cart-item-price">${formatVND(item.price)}</div>
+    `;
+    cartItems.appendChild(div);
+  });
+
+  cartCount.textContent = cart.length;
+  cartTotalText.textContent = formatVND(total);
+}
+
+function removeCartItem(index) {
+  const cart = JSON.parse(localStorage.getItem("bookingCart")) || [];
+  cart.splice(index, 1);
+  localStorage.setItem("bookingCart", JSON.stringify(cart));
+  renderCart();
+}
