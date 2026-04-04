@@ -194,10 +194,7 @@ public class PageController {
     public String confirmBookingPage() {
         return "homepage/confirm-booking";
     }
-    @GetMapping("/confirm-multi-booking")
-    public String confirmMultiBookingPage() {
-        return "homepage/confirm-multi-booking";
-    }
+
     @GetMapping("/homepage/payment")
     public String paymentPage() {
         return "homepage/payment";
