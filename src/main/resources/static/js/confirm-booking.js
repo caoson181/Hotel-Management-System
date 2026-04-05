@@ -1,13 +1,17 @@
 const params = new URLSearchParams(window.location.search);
 
+console.log("URL:", window.location.href);
+console.log("guests param:", params.get("guests"));
+
 const type = params.get("type");
 const rank = params.get("rank");
 const checkin = params.get("checkin");
 const checkout = params.get("checkout");
-
+const guests = Number(params.get("guests") || 1);
 document.getElementById("roomInfo").textContent = `${rank} - ${type}`;
 document.getElementById("checkin").textContent = checkin;
 document.getElementById("checkout").textContent = checkout;
+document.getElementById("guests").textContent = guests;
 
 fetch(`/rooms/api/filter?type=${type}&rank=${rank}`)
     .then(res => res.json())
@@ -66,7 +70,7 @@ document.getElementById("confirmBtn").onclick = () => {
     const rank = params.get("rank");
     const checkin = params.get("checkin");
     const checkout = params.get("checkout");
-
+    const guests = Number(params.get("guests") || 1);
     const totalText = document.getElementById("totalPrice").innerText.replace(/[^\d]/g, "");
 
     const payload = {
@@ -79,6 +83,7 @@ document.getElementById("confirmBtn").onclick = () => {
         roomRank: rank,
         checkInTime: checkin,
         checkOutTime: checkout,
+        numberOfGuests: guests,
         bookingTime: new Date().toISOString()
     };
 
@@ -93,6 +98,7 @@ document.getElementById("confirmBtn").onclick = () => {
             window.location.href = "/";
         });
 };
+
 function renderRooms(rooms) {
     const roomList = document.getElementById("roomList");
     roomList.innerHTML = "";
@@ -116,6 +122,7 @@ function renderRooms(rooms) {
 
     roomList.appendChild(grid);
 }
+
 let currentUser = null;
 fetch("/api/users/me")
     .then(res => res.json())

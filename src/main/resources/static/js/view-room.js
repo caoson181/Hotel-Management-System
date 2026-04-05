@@ -769,7 +769,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <div class="booking-detail-item">
                 <label>Number of Guests</label>
-                <div class="detail-value">${booking.numberOfGuests || "1"}</div>
+                <div class="detail-value">${booking.numberOfGuests ?? booking.guests ?? 1}</div>
             </div>
             <div class="booking-detail-item">
                 <label>Special Requests</label>

@@ -408,6 +408,7 @@ function updateActiveThumbnail() {
 }
 
 // ===== BOOKING FUNCTIONS =====
+
 function initBooking() {
   const checkin = document.getElementById("checkin");
   const checkout = document.getElementById("checkout");
@@ -417,7 +418,8 @@ function initBooking() {
   const incrementBtn = document.getElementById("incrementGuest");
   const bookBtn = document.getElementById("bookNowBtn");
 
-  let guestCount = 2;
+  window.guestCount = 2;
+  if (guestCountSpan) guestCountSpan.textContent = window.guestCount;
 
   function calculateTotal() {
     if (checkin && checkout && totalPriceSpan) {
@@ -434,8 +436,9 @@ function initBooking() {
 
   if (incrementBtn) {
     incrementBtn.onclick = () => {
-      if (guestCount < 4 && guestCountSpan) {
-        guestCountSpan.textContent = ++guestCount;
+      if (window.guestCount < 4 && guestCountSpan) {
+        window.guestCount++;
+        guestCountSpan.textContent = window.guestCount;
         calculateTotal();
       }
     };
@@ -443,20 +446,20 @@ function initBooking() {
 
   if (decrementBtn) {
     decrementBtn.onclick = () => {
-      if (guestCount > 1 && guestCountSpan) {
-        guestCountSpan.textContent = --guestCount;
+      if (window.guestCount > 1 && guestCountSpan) {
+        window.guestCount--;
+        guestCountSpan.textContent = window.guestCount;
         calculateTotal();
       }
     };
   }
-
   if (bookBtn) {
     bookBtn.onclick = () => {
       const params = new URLSearchParams(window.location.search);
 
       params.set("checkin", document.getElementById("checkin").value);
       params.set("checkout", document.getElementById("checkout").value);
-
+      params.set("guests", String(window.guestCount));
       window.location.href = `/confirm-booking?${params.toString()}`;
     };
   }
@@ -547,7 +550,9 @@ function bookNow(roomType, roomRank) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      customerId: window.customerId, // hardcode for now
+      customerId: window.customerId,
+      // hardcode for now
+
       roomType: roomType,
       roomRank: roomRank,
     }),
@@ -568,6 +573,7 @@ document.getElementById("bookNowBtn").addEventListener("click", () => {
   const params = new URLSearchParams(window.location.search);
   window.location.href = `/confirm-booking?${params.toString()}`;
 });
+
 
 async function loadSimilarPrices() {
   const list = [
@@ -740,12 +746,10 @@ document.getElementById("bookNowBtn").onclick = () => {
 
   params.set("checkin", document.getElementById("checkin").value);
   params.set("checkout", document.getElementById("checkout").value);
+  params.set("guests", String(window.guestCount));
+  params.set("mode", "single");
 
-  params.set("mode", "single"); // ✅ QUAN TRỌNG
-
-  // ❌ clear multi cũ
   localStorage.removeItem("bookingCart");
-
   localStorage.setItem("bookingMode", "single");
 
   window.location.href = `/confirm-booking?${params.toString()}`;
