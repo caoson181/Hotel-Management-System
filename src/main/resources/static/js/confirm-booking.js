@@ -94,33 +94,27 @@ document.getElementById("confirmBtn").onclick = () => {
         });
 };
 function renderRooms(rooms) {
-    const container = document.getElementById("roomList");
-    container.innerHTML = "";
+    const roomList = document.getElementById("roomList");
+    roomList.innerHTML = "";
+
+    const grid = document.createElement("div");
+    grid.className = "room-grid";
 
     rooms.forEach(room => {
-        const div = document.createElement("div");
-        div.className = "room-card";
+        const box = document.createElement("div");
+        box.className = "room-card";
 
-        div.textContent = room.roomNumber;
-
-        if (room.status.toUpperCase() === "AVAILABLE") {
-            div.classList.add("available");
-
-            div.onclick = () => {
-                selectedRoomId = room.id;
-
-                document.querySelectorAll(".room-card")
-                    .forEach(el => el.classList.remove("selected"));
-
-                div.classList.add("selected");
-            };
-
+        if (room.status?.toUpperCase() === "AVAILABLE") {
+            box.classList.add("available");
         } else {
-            div.classList.add("unavailable");
+            box.classList.add("unavailable");
         }
 
-        container.appendChild(div);
+        box.textContent = room.roomNumber;
+        grid.appendChild(box);
     });
+
+    roomList.appendChild(grid);
 }
 let currentUser = null;
 fetch("/api/users/me")
@@ -153,13 +147,13 @@ document.addEventListener("DOMContentLoaded", () => {
 function loadBookingSummary() {
     const cart = JSON.parse(localStorage.getItem("bookingCart")) || [];
     const container = document.getElementById("bookingSummary");
+    const roomList = document.getElementById("roomList");
     container.innerHTML = "";
-
+    roomList.innerHTML = "";
     let grandTotal = 0;
-
+    // render summary
     cart.forEach(room => {
         grandTotal += Number(room.price);
-
         const card = document.createElement("div");
         card.className = "booking-item";
         card.innerHTML = `
@@ -170,16 +164,62 @@ function loadBookingSummary() {
         `;
         container.appendChild(card);
     });
+    // ✅ GROUP CHUẨN
+    const grouped = new Map();
 
+    cart.forEach(room => {
+        const parts = room.name.trim().toLowerCase().split(/\s+/);
+        const type = parts[0];
+        const rank = parts.slice(1).join(" ");
+        const key = `${type}-${rank}`;
+
+        if (!grouped.has(key)) {
+            grouped.set(key, { type, rank });
+        }
+    });
+
+    Array.from(grouped.values()).forEach(item => {
+        loadRoomsByTypeRank(item.type, item.rank, roomList);
+    });
     const total = document.createElement("div");
     total.className = "booking-total";
     total.innerHTML = `Total: <strong>${formatVND(grandTotal)}</strong>`;
     container.appendChild(total);
+    console.log("GROUPED:", grouped);
 }
+function loadRoomsByTypeRank(type, rank, parentContainer) {
+    fetch(`/rooms/api/filter?type=${type}&rank=${rank}`)
+        .then(res => res.json())
+        .then(rooms => {
+            const section = document.createElement("div");
+            section.className = "room-group";
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadBookingSummary();
-});
+            const title = document.createElement("h3");
+            title.className = "room-group-title";
+            title.textContent = `${type} ${rank}`;
+            section.appendChild(title);
+
+            const grid = document.createElement("div");
+            grid.className = "room-group-list";
+
+            rooms.forEach(room => {
+                const box = document.createElement("div");
+                box.className = "room-card";
+                box.textContent = room.roomNumber;
+
+                if (room.status?.toUpperCase() === "AVAILABLE") {
+                    box.classList.add("available");
+                } else {
+                    box.classList.add("unavailable");
+                }
+
+                grid.appendChild(box);
+            });
+
+            section.appendChild(grid);
+            parentContainer.appendChild(section);
+        });
+}
 
 // ================= HELPERS =================
 function formatVND(number) {

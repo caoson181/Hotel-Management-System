@@ -198,16 +198,7 @@ body {
     gap: 10px;
 }
 
-.btn {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 600;
-}
 
-.btn.primary {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-}
 .bill-card {
     background: #fff;
     border-radius: 16px;
@@ -452,4 +443,33 @@ hr {
 
 .cart-book-btn:hover {
     background: #e0a800;
+}
+#roomList {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+}
+
+#room-group {
+    width: 100%;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #eef1f6;
+}
+.room-group-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    text-transform: lowercase;
+}
+
+.room-group-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-content: flex-start;
 }
