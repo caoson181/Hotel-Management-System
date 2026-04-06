@@ -13,6 +13,7 @@ public class SimpleBookingDTO {
     private String phone;
     private Double totalAmount;
     private LocalDateTime bookingTime;
+    private int numberOfGuests;
 
     private LocalDate checkInTime;
     private LocalDate checkOutTime;
@@ -56,4 +57,12 @@ public class SimpleBookingDTO {
 
     public LocalDateTime getBookingTime() { return bookingTime; }
     public void setBookingTime(LocalDateTime bookingTime) { this.bookingTime = bookingTime; }
+
+    public int getNumberOfGuests() {
+        return numberOfGuests;
+    }
+
+    public void setNumberOfGuests(int numberOfGuests) {
+        this.numberOfGuests = numberOfGuests;
+    }
 }

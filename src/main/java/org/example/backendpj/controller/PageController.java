@@ -194,6 +194,7 @@ public class PageController {
     public String confirmBookingPage() {
         return "homepage/confirm-booking";
     }
+
     @GetMapping("/homepage/payment")
     public String paymentPage() {
         return "homepage/payment";
