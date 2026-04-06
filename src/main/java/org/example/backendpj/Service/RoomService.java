@@ -68,6 +68,9 @@ public class RoomService {
                     booking.setCheckOutDate(LocalDate.now());
                 }
 
+                // Keep booking total consistent from its details
+                booking.setTotalAmount(calculateBookingTotal(booking));
+
                 bookingRepository.save(booking);
             }
         }
@@ -119,11 +122,26 @@ public class RoomService {
         // 5. Update statuses
         room.setStatus("RESERVED");
         booking.setStatus("RESERVED");
+        if (booking.getCheckInDate() == null) {
+            booking.setCheckInDate(LocalDate.now());
+        }
 
         // 6. Save
         bookingDetailRepository.save(detail);
+        booking.setTotalAmount(calculateBookingTotal(booking));
         roomRepository.save(room);
         bookingRepository.save(booking);
+    }
+
+    private BigDecimal calculateBookingTotal(Booking booking) {
+        List<BookingDetail> details = bookingDetailRepository.findAllByBooking(booking);
+        BigDecimal total = BigDecimal.ZERO;
+        for (BookingDetail d : details) {
+            if (d.getPrice() != null) {
+                total = total.add(d.getPrice());
+            }
+        }
+        return total;
     }
 
     private String mapRoomToBookingStatus(String roomStatus) {

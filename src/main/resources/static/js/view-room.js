@@ -720,9 +720,48 @@ document.addEventListener("DOMContentLoaded", function () {
                 <label>Total Amount</label>
                 <div class="detail-value">${booking.totalAmount != null ? Number(booking.totalAmount).toLocaleString("vi-VN") + " VND" : "N/A"}</div>
             </div>
+            <div class="booking-detail-item">
+                <label>Action</label>
+                <div class="detail-value">
+                    <button id="assignBookingBtn" class="view-details-btn" ${booking.assigned ? "disabled" : ""}>
+                        <i class="fas fa-check"></i> Assign
+                    </button>
+                </div>
+            </div>
         `;
 
     modalBody.innerHTML = detailsHtml;
+    const assignBtn = document.getElementById("assignBookingBtn");
+    if (assignBtn && !booking.assigned) {
+      assignBtn.onclick = () => {
+        if (!booking.groupCode) {
+          alert("Missing booking group");
+          return;
+        }
+        assignBtn.disabled = true;
+        fetch(`/api/customer-bookings/groups/${booking.groupCode}/assign`, {
+          method: "POST",
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(errorText || "Assign failed");
+            }
+            return response.json();
+          })
+          .then(() => {
+            showNotification("Assigned successfully", "success");
+            closeBookingModal();
+            loadRooms();
+            fetchBookingsData();
+          })
+          .catch((error) => {
+            console.error("Assign error:", error);
+            showNotification(error.message || "Assign failed", "error");
+            assignBtn.disabled = false;
+          });
+      };
+    }
     openBookingModal();
   };
 });

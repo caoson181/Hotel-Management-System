@@ -96,37 +96,19 @@ public class CustomerBookingController {
     @GetMapping("/groups")
     public List<Map<String, Object>> listGroups() {
         List<CustomerBooking> all = customerBookingRepository.findAllByOrderByCreatedAtDesc();
-        Map<String, List<CustomerBooking>> grouped = new LinkedHashMap<>();
-        for (CustomerBooking cb : all) {
-            grouped.computeIfAbsent(cb.getGroupCode(), k -> new ArrayList<>()).add(cb);
-        }
-
         List<Map<String, Object>> result = new ArrayList<>();
-        for (var entry : grouped.entrySet()) {
-            List<CustomerBooking> items = entry.getValue();
-            CustomerBooking first = items.get(0);
-            BigDecimal total = BigDecimal.ZERO;
-            for (CustomerBooking it : items) {
-                if (it.getPrice() != null) total = total.add(it.getPrice());
-            }
-
-            StringBuilder details = new StringBuilder();
-            for (int i = 0; i < items.size(); i++) {
-                CustomerBooking it = items.get(i);
-                if (i > 0) details.append(" | ");
-                details.append(it.getRoomType()).append(" ").append(it.getRoomRank())
-                        .append(" (").append(it.getCheckIn()).append(" -> ").append(it.getCheckOut()).append(")");
-            }
-
+        for (CustomerBooking cb : all) {
+            String details = cb.getRoomType() + " " + cb.getRoomRank()
+                    + " (" + cb.getCheckIn() + " -> " + cb.getCheckOut() + ")";
             result.add(Map.of(
-                    "bookingId", first.getId(),
-                    "customerId", first.getCustomer().getCustomerId(),
-                    "groupCode", first.getGroupCode(),
-                    "details", details.toString(),
-                    "status", first.getStatus(),
-                    "assigned", first.isAssigned(),
-                    "displayStatus", first.getStatus() + "/" + (first.isAssigned() ? "ASSIGNED" : "UNASSIGNED"),
-                    "totalAmount", total
+                    "bookingId", cb.getId(),
+                    "customerId", cb.getCustomer().getCustomerId(),
+                    "groupCode", cb.getGroupCode(),
+                    "details", details,
+                    "status", cb.getStatus(),
+                    "assigned", cb.isAssigned(),
+                    "displayStatus", cb.getStatus() + "/" + (cb.isAssigned() ? "ASSIGNED" : "UNASSIGNED"),
+                    "totalAmount", cb.getPrice() == null ? BigDecimal.ZERO : cb.getPrice()
             ));
         }
         return result;
