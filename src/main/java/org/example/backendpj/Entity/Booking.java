@@ -18,16 +18,16 @@ public class Booking {
     @JsonIgnore
     private Customer customer;
 
-    @Column(name = "check_in_date", nullable = true)
+    @Column(name = "check_in", nullable = true)
     private LocalDate checkInDate;
 
-    @Column(name = "check_out_date", nullable = true)
+    @Column(name = "check_out", nullable = true)
     private LocalDate checkOutDate;
 
     @Column(name = "status", nullable = false, length = 50)
     private String status;
 
-    @Column(name = "total_amount", precision = 12, scale = 2)
+    @Column(name = "total_price", precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
     public Booking() {
