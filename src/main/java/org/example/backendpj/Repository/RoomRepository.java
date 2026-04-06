@@ -34,7 +34,7 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
                         String roomType,
                         Pageable pageable);
 
-        Room findByRoomRankIgnoreCaseAndRoomTypeIgnoreCase(String rank, String type);
+        Room findFirstByRoomTypeIgnoreCaseAndRoomRankIgnoreCaseOrderByIdAsc(String type, String rank);
 
         @Query("SELECT r FROM Room r WHERE r.roomType = :type AND r.roomRank = :rank ORDER BY r.id ASC")
         List<Room> findByTypeAndRank(@Param("type") String type,

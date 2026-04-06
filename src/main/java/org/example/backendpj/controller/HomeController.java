@@ -43,9 +43,11 @@ public class HomeController {
     public String roomDetail(@RequestParam String rank,
                              @RequestParam String type,
                              Model model) {
+        Room room = roomRepository.findFirstByRoomTypeIgnoreCaseAndRoomRankIgnoreCaseOrderByIdAsc(type, rank);
 
         model.addAttribute("rank", rank);
         model.addAttribute("type", type);
+        model.addAttribute("room", room);
 
         return "homepage/room-detail";
     }

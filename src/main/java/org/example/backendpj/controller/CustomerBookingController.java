@@ -1,16 +1,34 @@
 package org.example.backendpj.controller;
 
-import org.example.backendpj.Entity.*;
-import org.example.backendpj.Repository.*;
+import org.example.backendpj.Entity.Booking;
+import org.example.backendpj.Entity.Customer;
+import org.example.backendpj.Entity.CustomerBooking;
+import org.example.backendpj.Entity.Payment;
+import org.example.backendpj.Entity.User;
+import org.example.backendpj.Repository.BookingRepository;
+import org.example.backendpj.Repository.CustomerBookingRepository;
+import org.example.backendpj.Repository.CustomerRepository;
+import org.example.backendpj.Repository.PaymentRepository;
+import org.example.backendpj.Repository.UserRepository;
+import org.example.backendpj.Service.RoomService;
 import org.example.backendpj.dto.CustomerCheckoutRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customer-bookings")
@@ -18,26 +36,23 @@ public class CustomerBookingController {
     private final CustomerBookingRepository customerBookingRepository;
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
-    private final RoomRepository roomRepository;
     private final BookingRepository bookingRepository;
-    private final BookingDetailRepository bookingDetailRepository;
     private final PaymentRepository paymentRepository;
+    private final RoomService roomService;
 
     public CustomerBookingController(
             CustomerBookingRepository customerBookingRepository,
             UserRepository userRepository,
             CustomerRepository customerRepository,
-            RoomRepository roomRepository,
             BookingRepository bookingRepository,
-            BookingDetailRepository bookingDetailRepository,
-            PaymentRepository paymentRepository) {
+            PaymentRepository paymentRepository,
+            RoomService roomService) {
         this.customerBookingRepository = customerBookingRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
-        this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
-        this.bookingDetailRepository = bookingDetailRepository;
         this.paymentRepository = paymentRepository;
+        this.roomService = roomService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -67,31 +82,46 @@ public class CustomerBookingController {
         List<CustomerBooking> createdBookings = new ArrayList<>();
 
         for (CustomerCheckoutRequest.CartItem item : req.getItems()) {
-            if (item == null) continue;
+            if (item == null) {
+                continue;
+            }
             if (item.getRoomType() == null || item.getRoomType().isBlank() ||
-                item.getRoomRank() == null || item.getRoomRank().isBlank()) {
+                    item.getRoomRank() == null || item.getRoomRank().isBlank()) {
                 throw new RuntimeException("roomType/roomRank is required");
             }
 
-            CustomerBooking cb = new CustomerBooking();
-            cb.setCustomer(customer);
-            cb.setCheckIn(LocalDate.parse(item.getCheckIn()));
-            cb.setCheckOut(LocalDate.parse(item.getCheckOut()));
-            cb.setRoomType(item.getRoomType());
-            cb.setRoomRank(item.getRoomRank());
-            cb.setGroupCode(groupCode);
-            cb.setStatus(paymentStatus);
-            cb.setAssigned(false);
-            cb.setCreatedAt(now);
-            if (item.getPrice() != null) {
-                cb.setPrice(BigDecimal.valueOf(item.getPrice()));
-                total = total.add(cb.getPrice());
+            LocalDate checkIn = LocalDate.parse(item.getCheckIn());
+            LocalDate checkOut = LocalDate.parse(item.getCheckOut());
+            if (checkIn.isBefore(LocalDate.now())) {
+                throw new RuntimeException("Check-in date cannot be in the past");
             }
-            customerBookingRepository.save(cb);
-            createdBookings.add(cb);
+            Map<String, Object> availability = roomService.getAvailabilitySummary(item.getRoomType(), item.getRoomRank(), checkIn, checkOut);
+            Number availableCount = (Number) availability.get("availableCount");
+            if (availableCount == null || availableCount.longValue() <= 0) {
+                throw new RuntimeException("No available room for " + item.getRoomType() + " " + item.getRoomRank()
+                        + " in " + checkIn + " -> " + checkOut);
+            }
+
+            CustomerBooking customerBooking = new CustomerBooking();
+            customerBooking.setCustomer(customer);
+            customerBooking.setCheckIn(checkIn);
+            customerBooking.setCheckOut(checkOut);
+            customerBooking.setRoomType(item.getRoomType());
+            customerBooking.setRoomRank(item.getRoomRank());
+            customerBooking.setGroupCode(groupCode);
+            customerBooking.setStatus(paymentStatus);
+            customerBooking.setAssigned(false);
+            customerBooking.setCreatedAt(now);
+            if (item.getPrice() != null) {
+                customerBooking.setPrice(BigDecimal.valueOf(item.getPrice()));
+                total = total.add(customerBooking.getPrice());
+            }
+            customerBookingRepository.save(customerBooking);
+            createdBookings.add(customerBooking);
         }
 
         if ("PAY_NOW".equals(payMode)) {
+            BigDecimal finalTotal = total;
             LocalDate minCheckIn = createdBookings.stream()
                     .map(CustomerBooking::getCheckIn)
                     .min(LocalDate::compareTo)
@@ -109,12 +139,12 @@ public class CustomerBookingController {
                         newBooking.setCheckInDate(minCheckIn);
                         newBooking.setCheckOutDate(maxCheckOut);
                         newBooking.setStatus("PENDING");
-                        newBooking.setTotalAmount(BigDecimal.ZERO);
+                        newBooking.setTotalAmount(finalTotal);
                         return bookingRepository.save(newBooking);
                     });
 
-            for (CustomerBooking cb : createdBookings) {
-                cb.setBooking(booking);
+            for (CustomerBooking customerBooking : createdBookings) {
+                customerBooking.setBooking(booking);
             }
             customerBookingRepository.saveAll(createdBookings);
 
@@ -142,79 +172,30 @@ public class CustomerBookingController {
     public List<Map<String, Object>> listGroups() {
         List<CustomerBooking> all = customerBookingRepository.findAllByOrderByCreatedAtDesc();
         List<Map<String, Object>> result = new ArrayList<>();
-        for (CustomerBooking cb : all) {
-            String details = cb.getRoomType() + " " + cb.getRoomRank()
-                    + " (" + cb.getCheckIn() + " -> " + cb.getCheckOut() + ")";
-            result.add(Map.of(
-                    "bookingId", cb.getId(),
-                    "customerId", cb.getCustomer().getCustomerId(),
-                    "groupCode", cb.getGroupCode(),
-                    "details", details,
-                    "status", cb.getStatus(),
-                    "assigned", cb.isAssigned(),
-                    "displayStatus", cb.getStatus() + "/" + (cb.isAssigned() ? "ASSIGNED" : "UNASSIGNED"),
-                    "totalAmount", cb.getPrice() == null ? BigDecimal.ZERO : cb.getPrice()
-            ));
+        for (CustomerBooking customerBooking : all) {
+            String details = customerBooking.getRoomType() + " " + customerBooking.getRoomRank()
+                    + " (" + customerBooking.getCheckIn() + " -> " + customerBooking.getCheckOut() + ")";
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("bookingId", customerBooking.getId());
+            row.put("customerId", customerBooking.getCustomer().getCustomerId());
+            row.put("groupCode", customerBooking.getGroupCode());
+            row.put("details", details);
+            row.put("status", customerBooking.getStatus());
+            row.put("assigned", customerBooking.isAssigned());
+            row.put("displayStatus", customerBooking.getStatus() + "/" + (customerBooking.isAssigned() ? "ASSIGNED" : "UNASSIGNED"));
+            row.put("totalAmount", customerBooking.getPrice() == null ? BigDecimal.ZERO : customerBooking.getPrice());
+            row.put("checkIn", customerBooking.getCheckIn());
+            row.put("checkOut", customerBooking.getCheckOut());
+            row.put("roomType", customerBooking.getRoomType());
+            row.put("roomRank", customerBooking.getRoomRank());
+            row.put("roomNumber", customerBooking.getAssignedRoom() != null ? customerBooking.getAssignedRoom().getRoomNumber() : null);
+            result.add(row);
         }
         return result;
     }
 
     @PostMapping("/groups/{groupCode}/assign")
     public Map<String, Object> assignGroup(@PathVariable String groupCode) {
-        List<CustomerBooking> items = customerBookingRepository.findAllByGroupCodeOrderByIdAsc(groupCode);
-        if (items.isEmpty()) throw new RuntimeException("Customer booking group not found");
-
-        Customer customer = items.get(0).getCustomer();
-        Booking booking = bookingRepository.findTopByGroupCode(groupCode)
-                .orElseGet(() -> {
-                    Booking newBooking = new Booking();
-                    newBooking.setCustomer(customer);
-                    newBooking.setGroupCode(groupCode);
-                    newBooking.setStatus("RESERVED");
-                    newBooking.setTotalAmount(BigDecimal.ZERO);
-                    return bookingRepository.save(newBooking);
-                });
-        booking.setStatus("RESERVED");
-
-        BigDecimal total = BigDecimal.ZERO;
-        for (CustomerBooking cb : items) {
-            if (cb.isAssigned()) {
-                continue;
-            }
-
-            Room room = roomRepository.findByRoomTypeAndRoomRank(cb.getRoomType(), cb.getRoomRank()).stream()
-                    .filter(r -> r.getStatus() != null && r.getStatus().equalsIgnoreCase("AVAILABLE"))
-                    .min(Comparator.comparing(Room::getId))
-                    .orElseThrow(() -> new RuntimeException("No available room for " + cb.getRoomType() + " " + cb.getRoomRank()));
-
-            room.setStatus("RESERVED");
-            roomRepository.save(room);
-
-            BookingDetail detail = new BookingDetail();
-            detail.setBooking(booking);
-            detail.setRoom(room);
-            detail.setPrice(room.getPrice());
-            detail.setCheckInDate(cb.getCheckIn());
-            detail.setCheckOutDate(cb.getCheckOut());
-            bookingDetailRepository.save(detail);
-
-            if (room.getPrice() != null) total = total.add(room.getPrice());
-            cb.setBooking(booking);
-            cb.setAssigned(true);
-            customerBookingRepository.save(cb);
-        }
-
-        if (booking.getCheckInDate() == null || booking.getCheckOutDate() == null) {
-            booking.setCheckInDate(items.stream().map(CustomerBooking::getCheckIn).min(LocalDate::compareTo).orElse(null));
-            booking.setCheckOutDate(items.stream().map(CustomerBooking::getCheckOut).max(LocalDate::compareTo).orElse(null));
-        }
-        booking.setTotalAmount(booking.getTotalAmount() == null ? total : booking.getTotalAmount().add(total));
-        bookingRepository.save(booking);
-
-        return Map.of(
-                "bookingId", booking.getId(),
-                "status", "ASSIGNED"
-        );
+        return roomService.assignGroupBookings(groupCode);
     }
 }
-

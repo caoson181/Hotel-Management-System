@@ -30,6 +30,12 @@ public class BookingDetail {
     @Column(name = "check_out")
     private LocalDate checkOutDate;
 
+    @Column(name = "actual_check_out")
+    private LocalDate actualCheckOutDate;
+
+    @Column(name = "status", length = 30)
+    private String status;
+
     public BookingDetail() {
     }
 
@@ -79,5 +85,21 @@ public class BookingDetail {
 
     public void setCheckOutDate(LocalDate checkOutDate) {
         this.checkOutDate = checkOutDate;
+    }
+
+    public LocalDate getActualCheckOutDate() {
+        return actualCheckOutDate;
+    }
+
+    public void setActualCheckOutDate(LocalDate actualCheckOutDate) {
+        this.actualCheckOutDate = actualCheckOutDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

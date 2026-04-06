@@ -51,7 +51,7 @@ public class Room {
     public void setPrice(BigDecimal price) { this.price = price; }
 
     public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(String status) { this.status = normalizeStatus(status); }
 
     public BigDecimal getBasePrice() { return basePrice; }
     public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
@@ -61,5 +61,20 @@ public class Room {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    private String normalizeStatus(String status) {
+        if (status == null) {
+            return null;
+        }
+
+        return switch (status.trim().toUpperCase()) {
+            case "AVAILABLE" -> "Available";
+            case "RESERVED" -> "Reserved";
+            case "OCCUPIED" -> "Occupied";
+            case "CHECKED-OUT" -> "Checked-out";
+            case "HOUSEKEEPING" -> "Housekeeping";
+            default -> status.trim();
+        };
+    }
 
 }

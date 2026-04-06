@@ -23,6 +23,10 @@ public class CustomerBooking {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_room_id")
+    private Room assignedRoom;
+
     @Column(name = "check_in", nullable = false)
     private LocalDate checkIn;
 
@@ -73,6 +77,14 @@ public class CustomerBooking {
 
     public void setBooking(Booking booking) {
         this.booking = booking;
+    }
+
+    public Room getAssignedRoom() {
+        return assignedRoom;
+    }
+
+    public void setAssignedRoom(Room assignedRoom) {
+        this.assignedRoom = assignedRoom;
     }
 
     public LocalDate getCheckIn() {

@@ -43,31 +43,43 @@
 
             <!-- Filter Row: Type, Rank, and Role Indicator -->
             <div class="filter-row">
-                <div class="filter-group">
-                    <label>Room Type:</label>
-                    <select id="typeFilter" class="filter-select">
-                        <option value="all">All Types</option>
-                        <option value="Single">Single</option>
-                        <option value="Double">Double</option>
-                        <option value="Twin">Twin</option>
-                        <option value="Triple">Triple</option>
-                        <option value="Family">Family</option>
-                    </select>
+                <div class="filter-row-main">
+                    <div class="filter-group filter-group-wide">
+                        <label>Check-In:</label>
+                        <input type="date" id="dateCheckIn" class="filter-select">
+                    </div>
+                    <div class="filter-group filter-group-wide">
+                        <label>Check-Out:</label>
+                        <input type="date" id="dateCheckOut" class="filter-select">
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label>Room Rank:</label>
-                    <select id="rankFilter" class="filter-select">
-                        <option value="all">All Ranks</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Superior">Superior</option>
-                        <option value="Deluxe">Deluxe</option>
-                        <option value="Executive">Executive</option>
-                        <option value="Suite">Suite</option>
-                    </select>
-                </div>
-                <div class="role-indicator" id="roleIndicator">
-                    <i class="fas fa-user-tag"></i>
-                    <span id="userRole">Receptionist</span>
+                <div class="filter-row-secondary">
+                    <div class="filter-group filter-group-wide">
+                        <label>Room Type:</label>
+                        <select id="typeFilter" class="filter-select">
+                            <option value="all">All Types</option>
+                            <option value="Single">Single</option>
+                            <option value="Double">Double</option>
+                            <option value="Twin">Twin</option>
+                            <option value="Triple">Triple</option>
+                            <option value="Family">Family</option>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-group-wide">
+                        <label>Room Rank:</label>
+                        <select id="rankFilter" class="filter-select">
+                            <option value="all">All Ranks</option>
+                            <option value="Standard">Standard</option>
+                            <option value="Superior">Superior</option>
+                            <option value="Deluxe">Deluxe</option>
+                            <option value="Executive">Executive</option>
+                            <option value="Suite">Suite</option>
+                        </select>
+                    </div>
+                    <div class="role-indicator" id="roleIndicator">
+                        <i class="fas fa-user-tag"></i>
+                        <span id="userRole">Receptionist</span>
+                    </div>
                 </div>
             </div>
 
@@ -140,6 +152,7 @@
                         <tr>
                             <th>Customer Booking ID</th>
                             <th>Customer ID</th>
+                            <th>Room Number</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>

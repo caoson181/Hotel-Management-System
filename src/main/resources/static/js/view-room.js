@@ -40,6 +40,8 @@ let searchTerm = "";
 let currentPage = 0;
 let currentTypeFilter = "all";
 let currentRankFilter = "all";
+let currentCheckInFilter = "";
+let currentCheckOutFilter = "";
 const itemsPerPage = 10;
 
 // DOM Elements
@@ -51,7 +53,7 @@ let tableBody,
   statusCircles,
   pagination,
   roleIndicator;
-let typeFilter, rankFilter, bookingsTableBody;
+let typeFilter, rankFilter, bookingsTableBody, dateCheckInInput, dateCheckOutInput;
 
 // Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
@@ -76,6 +78,16 @@ document.addEventListener("DOMContentLoaded", function () {
   typeFilter = document.getElementById("typeFilter");
   rankFilter = document.getElementById("rankFilter");
   bookingsTableBody = document.getElementById("bookingsTableBody");
+  dateCheckInInput = document.getElementById("dateCheckIn");
+  dateCheckOutInput = document.getElementById("dateCheckOut");
+
+  const today = new Date().toISOString().split("T")[0];
+  if (dateCheckInInput) {
+    dateCheckInInput.min = today;
+  }
+  if (dateCheckOutInput) {
+    dateCheckOutInput.min = today;
+  }
 
   // Set role indicator
   if (roleIndicator) {
@@ -126,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
     typeFilter.addEventListener("change", (e) => {
       currentTypeFilter = e.target.value;
       currentPage = 0;
-      renderTable();
+      loadRooms();
     });
   }
 
@@ -135,7 +147,26 @@ document.addEventListener("DOMContentLoaded", function () {
     rankFilter.addEventListener("change", (e) => {
       currentRankFilter = e.target.value;
       currentPage = 0;
-      renderTable();
+      loadRooms();
+    });
+  }
+
+  if (dateCheckInInput) {
+    dateCheckInInput.addEventListener("change", (e) => {
+      currentCheckInFilter = e.target.value;
+      if (dateCheckOutInput) {
+        dateCheckOutInput.min = currentCheckInFilter || today;
+      }
+      currentPage = 0;
+      loadRooms();
+    });
+  }
+
+  if (dateCheckOutInput) {
+    dateCheckOutInput.addEventListener("change", (e) => {
+      currentCheckOutFilter = e.target.value;
+      currentPage = 0;
+      loadRooms();
     });
   }
 
@@ -164,23 +195,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Load rooms from backend (or from window.rooms initial payload)
 function loadRooms() {
-  fetch("/rooms/api")
+  const params = new URLSearchParams();
+  if (currentCheckInFilter) params.set("checkIn", currentCheckInFilter);
+  if (currentCheckOutFilter) params.set("checkOut", currentCheckOutFilter);
+  if (currentTypeFilter !== "all") params.set("type", currentTypeFilter);
+  if (currentRankFilter !== "all") params.set("rank", currentRankFilter);
+
+  fetch(`/api/rooms/availability-list?${params.toString()}`)
     .then((res) => res.json())
     .then((data) => {
       rooms = data.map((r) => ({
         ...r,
         status: (r.status || "").toLowerCase(),
+        dateStatus: (r.dateStatus || "").toLowerCase(),
+        hasActiveBookingToday: Boolean(r.hasActiveBookingToday),
+        hasNoShowCandidateToday: Boolean(r.hasNoShowCandidateToday),
       }));
       currentPage = 0;
       renderTable();
     })
     .catch((error) => {
       console.error("Error loading rooms:", error);
-      // fallback to window.rooms if present
-      rooms = (window.rooms || []).map((r) => ({
-        ...r,
-        status: (r.status || "").toLowerCase(),
-      }));
+      rooms = [];
       currentPage = 0;
       renderTable();
     });
@@ -190,23 +226,26 @@ function loadRooms() {
 function renderTable() {
   if (!tableBody) return;
 
+  const hasDateFilter = Boolean(currentCheckInFilter && currentCheckOutFilter);
   let roomsData = (rooms || []).map((r) => ({
     id: r.id,
     roomNumber: r.roomNumber,
     roomType: r.roomType,
     roomRank: r.roomRank,
     status: (r.status || "").toLowerCase(),
+    dateStatus: (r.dateStatus || "").toLowerCase(),
+    dateLabel: r.dateLabel || "",
+    availableForRange: r.availableForRange !== false,
+    hasActiveBookingToday: Boolean(r.hasActiveBookingToday),
+    hasNoShowCandidateToday: Boolean(r.hasNoShowCandidateToday),
   }));
 
   // Apply filters
   let filteredRooms = roomsData.filter((room) => {
-    if (currentFilter !== "all" && room.status !== currentFilter) {
-      return false;
-    }
-    if (currentTypeFilter !== "all" && room.roomType !== currentTypeFilter) {
-      return false;
-    }
-    if (currentRankFilter !== "all" && room.roomRank !== currentRankFilter) {
+    const effectiveStatus = hasDateFilter
+      ? (room.availableForRange ? "available" : "reserved")
+      : room.status;
+    if (currentFilter !== "all" && effectiveStatus !== currentFilter) {
       return false;
     }
     if (searchTerm) {
@@ -257,8 +296,18 @@ function renderTable() {
                 <td><strong>${escapeHtml(room.roomNumber)}</strong></td>
                 <td>${escapeHtml(room.roomType)}</td>
                 <td>
-                    <span class="status-badge status-${escapeHtml(room.status)}">
-                        ${formatStatus(room.status)}
+                    <span class="status-badge status-${escapeHtml(
+                      hasDateFilter
+                        ? room.availableForRange
+                          ? "available"
+                          : "reserved"
+                        : room.status,
+                    )}">
+                        ${escapeHtml(
+                          hasDateFilter
+                            ? room.dateLabel || (room.availableForRange ? "Available for selected dates" : "Booked in selected dates")
+                            : formatStatus(room.status),
+                        )}
                     </span>
                 </td>
                 <td>${escapeHtml(room.roomRank)}</td>
@@ -277,6 +326,10 @@ function renderTable() {
 function renderActionDropdown(room) {
   const role = (userRole || "").toLowerCase();
   const status = (room.status || "").toLowerCase().trim();
+  const hasDateFilter = Boolean(currentCheckInFilter && currentCheckOutFilter);
+  const canAssignForSelectedDates = !hasDateFilter || room.availableForRange;
+  const hasActiveBookingToday = Boolean(room.hasActiveBookingToday);
+  const hasNoShowCandidateToday = Boolean(room.hasNoShowCandidateToday);
 
   const allowedStatuses = statusFlows[role]?.[status] || [];
 
@@ -286,9 +339,13 @@ function renderActionDropdown(room) {
   }
 
   let dropdownContent = "";
+  if (status === "available" && !canAssignForSelectedDates) {
+    return '<span class="no-action">—</span>';
+  }
 
-  // ✅ AVAILABLE → ONLY ASSIGN (NO STATUS OPTIONS)
-  if (status === "available") {
+
+  // ✅ AVAILABLE → ASSIGN, plus occupied action if room has an active booking today
+  if (status === "available" && canAssignForSelectedDates) {
     if (role === "receptionist" || role === "manager") {
       dropdownContent = `
                 <div class="dropdown-item" style="padding: 8px 12px;">
@@ -306,6 +363,25 @@ function renderActionDropdown(room) {
                     <i class="fas fa-user-plus"></i> Assign to Customer
                 </div>
             `;
+      if (hasActiveBookingToday) {
+        dropdownContent += `
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item"
+                    onclick="changeRoomStatus(${room.id}, 'occupied')">
+                    <i class="fas ${getStatusIcon("occupied")}"></i>
+                    ${formatStatus("occupied")}
+                </div>
+            `;
+      } else if (hasNoShowCandidateToday) {
+        dropdownContent += `
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item"
+                    onclick="markNoShow(${room.id})">
+                    <i class="fas fa-user-slash"></i>
+                    Mark No-show
+                </div>
+            `;
+      }
     } else {
       return '<span class="no-action">—</span>';
     }
@@ -333,7 +409,7 @@ function renderActionDropdown(room) {
   return `
         <div class="action-dropdown">
             <button class="dropdown-btn">
-                ${status === "available" ? "Assign" : "Actions"}
+                ${status === "available" && !hasActiveBookingToday ? "Assign" : "Actions"}
                 <i class="fas fa-chevron-down"></i>
             </button>
             <div class="dropdown-menu">
@@ -408,7 +484,6 @@ function initDropdowns() {
 
 // Change room status
 function changeRoomStatus(roomId, newStatus) {
-  // Call API to update status
   fetch(`/api/rooms/${roomId}/status`, {
     method: "PUT",
     headers: {
@@ -416,17 +491,16 @@ function changeRoomStatus(roomId, newStatus) {
     },
     body: JSON.stringify({ status: newStatus }),
   })
-    .then((response) => {
+    .then(async (response) => {
       if (response.ok) {
-        // Show success message
         showNotification(
           `Room status changed to ${formatStatus(newStatus)}`,
           "success",
         );
-        // Refresh data and table
         loadRooms();
       } else {
-        showNotification("Failed to change room status", "error");
+        const errorText = await response.text();
+        showNotification(extractErrorMessage(errorText) || "Failed to change room status", "error");
       }
     })
     .catch((error) => {
@@ -479,7 +553,7 @@ function assignRoomToCustomer(roomId) {
       } else {
         const errorText = await response.text();
         console.error("Backend error:", errorText);
-        showNotification(errorText || "Failed to assign room", "error");
+        showNotification(extractErrorMessage(errorText) || "Failed to assign room", "error");
       }
     })
     .catch((error) => {
@@ -541,7 +615,7 @@ function populateBookingsTable(bookings) {
   if (!bookings || bookings.length === 0) {
     const row = bookingsTableBody.insertRow();
     const cell = row.insertCell(0);
-    cell.colSpan = 4; // Booking ID, Customer ID, Status, Action
+    cell.colSpan = 5;
     cell.textContent = "No bookings found";
     cell.style.textAlign = "center";
     cell.style.padding = "40px";
@@ -586,12 +660,16 @@ function populateBookingsTable(bookings) {
     const cellId = row.insertCell(1);
     cellId.textContent = booking.customerId || booking.customer_id || "N/A";
 
+    // Assigned room number
+    const cellRoomNumber = row.insertCell(2);
+    cellRoomNumber.textContent = booking.roomNumber || "—";
+
     // Payment + assign status
-    const cellStatus = row.insertCell(2);
+    const cellStatus = row.insertCell(3);
     cellStatus.textContent = booking.displayStatus || "UNPAID/UNASSIGNED";
 
     // View detail button
-    const cellAction = row.insertCell(3);
+    const cellAction = row.insertCell(4);
     const viewBtn = document.createElement("button");
     viewBtn.className = "view-details-btn";
     viewBtn.innerHTML = '<i class="fas fa-eye"></i> View';
@@ -696,13 +774,46 @@ function getStatusIcon(status) {
 
 // Show notification
 function showNotification(message, type = "info") {
-  // You can implement a toast notification here
-  alert(message); // Simple alert for now
+  alert(message);
+}
+
+function extractErrorMessage(rawText) {
+  if (!rawText) {
+    return "";
+  }
+
+  try {
+    const parsed = JSON.parse(rawText);
+    return parsed.message || parsed.error || "";
+  } catch (error) {
+    return rawText;
+  }
+}
+
+function markNoShow(roomId) {
+  fetch(`/api/rooms/${roomId}/mark-no-show`, {
+    method: "POST",
+  })
+    .then(async (response) => {
+      if (response.ok) {
+        showNotification("Booking marked as no-show", "success");
+        loadRooms();
+        fetchBookingsData();
+      } else {
+        const errorText = await response.text();
+        showNotification(extractErrorMessage(errorText) || "Failed to mark no-show", "error");
+      }
+    })
+    .catch((error) => {
+      console.error("Error marking no-show:", error);
+      showNotification("Error marking no-show", "error");
+    });
 }
 
 // Make functions globally available
 window.changeRoomStatus = changeRoomStatus;
 window.assignRoomToCustomer = assignRoomToCustomer;
+window.markNoShow = markNoShow;
 
 // Booking Details Modal Handler
 document.addEventListener("DOMContentLoaded", function () {
@@ -777,6 +888,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="detail-value">${escapeHtml(booking.customerId || "N/A")}</div>
             </div>
             <div class="booking-detail-item">
+                <label>Assigned Room</label>
+                <div class="detail-value">${escapeHtml(booking.roomNumber || "Not assigned yet")}</div>
+            </div>
+            <div class="booking-detail-item">
                 <label>Status</label>
                 <div class="detail-value">
                     <span class="status-badge">${escapeHtml(booking.displayStatus || "UNPAID/UNASSIGNED")}</span>
@@ -789,6 +904,10 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="booking-detail-item">
                 <label>Booking Details</label>
                 <div class="detail-value">${escapeHtml(booking.details || "N/A")}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Date Range</label>
+                <div class="detail-value">${escapeHtml(booking.checkIn || "N/A")} -> ${escapeHtml(booking.checkOut || "N/A")}</div>
             </div>
             <div class="booking-detail-item">
                 <label>Total Amount</label>

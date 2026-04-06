@@ -52,7 +52,7 @@
           <img
             class="main-image"
             id="mainImage"
-            th:src="${room != null ? room.image : 'https://images.unsplash.com/photo-1590490360182-c33d5773345b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'}"
+            src="https://images.unsplash.com/photo-1590490360182-c33d5773345b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
             alt="Room"
           />
         </div>
@@ -77,12 +77,12 @@
           <div class="room-meta" data-aos="fade-up" data-aos-delay="100">
             <span
               ><i class="fas fa-user"></i>
-              <span th:text="${room != null ? room.guests : 2}">2</span>
+              <span>2</span>
               <span th:text="#{room.guest}">Guests</span>
             </span>
             <span
               ><i class="fas fa-ruler-combined"></i>
-              <span th:text="${room != null ? room.size : 32}">32</span>
+              <span>32</span>
               m²</span
             >
             <span
@@ -149,7 +149,7 @@
 
           <div class="booking-card">
             <div class="price">
-              $<span id="priceValue">199</span>
+              <span id="priceValue">199</span>
               <small th:text="#{room.night}">/night</small>
             </div>
             <hr />
@@ -162,7 +162,6 @@
                 type="date"
                 class="date-input"
                 id="checkin"
-                value="2025-04-01"
               />
             </div>
             <div class="date-picker">
@@ -174,8 +173,11 @@
                 type="date"
                 class="date-input"
                 id="checkout"
-                value="2025-04-03"
               />
+            </div>
+            <div class="availability-box" id="availabilityBox">
+              <strong id="availabilityTitle">Select dates to check availability</strong>
+              <p id="availabilityText">Availability will be calculated for the exact date range you choose.</p>
             </div>
             <div class="guest-selector">
               <label
@@ -407,3 +409,4 @@
     </script>
   </body>
 </html>
+

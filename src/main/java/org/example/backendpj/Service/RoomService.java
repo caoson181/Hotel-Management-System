@@ -19,8 +19,15 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class RoomService {
@@ -61,21 +68,41 @@ public class RoomService {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        room.setStatus(newStatus);
+        String normalizedStatus = newStatus == null ? "" : newStatus.trim().toUpperCase();
+        validateStatusChange(room, normalizedStatus);
+
+        room.setStatus(normalizedStatus);
         room = roomRepository.save(room);
-
-        Optional<BookingDetail> detailOpt = bookingDetailRepository.findTopByRoomOrderByIdDesc(room);
-
-        if (detailOpt.isPresent()) {
-            Booking booking = detailOpt.get().getBooking();
-            syncBookingSummary(booking);
-            bookingRepository.save(booking);
+        if ("CHECKED-OUT".equals(normalizedStatus)) {
+            applyActualCheckoutDate(room, LocalDate.now());
         }
 
+        syncBookingsForRoom(room);
         return room;
     }
 
-    public void assignRoomToCustomer(Integer roomId, String customerId, String customerBookingId) {
+    public void markNoShowForToday(Integer roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        LocalDate today = LocalDate.now();
+        List<BookingDetail> checkoutDetails = bookingDetailRepository.findCheckOutDetailsByDate(room, today);
+        BookingDetail targetDetail = checkoutDetails.stream()
+                .filter(this::canMarkNoShow)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No no-show candidate found for today"));
+
+        targetDetail.setStatus("NO_SHOW");
+        bookingDetailRepository.save(targetDetail);
+
+        Booking booking = targetDetail.getBooking();
+        if (booking != null) {
+            syncBookingSummary(booking);
+            bookingRepository.save(booking);
+        }
+    }
+
+    public Booking assignRoomToCustomer(Integer roomId, String customerId, String customerBookingId) {
         if (customerId == null || customerId.isBlank()) {
             throw new RuntimeException("Customer ID is required");
         }
@@ -105,35 +132,203 @@ public class RoomService {
             throw new RuntimeException("Customer booking is already assigned");
         }
 
+        LocalDate checkIn = customerBooking.getCheckIn();
+        LocalDate checkOut = customerBooking.getCheckOut();
+        validateDateRange(checkIn, checkOut);
+
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        if (!room.getStatus().equalsIgnoreCase("AVAILABLE")) {
-            throw new RuntimeException("Room is not available");
+        if (!isRoomAssignableForDates(room, checkIn, checkOut, List.of())) {
+            throw new RuntimeException("Room is not available for the selected dates");
         }
 
-        Booking booking = customerBooking.getBooking();
-        if (booking == null) {
-            booking = findOrCreateBookingForGroup(customerBooking.getGroupCode(), customer);
+        Booking booking = findOrCreateBookingForGroup(customerBooking.getGroupCode(), customer);
+        createAssignment(booking, customerBooking, room);
+        return booking;
+    }
+
+    public Map<String, Object> assignGroupBookings(String groupCode) {
+        List<CustomerBooking> items = customerBookingRepository.findAllByGroupCodeOrderByIdAsc(groupCode);
+        if (items.isEmpty()) {
+            throw new RuntimeException("Customer booking group not found");
         }
 
+        Customer customer = items.get(0).getCustomer();
+        Booking booking = findOrCreateBookingForGroup(groupCode, customer);
+
+        List<CustomerBooking> unassignedItems = items.stream()
+                .filter(cb -> !cb.isAssigned())
+                .sorted(Comparator.comparing(CustomerBooking::getId))
+                .toList();
+
+        List<PendingSelection> pendingSelections = new ArrayList<>();
+        for (CustomerBooking customerBooking : unassignedItems) {
+            validateDateRange(customerBooking.getCheckIn(), customerBooking.getCheckOut());
+            Room selectedRoom = findFirstAvailableRoom(
+                    customerBooking.getRoomType(),
+                    customerBooking.getRoomRank(),
+                    customerBooking.getCheckIn(),
+                    customerBooking.getCheckOut(),
+                    pendingSelections);
+
+            if (selectedRoom == null) {
+                throw new RuntimeException(
+                        "No available room for " + customerBooking.getRoomType() + " " + customerBooking.getRoomRank()
+                                + " in " + customerBooking.getCheckIn() + " -> " + customerBooking.getCheckOut());
+            }
+
+            pendingSelections.add(new PendingSelection(customerBooking, selectedRoom));
+        }
+
+        for (PendingSelection selection : pendingSelections) {
+            createAssignment(booking, selection.customerBooking(), selection.room());
+        }
+
+        return Map.of(
+                "bookingId", booking.getId(),
+                "status", booking.getStatus(),
+                "assignedCount", pendingSelections.size());
+    }
+
+    public Map<String, Object> getAvailabilitySummary(String type, String rank, LocalDate checkIn, LocalDate checkOut) {
+        validateDateRange(checkIn, checkOut);
+        List<Room> rooms = roomRepository.findByRoomTypeAndRoomRank(type, rank);
+        long availableCount = rooms.stream()
+                .filter(room -> isRoomAssignableForDates(room, checkIn, checkOut, List.of()))
+                .count();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("type", type);
+        response.put("rank", rank);
+        response.put("checkIn", checkIn);
+        response.put("checkOut", checkOut);
+        response.put("totalRooms", rooms.size());
+        response.put("availableCount", availableCount);
+        response.put("unavailableCount", Math.max(0, rooms.size() - availableCount));
+        response.put("available", availableCount > 0);
+        return response;
+    }
+
+    public List<Map<String, Object>> getRoomsWithAvailability(LocalDate checkIn, LocalDate checkOut, String type, String rank) {
+        List<Room> rooms = roomRepository.findAll(Sort.by("roomNumber").ascending());
+        boolean hasDateRange = checkIn != null && checkOut != null;
+        LocalDate today = LocalDate.now();
+        if (hasDateRange) {
+            validateDateRange(checkIn, checkOut);
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Room room : rooms) {
+            if (type != null && !type.isBlank() && !room.getRoomType().equalsIgnoreCase(type)) {
+                continue;
+            }
+            if (rank != null && !rank.isBlank() && !room.getRoomRank().equalsIgnoreCase(rank)) {
+                continue;
+            }
+
+            boolean availableForRange = !hasDateRange || isRoomAssignableForDates(room, checkIn, checkOut, List.of());
+            boolean hasActiveBookingToday = !bookingDetailRepository.findActiveDetailsByDate(room, today).isEmpty();
+            boolean hasNoShowCandidateToday = bookingDetailRepository.findCheckOutDetailsByDate(room, today).stream()
+                    .anyMatch(this::canMarkNoShow);
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", room.getId());
+            item.put("roomNumber", room.getRoomNumber());
+            item.put("roomType", room.getRoomType());
+            item.put("roomRank", room.getRoomRank());
+            item.put("status", room.getStatus());
+            item.put("hasActiveBookingToday", hasActiveBookingToday);
+            item.put("hasNoShowCandidateToday", hasNoShowCandidateToday);
+            item.put("availableForRange", availableForRange);
+            item.put("dateStatus", availableForRange ? "AVAILABLE" : "BOOKED");
+            item.put("dateLabel", availableForRange ? "Available for selected dates" : "Booked in selected dates");
+            result.add(item);
+        }
+        return result;
+    }
+
+    public Room getRepresentativeRoom(String type, String rank) {
+        return roomRepository.findFirstByRoomTypeIgnoreCaseAndRoomRankIgnoreCaseOrderByIdAsc(type, rank);
+    }
+
+    private void createAssignment(Booking booking, CustomerBooking customerBooking, Room room) {
         BookingDetail detail = new BookingDetail();
         detail.setBooking(booking);
         detail.setRoom(room);
         detail.setPrice(room.getPrice());
         detail.setCheckInDate(customerBooking.getCheckIn());
         detail.setCheckOutDate(customerBooking.getCheckOut());
-
-        room.setStatus("RESERVED");
-
+        detail.setActualCheckOutDate(null);
+        detail.setStatus("ASSIGNED");
         bookingDetailRepository.save(detail);
-        customerBooking.setBooking(booking);
-        customerBooking.setAssigned(true);
 
-        roomRepository.save(room);
+        customerBooking.setBooking(booking);
+        customerBooking.setAssignedRoom(room);
+        customerBooking.setAssigned(true);
+        customerBookingRepository.save(customerBooking);
+
         syncBookingSummary(booking);
         bookingRepository.save(booking);
-        customerBookingRepository.save(customerBooking);
+    }
+
+    private void validateStatusChange(Room room, String newStatus) {
+        LocalDate today = LocalDate.now();
+        List<BookingDetail> activeDetails = bookingDetailRepository.findActiveDetailsByDate(room, today);
+        String currentStatus = room.getStatus() == null ? "" : room.getStatus().trim().toUpperCase();
+
+        if ("AVAILABLE".equals(newStatus) && "HOUSEKEEPING".equals(currentStatus)) {
+            return;
+        }
+
+        if (("OCCUPIED".equals(newStatus) || "CHECKED-OUT".equals(newStatus) || "RESERVED".equals(newStatus))
+                && activeDetails.isEmpty()) {
+            throw new RuntimeException("This room has no active booking for today");
+        }
+
+        if ("AVAILABLE".equals(newStatus) && !activeDetails.isEmpty()) {
+            throw new RuntimeException("This room still has an active booking for today");
+        }
+    }
+
+    private void applyActualCheckoutDate(Room room, LocalDate checkoutDate) {
+        bookingDetailRepository.findActiveDetailsByDate(room, checkoutDate).stream()
+                .findFirst()
+                .ifPresent(detail -> {
+                    detail.setActualCheckOutDate(checkoutDate);
+                    bookingDetailRepository.save(detail);
+                });
+    }
+
+    private void syncBookingsForRoom(Room room) {
+        Set<Booking> bookings = new LinkedHashSet<>();
+        for (BookingDetail detail : bookingDetailRepository.findAllByRoom(room)) {
+            bookings.add(detail.getBooking());
+        }
+        for (Booking booking : bookings) {
+            syncBookingSummary(booking);
+            bookingRepository.save(booking);
+        }
+    }
+
+    private boolean canMarkNoShow(BookingDetail detail) {
+        if (detail == null) {
+            return false;
+        }
+
+        String detailStatus = detail.getStatus() == null ? "" : detail.getStatus().trim().toUpperCase();
+        if ("NO_SHOW".equals(detailStatus)) {
+            return false;
+        }
+
+        Booking booking = detail.getBooking();
+        String bookingStatus = booking != null && booking.getStatus() != null
+                ? booking.getStatus().trim().toUpperCase()
+                : "";
+        if ("COMPLETED".equals(bookingStatus)) {
+            return false;
+        }
+
+        return !hasOperationalProgress(List.of(detail));
     }
 
     private Booking findOrCreateBookingForGroup(String groupCode, Customer customer) {
@@ -146,6 +341,52 @@ public class RoomService {
                     newBooking.setTotalAmount(BigDecimal.ZERO);
                     return bookingRepository.save(newBooking);
                 });
+    }
+
+    private Room findFirstAvailableRoom(String roomType,
+                                        String roomRank,
+                                        LocalDate checkIn,
+                                        LocalDate checkOut,
+                                        List<PendingSelection> pendingSelections) {
+        return roomRepository.findByRoomTypeAndRoomRank(roomType, roomRank).stream()
+                .filter(room -> isRoomAssignableForDates(room, checkIn, checkOut, pendingSelections))
+                .min(Comparator.comparing(Room::getRoomNumber))
+                .orElse(null);
+    }
+
+    private boolean isRoomAssignableForDates(Room room,
+                                             LocalDate checkIn,
+                                             LocalDate checkOut,
+                                             List<PendingSelection> pendingSelections) {
+        if (room == null) {
+            return false;
+        }
+        if ("HOUSEKEEPING".equalsIgnoreCase(room.getStatus())) {
+            return false;
+        }
+        if (!bookingDetailRepository.findOverlappingDetails(room, checkIn, checkOut).isEmpty()) {
+            return false;
+        }
+        for (PendingSelection selection : pendingSelections) {
+            if (selection.room().getId().equals(room.getId())
+                    && isDateOverlap(selection.customerBooking().getCheckIn(), selection.customerBooking().getCheckOut(), checkIn, checkOut)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isDateOverlap(LocalDate startA, LocalDate endA, LocalDate startB, LocalDate endB) {
+        return startA.isBefore(endB) && endA.isAfter(startB);
+    }
+
+    private void validateDateRange(LocalDate checkIn, LocalDate checkOut) {
+        if (checkIn == null || checkOut == null) {
+            throw new RuntimeException("Check-in and check-out are required");
+        }
+        if (!checkOut.isAfter(checkIn)) {
+            throw new RuntimeException("Check-out must be after check-in");
+        }
     }
 
     private BigDecimal calculateBookingTotal(Booking booking) {
@@ -165,6 +406,7 @@ public class RoomService {
             booking.setCheckInDate(null);
             booking.setCheckOutDate(null);
             booking.setTotalAmount(BigDecimal.ZERO);
+            booking.setStatus("PENDING");
             return;
         }
 
@@ -174,7 +416,7 @@ public class RoomService {
                 .min(LocalDate::compareTo)
                 .orElse(null);
         LocalDate maxCheckOut = details.stream()
-                .map(BookingDetail::getCheckOutDate)
+                .map(this::getEffectiveCheckOutDate)
                 .filter(date -> date != null)
                 .max(LocalDate::compareTo)
                 .orElse(null);
@@ -182,56 +424,81 @@ public class RoomService {
         booking.setCheckInDate(minCheckIn);
         booking.setCheckOutDate(maxCheckOut);
         booking.setTotalAmount(calculateBookingTotal(booking));
-        booking.setStatus(calculateBookingStatus(details));
+        booking.setStatus(calculateBookingStatus(booking, details, minCheckIn, maxCheckOut));
     }
 
-    private String calculateBookingStatus(List<BookingDetail> details) {
-        boolean hasReserved = false;
-        boolean hasOccupied = false;
-        boolean hasActiveProgress = false;
+    private String calculateBookingStatus(Booking booking,
+                                          List<BookingDetail> details,
+                                          LocalDate minCheckIn,
+                                          LocalDate maxCheckOut) {
+        LocalDate today = LocalDate.now();
+        boolean hasActiveToday = false;
+        boolean hasOccupiedToday = false;
+        boolean hasOperationalProgress = hasOperationalProgress(details);
+        boolean allNoShow = details.stream()
+                .allMatch(detail -> "NO_SHOW".equalsIgnoreCase(detail.getStatus()));
+        String previousStatus = booking.getStatus() == null ? "" : booking.getStatus().trim().toUpperCase();
 
         for (BookingDetail detail : details) {
-            String status = detail.getRoom() != null && detail.getRoom().getStatus() != null
-                    ? detail.getRoom().getStatus().trim().toUpperCase()
-                    : "";
-            switch (status) {
-                case "OCCUPIED" -> {
-                    hasOccupied = true;
-                    hasActiveProgress = true;
+            if ("NO_SHOW".equalsIgnoreCase(detail.getStatus())) {
+                continue;
+            }
+            String roomStatus = detail.getRoom() != null ? detail.getRoom().getStatus() : null;
+            LocalDate effectiveCheckOut = getEffectiveCheckOutDate(detail);
+            if (detail.getCheckInDate() != null && effectiveCheckOut != null
+                    && !today.isBefore(detail.getCheckInDate())
+                    && today.isBefore(effectiveCheckOut)) {
+                hasActiveToday = true;
+                if (roomStatus != null && "OCCUPIED".equalsIgnoreCase(roomStatus)) {
+                    hasOccupiedToday = true;
                 }
-                case "RESERVED" -> {
-                    hasReserved = true;
-                    hasActiveProgress = true;
-                }
-                case "CHECKED-OUT", "HOUSEKEEPING", "AVAILABLE" -> {
-                }
-                default -> hasActiveProgress = true;
             }
         }
 
-        if (hasOccupied) {
+        if (hasOccupiedToday) {
             return "OCCUPIED";
         }
-        if (hasReserved) {
+        if (allNoShow) {
+            return "NO_SHOW";
+        }
+        if (hasActiveToday) {
             return "RESERVED";
         }
-        if (!hasActiveProgress) {
-            return "COMPLETED";
-        }
-        return bookingStatusFallback(details);
-    }
-
-    private String bookingStatusFallback(List<BookingDetail> details) {
-        for (BookingDetail detail : details) {
-            String status = detail.getRoom() != null ? detail.getRoom().getStatus() : null;
-            if (status != null && !status.isBlank()) {
-                return status.toUpperCase();
+        if (maxCheckOut != null && !today.isBefore(maxCheckOut)) {
+            if (hasOperationalProgress
+                    || "OCCUPIED".equals(previousStatus)
+                    || "CHECKED-OUT".equals(previousStatus)
+                    || "COMPLETED".equals(previousStatus)) {
+                return "COMPLETED";
             }
+            return "NO_SHOW";
+        }
+        if (minCheckIn != null && today.isBefore(minCheckIn)) {
+            return "RESERVED";
         }
         return "RESERVED";
     }
 
-    public Room getRepresentativeRoom(String type, String rank) {
-        return roomRepository.findByTypeAndRank(type, rank).stream().findFirst().orElse(null);
+    private boolean hasOperationalProgress(List<BookingDetail> details) {
+        for (BookingDetail detail : details) {
+            if ("NO_SHOW".equalsIgnoreCase(detail.getStatus())) {
+                continue;
+            }
+            String roomStatus = detail.getRoom() != null ? detail.getRoom().getStatus() : null;
+            if (roomStatus != null && (
+                    "OCCUPIED".equalsIgnoreCase(roomStatus)
+                            || "CHECKED-OUT".equalsIgnoreCase(roomStatus)
+                            || "HOUSEKEEPING".equalsIgnoreCase(roomStatus))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private LocalDate getEffectiveCheckOutDate(BookingDetail detail) {
+        return detail.getActualCheckOutDate() != null ? detail.getActualCheckOutDate() : detail.getCheckOutDate();
+    }
+
+    private record PendingSelection(CustomerBooking customerBooking, Room room) {
     }
 }

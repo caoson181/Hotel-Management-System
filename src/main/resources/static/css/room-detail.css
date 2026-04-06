@@ -368,6 +368,45 @@ h1, h2, h3, h4 {
     margin-bottom: 0.8rem;
 }
 
+.availability-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.availability-box strong {
+    display: block;
+    font-size: 0.9rem;
+    color: #1e2b3a;
+    margin-bottom: 0.25rem;
+}
+
+.availability-box p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.availability-box.available {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
+.availability-box.available strong {
+    color: #166534;
+}
+
+.availability-box.unavailable {
+    border-color: #fecaca;
+    background: #fef2f2;
+}
+
+.availability-box.unavailable strong {
+    color: #991b1b;
+}
+
 .guest-selector label {
     display: block;
     margin-bottom: 0.3rem;
