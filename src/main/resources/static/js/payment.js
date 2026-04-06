@@ -25,14 +25,4 @@ btn.onclick = () => {
         })
         .catch(err => console.error(err));
 };
-// nút VNPay riêng
-document.getElementById("vnpayBtn").onclick = () => {
-    const totalText = document
-        .getElementById("totalPrice")
-        .innerText.replace("$", "");
-
-    const amount = Number(totalText);
-
-    window.location.href = `/create-payment?amount=${amount}&bookingId=${bookingId}`;
-};
 

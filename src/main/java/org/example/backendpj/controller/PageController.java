@@ -199,11 +199,4 @@ public class PageController {
     public String paymentPage() {
         return "homepage/payment";
     }
-    @GetMapping("/vnpay")
-    public void goVNPay(@RequestParam Long bookingId,
-                        HttpServletResponse response) throws IOException {
-
-        // redirect luôn sang create-payment
-        response.sendRedirect("/create-payment?bookingId=" + bookingId);
-    }
 }
