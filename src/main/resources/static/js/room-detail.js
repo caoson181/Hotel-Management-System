@@ -752,21 +752,23 @@ async function checkoutCart(payMode) {
     throw new Error(err || "Checkout failed");
   }
 
-  const data = await response.json();
+  await response.json();
   localStorage.removeItem("cart");
   loadCartUI();
 
-  if (payMode === "PAY_NOW") {
-    window.location.href = "/homepage/payment";
-    return;
-  }
-
-  alert("✅ Đã lưu booking trả sau. Manager sẽ assign thủ công.");
+  alert("Booking saved successfully. Manager will assign the room(s) later.");
 }
 
 const payNowBtn = document.getElementById("payNowBtn");
 if (payNowBtn) {
-  payNowBtn.onclick = () => checkoutCart("PAY_NOW").catch((e) => alert(e.message));
+  payNowBtn.onclick = () => {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (cart.length === 0) {
+      alert("Cart is empty!");
+      return;
+    }
+    window.location.href = "/checkout/payment";
+  };
 }
 
 const payLaterBtn = document.getElementById("payLaterBtn");

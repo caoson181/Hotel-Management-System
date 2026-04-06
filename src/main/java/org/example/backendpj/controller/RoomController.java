@@ -148,7 +148,8 @@ public class RoomController {
             @PathVariable Integer roomId,
             @RequestBody Map<String, String> request) {
         String customerId = request.get("customerId");
-        roomService.assignRoomToCustomer(roomId, customerId);
+        String customerBookingId = request.get("customerBookingId");
+        roomService.assignRoomToCustomer(roomId, customerId, customerBookingId);
         return ResponseEntity.ok().build();
     }
 

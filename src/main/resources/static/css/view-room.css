@@ -424,19 +424,25 @@ tr:hover td {
   color: #4f46e5;
 }
 
-.customer-id-input {
+.customer-id-input,
+.customer-booking-id-input {
   padding: 8px 12px;
-  margin: 5px 10px;
+  margin: 0;
   border: 1px solid #e9ecef;
   border-radius: 8px;
   font-size: 12px;
   font-family: 'Inter', sans-serif;
-  width: calc(100% - 20px);
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  transition: all 0.2s ease;
 }
 
-.customer-id-input:focus {
+.customer-id-input:focus,
+.customer-booking-id-input:focus {
   outline: none;
   border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
 }
 
 @keyframes fadeIn {
@@ -565,11 +571,11 @@ tr:hover td {
   font-style: italic;
 }
 
-/* Set column widths for bookings table - Without Status column */
-#bookingsTable th:nth-child(1), #bookingsTable td:nth-child(1) { width: 30%; } /* Customer ID */
-#bookingsTable th:nth-child(2), #bookingsTable td:nth-child(2) { width: 25%; } /* Room Type */
-#bookingsTable th:nth-child(3), #bookingsTable td:nth-child(3) { width: 25%; } /* Room Rank */
-#bookingsTable th:nth-child(4), #bookingsTable td:nth-child(4) { width: 20%; } /* Action */
+/* Set column widths for bookings table */
+#bookingsTable th:nth-child(1), #bookingsTable td:nth-child(1) { width: 28%; }
+#bookingsTable th:nth-child(2), #bookingsTable td:nth-child(2) { width: 24%; }
+#bookingsTable th:nth-child(3), #bookingsTable td:nth-child(3) { width: 28%; }
+#bookingsTable th:nth-child(4), #bookingsTable td:nth-child(4) { width: 20%; }
 
 /* Booking Row Clickable */
 .booking-row {
@@ -579,6 +585,18 @@ tr:hover td {
 
 .booking-row:hover {
   background: #f8f9fa;
+}
+
+#bookingsTable .booking-row-no-divider td {
+  border-bottom-color: transparent;
+}
+
+#bookingsTable .booking-row-group-start td {
+  border-top: 1px solid #e9ecef;
+}
+
+#bookingsTable .booking-row-group-start:first-child td {
+  border-top: none;
 }
 
 /* View Details Button - Make it more visible */
@@ -734,6 +752,12 @@ tr:hover td {
     font-weight: 500;
     word-break: break-word;
     line-height: 1.5;
+}
+
+.modal-no-action {
+    color: #6c757d;
+    font-size: 13px;
+    font-weight: 500;
 }
 
 /* Responsive */

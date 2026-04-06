@@ -195,8 +195,8 @@ public class PageController {
         return "homepage/confirm-booking";
     }
 
-    @GetMapping("/homepage/payment")
+    @GetMapping("/checkout/payment")
     public String paymentPage() {
-        return "homepage/payment";
+        return "homepage/fake-payment";
     }
 }

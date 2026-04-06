@@ -21,6 +21,7 @@ public class CustomerBookingController {
     private final RoomRepository roomRepository;
     private final BookingRepository bookingRepository;
     private final BookingDetailRepository bookingDetailRepository;
+    private final PaymentRepository paymentRepository;
 
     public CustomerBookingController(
             CustomerBookingRepository customerBookingRepository,
@@ -28,13 +29,15 @@ public class CustomerBookingController {
             CustomerRepository customerRepository,
             RoomRepository roomRepository,
             BookingRepository bookingRepository,
-            BookingDetailRepository bookingDetailRepository) {
+            BookingDetailRepository bookingDetailRepository,
+            PaymentRepository paymentRepository) {
         this.customerBookingRepository = customerBookingRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
         this.roomRepository = roomRepository;
         this.bookingRepository = bookingRepository;
         this.bookingDetailRepository = bookingDetailRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -61,6 +64,7 @@ public class CustomerBookingController {
         String groupCode = UUID.randomUUID().toString().replace("-", "");
         LocalDateTime now = LocalDateTime.now();
         BigDecimal total = BigDecimal.ZERO;
+        List<CustomerBooking> createdBookings = new ArrayList<>();
 
         for (CustomerCheckoutRequest.CartItem item : req.getItems()) {
             if (item == null) continue;
@@ -84,6 +88,47 @@ public class CustomerBookingController {
                 total = total.add(cb.getPrice());
             }
             customerBookingRepository.save(cb);
+            createdBookings.add(cb);
+        }
+
+        if ("PAY_NOW".equals(payMode)) {
+            LocalDate minCheckIn = createdBookings.stream()
+                    .map(CustomerBooking::getCheckIn)
+                    .min(LocalDate::compareTo)
+                    .orElse(null);
+            LocalDate maxCheckOut = createdBookings.stream()
+                    .map(CustomerBooking::getCheckOut)
+                    .max(LocalDate::compareTo)
+                    .orElse(null);
+
+            Booking booking = bookingRepository.findTopByGroupCode(groupCode)
+                    .orElseGet(() -> {
+                        Booking newBooking = new Booking();
+                        newBooking.setCustomer(customer);
+                        newBooking.setGroupCode(groupCode);
+                        newBooking.setCheckInDate(minCheckIn);
+                        newBooking.setCheckOutDate(maxCheckOut);
+                        newBooking.setStatus("PENDING");
+                        newBooking.setTotalAmount(BigDecimal.ZERO);
+                        return bookingRepository.save(newBooking);
+                    });
+
+            for (CustomerBooking cb : createdBookings) {
+                cb.setBooking(booking);
+            }
+            customerBookingRepository.saveAll(createdBookings);
+
+            Payment payment = new Payment();
+            payment.setBooking(booking);
+            payment.setAmount(total);
+            payment.setPaymentMethod(
+                    req.getPaymentMethod() == null || req.getPaymentMethod().isBlank()
+                            ? "VNPAY"
+                            : req.getPaymentMethod().trim().toUpperCase()
+            );
+            payment.setPaymentDate(now);
+            payment.setStatus("SUCCESS");
+            paymentRepository.save(payment);
         }
 
         return Map.of(
@@ -120,20 +165,23 @@ public class CustomerBookingController {
         if (items.isEmpty()) throw new RuntimeException("Customer booking group not found");
 
         Customer customer = items.get(0).getCustomer();
-
-        LocalDate minCheckIn = items.stream().map(CustomerBooking::getCheckIn).min(LocalDate::compareTo).orElse(items.get(0).getCheckIn());
-        LocalDate maxCheckOut = items.stream().map(CustomerBooking::getCheckOut).max(LocalDate::compareTo).orElse(items.get(0).getCheckOut());
-
-        Booking booking = new Booking();
-        booking.setCustomer(customer);
-        booking.setCheckInDate(minCheckIn);
-        booking.setCheckOutDate(maxCheckOut);
+        Booking booking = bookingRepository.findTopByGroupCode(groupCode)
+                .orElseGet(() -> {
+                    Booking newBooking = new Booking();
+                    newBooking.setCustomer(customer);
+                    newBooking.setGroupCode(groupCode);
+                    newBooking.setStatus("RESERVED");
+                    newBooking.setTotalAmount(BigDecimal.ZERO);
+                    return bookingRepository.save(newBooking);
+                });
         booking.setStatus("RESERVED");
-        booking.setTotalAmount(BigDecimal.ZERO);
-        booking = bookingRepository.save(booking);
 
         BigDecimal total = BigDecimal.ZERO;
         for (CustomerBooking cb : items) {
+            if (cb.isAssigned()) {
+                continue;
+            }
+
             Room room = roomRepository.findByRoomTypeAndRoomRank(cb.getRoomType(), cb.getRoomRank()).stream()
                     .filter(r -> r.getStatus() != null && r.getStatus().equalsIgnoreCase("AVAILABLE"))
                     .min(Comparator.comparing(Room::getId))
@@ -146,14 +194,21 @@ public class CustomerBookingController {
             detail.setBooking(booking);
             detail.setRoom(room);
             detail.setPrice(room.getPrice());
+            detail.setCheckInDate(cb.getCheckIn());
+            detail.setCheckOutDate(cb.getCheckOut());
             bookingDetailRepository.save(detail);
 
             if (room.getPrice() != null) total = total.add(room.getPrice());
+            cb.setBooking(booking);
             cb.setAssigned(true);
             customerBookingRepository.save(cb);
         }
 
-        booking.setTotalAmount(total);
+        if (booking.getCheckInDate() == null || booking.getCheckOutDate() == null) {
+            booking.setCheckInDate(items.stream().map(CustomerBooking::getCheckIn).min(LocalDate::compareTo).orElse(null));
+            booking.setCheckOutDate(items.stream().map(CustomerBooking::getCheckOut).max(LocalDate::compareTo).orElse(null));
+        }
+        booking.setTotalAmount(booking.getTotalAmount() == null ? total : booking.getTotalAmount().add(total));
         bookingRepository.save(booking);
 
         return Map.of(

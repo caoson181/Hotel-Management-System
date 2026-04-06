@@ -2,6 +2,7 @@ package org.example.backendpj.Entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "BookingDetail")
@@ -22,6 +23,12 @@ public class BookingDetail {
 
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @Column(name = "check_in")
+    private LocalDate checkInDate;
+
+    @Column(name = "check_out")
+    private LocalDate checkOutDate;
 
     public BookingDetail() {
     }
@@ -56,5 +63,21 @@ public class BookingDetail {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public LocalDate getCheckInDate() {
+        return checkInDate;
+    }
+
+    public void setCheckInDate(LocalDate checkInDate) {
+        this.checkInDate = checkInDate;
+    }
+
+    public LocalDate getCheckOutDate() {
+        return checkOutDate;
+    }
+
+    public void setCheckOutDate(LocalDate checkOutDate) {
+        this.checkOutDate = checkOutDate;
     }
 }

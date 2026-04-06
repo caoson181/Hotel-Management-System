@@ -10,4 +10,6 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     Optional<Booking> findTopByCustomerAndStatus(Customer customer, String status);
 
     Optional<Booking> findTopByCustomer(Customer customer);
+
+    Optional<Booking> findTopByGroupCode(String groupCode);
 }

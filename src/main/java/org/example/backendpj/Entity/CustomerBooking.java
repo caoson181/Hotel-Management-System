@@ -19,6 +19,10 @@ public class CustomerBooking {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
+
     @Column(name = "check_in", nullable = false)
     private LocalDate checkIn;
 
@@ -61,6 +65,14 @@ public class CustomerBooking {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
     }
 
     public LocalDate getCheckIn() {

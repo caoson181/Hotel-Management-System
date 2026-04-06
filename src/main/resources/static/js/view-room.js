@@ -296,6 +296,11 @@ function renderActionDropdown(room) {
                         class="customer-id-input"
                         id="customerId_${room.id}" style="width: 100%;">
                 </div>
+                <div class="dropdown-item" style="padding: 8px 12px;">
+                    <input type="text" placeholder="Customer Booking ID"
+                        class="customer-booking-id-input"
+                        id="customerBookingId_${room.id}" style="width: 100%;">
+                </div>
                 <div class="dropdown-item"
                     onclick="assignRoomToCustomer(${room.id})">
                     <i class="fas fa-user-plus"></i> Assign to Customer
@@ -432,11 +437,21 @@ function changeRoomStatus(roomId, newStatus) {
 
 // Assign room to customer
 function assignRoomToCustomer(roomId) {
-  const input = document.getElementById(`customerId_${roomId}`);
-  const customerId = input ? input.value.trim() : "";
+  const customerInput = document.getElementById(`customerId_${roomId}`);
+  const customerBookingInput = document.getElementById(
+    `customerBookingId_${roomId}`,
+  );
+  const customerId = customerInput ? customerInput.value.trim() : "";
+  const customerBookingId = customerBookingInput
+    ? customerBookingInput.value.trim()
+    : "";
 
   if (!customerId) {
     showNotification("Please enter Customer ID", "warning");
+    return;
+  }
+  if (!customerBookingId) {
+    showNotification("Please enter Customer Booking ID", "warning");
     return;
   }
 
@@ -446,12 +461,19 @@ function assignRoomToCustomer(roomId) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ customerId: customerId }),
+    body: JSON.stringify({
+      customerId: customerId,
+      customerBookingId: customerBookingId,
+    }),
   })
     .then(async (response) => {
       if (response.ok) {
-        showNotification(`Room assigned to customer ${customerId}`, "success");
-        if (input) input.value = "";
+        showNotification(
+          `Room assigned to customer ${customerId} for booking ${customerBookingId}`,
+          "success",
+        );
+        if (customerInput) customerInput.value = "";
+        if (customerBookingInput) customerBookingInput.value = "";
         loadRooms();
         fetchBookingsData();
       } else {
@@ -471,14 +493,43 @@ function fetchBookingsData() {
   fetch("/api/customer-bookings/groups")
     .then((res) => res.json())
     .then((data) => {
-      allBookings = data;
-      populateBookingsTable(data);
+      const sortedBookings = sortBookingsByGroup(data);
+      allBookings = sortedBookings;
+      populateBookingsTable(sortedBookings);
     })
     .catch((error) => {
       console.error("Error fetching bookings:", error);
       // For demo, show empty state
       populateBookingsTable([]);
     });
+}
+
+function sortBookingsByGroup(bookings) {
+  const groups = new Map();
+
+  bookings.forEach((booking) => {
+    const groupKey = booking.groupCode || `__single__${booking.bookingId || booking.booking_id}`;
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, []);
+    }
+    groups.get(groupKey).push(booking);
+  });
+
+  const sortedGroups = Array.from(groups.values())
+    .map((group) =>
+      [...group].sort((a, b) => {
+        const idA = Number(a.bookingId || a.booking_id || 0);
+        const idB = Number(b.bookingId || b.booking_id || 0);
+        return idA - idB;
+      }),
+    )
+    .sort((groupA, groupB) => {
+      const firstA = Number(groupA[0]?.bookingId || groupA[0]?.booking_id || 0);
+      const firstB = Number(groupB[0]?.bookingId || groupB[0]?.booking_id || 0);
+      return firstA - firstB;
+    });
+
+  return sortedGroups.flat();
 }
 
 // Populate bookings table
@@ -499,10 +550,33 @@ function populateBookingsTable(bookings) {
     return;
   }
 
-  bookings.forEach((booking) => {
+  bookings.forEach((booking, index) => {
+    const previousBooking = index > 0 ? bookings[index - 1] : null;
+    const nextBooking = index < bookings.length - 1 ? bookings[index + 1] : null;
+    const sameGroupAsPrevious =
+      previousBooking &&
+      previousBooking.groupCode &&
+      booking.groupCode &&
+      previousBooking.groupCode === booking.groupCode;
+    const sameGroupAsNext =
+      nextBooking &&
+      nextBooking.groupCode &&
+      booking.groupCode &&
+      nextBooking.groupCode === booking.groupCode;
+
     const row = bookingsTableBody.insertRow();
     row.className = "booking-row";
     row.style.cursor = "pointer";
+    if (sameGroupAsPrevious) {
+      row.classList.add("booking-row-group-member");
+    } else {
+      row.classList.add("booking-row-group-start");
+    }
+    if (sameGroupAsNext) {
+      row.classList.add("booking-row-no-divider");
+    } else {
+      row.classList.add("booking-row-group-end");
+    }
 
     // Booking ID
     const cellBookingId = row.insertCell(0);
@@ -695,7 +769,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const detailsHtml = `
             <div class="booking-detail-item">
-                <label>Booking ID</label>
+                <label>Customer Booking ID</label>
                 <div class="detail-value">${escapeHtml(booking.bookingId || "N/A")}</div>
             </div>
             <div class="booking-detail-item">
@@ -723,9 +797,15 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="booking-detail-item">
                 <label>Action</label>
                 <div class="detail-value">
-                    <button id="assignBookingBtn" class="view-details-btn" ${booking.assigned ? "disabled" : ""}>
+                    ${
+                      userRole === "receptionist" || userRole === "manager"
+                        ? `<button id="assignBookingBtn" class="view-details-btn" ${
+                            booking.assigned ? "disabled" : ""
+                          }>
                         <i class="fas fa-check"></i> Assign
-                    </button>
+                    </button>`
+                        : '<span class="modal-no-action">View only</span>'
+                    }
                 </div>
             </div>
         `;

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment</title>
+    <link rel="stylesheet" href="/css/fake-payment.css">
+</head>
+<body>
+<main class="payment-shell">
+    <section class="payment-panel">
+        <div class="panel-top">
+            <div>
+                <p class="eyebrow">Checkout Gateway</p>
+                <h1>Choose a payment gateway</h1>
+                <p class="subtext">This is a demo payment page that simulates VNPay or MoMo before the booking is saved as paid.</p>
+            </div>
+            <button class="ghost-btn" id="backBtn" type="button">Back to Cart</button>
+        </div>
+
+        <div class="gateway-grid">
+            <button class="gateway-card active" type="button" data-method="VNPAY">
+                <span class="gateway-badge gateway-badge-blue">VNPay</span>
+                <strong>VNPay Sandbox</strong>
+                <span>ATM cards, QR, domestic banking</span>
+            </button>
+            <button class="gateway-card" type="button" data-method="MOMO">
+                <span class="gateway-badge gateway-badge-pink">MoMo</span>
+                <strong>MoMo Wallet</strong>
+                <span>E-wallet flow with OTP confirmation</span>
+            </button>
+        </div>
+
+        <form class="payment-form" id="paymentForm">
+            <div class="field-grid">
+                <label class="field">
+                    <span>Account Holder</span>
+                    <input id="accountName" type="text" placeholder="NGUYEN VAN A" required>
+                </label>
+                <label class="field">
+                    <span>Phone Number</span>
+                    <input id="phoneNumber" type="text" placeholder="0901234567" required>
+                </label>
+            </div>
+
+            <div class="field-grid">
+                <label class="field">
+                    <span id="codeLabel">Bank / Wallet Code</span>
+                    <input id="paymentCode" type="text" placeholder="VNPAY-998877" required>
+                </label>
+                <label class="field">
+                    <span>OTP</span>
+                    <input id="otpCode" type="text" placeholder="123456" maxlength="6" required>
+                </label>
+            </div>
+
+            <div class="notice-box">
+                <p id="gatewayHint">VNPay demo mode: enter any 6-digit OTP to simulate a successful transaction.</p>
+            </div>
+
+            <div class="form-actions">
+                <button class="ghost-btn" id="cancelBtn" type="button">Cancel</button>
+                <button class="primary-btn" id="confirmPaymentBtn" type="submit">Confirm Payment</button>
+            </div>
+        </form>
+    </section>
+
+    <aside class="summary-panel">
+        <div class="summary-card">
+            <p class="eyebrow">Booking Summary</p>
+            <div id="summaryItems" class="summary-items"></div>
+            <div class="summary-total">
+                <span>Total Amount</span>
+                <strong id="summaryTotal">0 đ</strong>
+            </div>
+        </div>
+
+        <div class="timeline-card">
+            <p class="eyebrow">Flow</p>
+            <ol>
+                <li>Review room selection</li>
+                <li>Choose VNPay or MoMo</li>
+                <li>Confirm simulated payment</li>
+                <li>Booking saved as paid and sent to staff</li>
+            </ol>
+        </div>
+    </aside>
+</main>
+
+<script src="/js/fake-payment.js"></script>
+</body>
+</html>

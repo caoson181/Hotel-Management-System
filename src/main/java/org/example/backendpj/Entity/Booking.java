@@ -27,6 +27,9 @@ public class Booking {
     @Column(name = "status", nullable = false, length = 50)
     private String status;
 
+    @Column(name = "group_code", length = 64)
+    private String groupCode;
+
     @Column(name = "total_price", precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
@@ -71,6 +74,14 @@ public class Booking {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getGroupCode() {
+        return groupCode;
+    }
+
+    public void setGroupCode(String groupCode) {
+        this.groupCode = groupCode;
     }
 
     public BigDecimal getTotalAmount() {

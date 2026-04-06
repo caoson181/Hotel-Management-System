@@ -4,6 +4,7 @@ import java.util.List;
 
 public class CustomerCheckoutRequest {
     private String payMode; // PAY_NOW or PAY_LATER
+    private String paymentMethod;
     private List<CartItem> items;
 
     public String getPayMode() {
@@ -12,6 +13,14 @@ public class CustomerCheckoutRequest {
 
     public void setPayMode(String payMode) {
         this.payMode = payMode;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
     public List<CartItem> getItems() {
