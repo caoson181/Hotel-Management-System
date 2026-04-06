@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
-@Table(name = "booking")
+@Table(name = "Booking", schema = "dbo")
 public class Booking {
 
     @Id

@@ -3,7 +3,7 @@ package org.example.backendpj.Entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "equipment_status", indexes = {
+@Table(name = "EquipmentTemplate", indexes = {
         @Index(name = "idx_room_rank", columnList = "room_rank")
 })
 public class EquipmentTemplate {

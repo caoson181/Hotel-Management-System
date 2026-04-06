@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "[User]")
 public class User {
 
     @Id
