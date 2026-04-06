@@ -194,11 +194,6 @@
               <span th:text="#{room.total}">Total</span><br />
               <span id="totalPrice">$398</span>
             </div>
-            <button class="book-btn" id="bookNowBtn">
-              <i class="fas fa-check-circle"></i>
-              <span th:text="#{room.booknow}">Book Now</span>
-            </button>
-
             <button id="addRoomBtn" class="add-btn">
               ➕ Add Room
             </button>
@@ -229,8 +224,9 @@
 
             <div id="cartItems" class="cart-items"></div>
 
-            <div class="cart-footer">
-              <button id="goConfirm" class="cart-confirm-btn">Book Now</button>
+            <div class="cart-footer" style="display:flex; gap:8px;">
+              <button id="payNowBtn" class="cart-confirm-btn" style="flex:1;">Trả tiền trước</button>
+              <button id="payLaterBtn" class="cart-confirm-btn" style="flex:1; background:#6c757d;">Trả tiền sau</button>
             </div>
           </div>
         </div>

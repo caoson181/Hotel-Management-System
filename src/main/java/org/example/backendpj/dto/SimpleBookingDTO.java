@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class SimpleBookingDTO {
+    private Integer bookingId;
     private Integer customerId;
     private String roomType;
     private String roomRank;
@@ -17,6 +18,14 @@ public class SimpleBookingDTO {
 
     private LocalDate checkInTime;
     private LocalDate checkOutTime;
+
+    public Integer getBookingId() {
+        return bookingId;
+    }
+
+    public void setBookingId(Integer bookingId) {
+        this.bookingId = bookingId;
+    }
 
     public Integer getCustomerId() { return customerId; }
     public void setCustomerId(Integer customerId) { this.customerId = customerId; }

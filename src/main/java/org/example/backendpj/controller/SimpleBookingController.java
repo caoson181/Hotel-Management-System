@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/api/bookings")
 public class SimpleBookingController {
 
     private List<SimpleBookingDTO> bookings = new ArrayList<>();
+    private final AtomicInteger bookingSequence = new AtomicInteger(1);
 
     @Autowired
     private UserRepository userRepository;
@@ -28,6 +30,7 @@ public class SimpleBookingController {
     @PostMapping
     public SimpleBookingDTO createBooking(@RequestBody SimpleBookingDTO booking,
                                           Principal principal) {
+        booking.setBookingId(bookingSequence.getAndIncrement());
 
         if (principal != null) {
             String username = principal.getName();

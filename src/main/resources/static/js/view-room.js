@@ -468,8 +468,7 @@ function assignRoomToCustomer(roomId) {
 
 // Fetch bookings data
 function fetchBookingsData() {
-  // Replace with your actual API endpoint
-  fetch("/api/bookings/current")
+  fetch("/api/customer-bookings/groups")
     .then((res) => res.json())
     .then((data) => {
       allBookings = data;
@@ -491,7 +490,7 @@ function populateBookingsTable(bookings) {
   if (!bookings || bookings.length === 0) {
     const row = bookingsTableBody.insertRow();
     const cell = row.insertCell(0);
-    cell.colSpan = 4; // Customer ID, Room Type, Room Rank, Action
+    cell.colSpan = 4; // Booking ID, Customer ID, Status, Action
     cell.textContent = "No bookings found";
     cell.style.textAlign = "center";
     cell.style.padding = "40px";
@@ -505,23 +504,23 @@ function populateBookingsTable(bookings) {
     row.className = "booking-row";
     row.style.cursor = "pointer";
 
+    // Booking ID
+    const cellBookingId = row.insertCell(0);
+    cellBookingId.textContent = booking.bookingId || booking.booking_id || "N/A";
+
     // Customer ID
-    const cellId = row.insertCell(0);
+    const cellId = row.insertCell(1);
     cellId.textContent = booking.customerId || booking.customer_id || "N/A";
 
-    // Room Type
-    const cellType = row.insertCell(1);
-    cellType.textContent = booking.roomType || booking.room_type || "N/A";
+    // Payment + assign status
+    const cellStatus = row.insertCell(2);
+    cellStatus.textContent = booking.displayStatus || "UNPAID/UNASSIGNED";
 
-    // Room Rank
-    const cellRank = row.insertCell(2);
-    cellRank.textContent = booking.roomRank || booking.room_rank || "N/A";
-
-    // Action button
+    // View detail button
     const cellAction = row.insertCell(3);
     const viewBtn = document.createElement("button");
     viewBtn.className = "view-details-btn";
-    viewBtn.innerHTML = '<i class="fas fa-eye"></i> View Details';
+    viewBtn.innerHTML = '<i class="fas fa-eye"></i> View';
     viewBtn.onclick = (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -694,90 +693,32 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalBody = document.getElementById("bookingDetailsBody");
     if (!modalBody) return;
 
-    const formatDate = (dateString) => {
-      if (!dateString) return "N/A";
-      try {
-        const date = new Date(dateString);
-        return date.toLocaleString("en-US", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-      } catch (e) {
-        return dateString;
-      }
-    };
-
     const detailsHtml = `
             <div class="booking-detail-item">
                 <label>Booking ID</label>
-                <div class="detail-value">${escapeHtml(booking.bookingId || booking.id || "N/A")}</div>
+                <div class="detail-value">${escapeHtml(booking.bookingId || "N/A")}</div>
             </div>
             <div class="booking-detail-item">
                 <label>Customer ID</label>
-                <div class="detail-value">
-  ${escapeHtml(booking.customer?.customerId || "N/A")}
-</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Customer Name</label>
-                <div class="detail-value">${escapeHtml(booking.customerName || "N/A")}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Email</label>
-                <div class="detail-value">${escapeHtml(booking.email || "N/A")}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Phone Number</label>
-                <div class="detail-value">${escapeHtml(booking.phone || "N/A")}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Room Type</label>
-                <div class="detail-value">${escapeHtml(booking.roomType || "N/A")}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Room Rank</label>
-                <div class="detail-value">${escapeHtml(booking.roomRank || "N/A")}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Room Number</label>
-                <div class="detail-value">${escapeHtml(booking.roomNumber || "Not assigned yet")}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Booking Time</label>
-                <div class="detail-value">${formatDate(booking.bookingTime)}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Check-in Time</label>
-                <div class="detail-value">${formatDate(booking.checkInTime)}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Check-out Time</label>
-                <div class="detail-value">${formatDate(booking.checkOutTime)}</div>
+                <div class="detail-value">${escapeHtml(booking.customerId || "N/A")}</div>
             </div>
             <div class="booking-detail-item">
                 <label>Status</label>
                 <div class="detail-value">
-                    <span class="status-badge">${escapeHtml(booking.status || "N/A")}</span>
+                    <span class="status-badge">${escapeHtml(booking.displayStatus || "UNPAID/UNASSIGNED")}</span>
                 </div>
             </div>
             <div class="booking-detail-item">
+                <label>Group Code</label>
+                <div class="detail-value">${escapeHtml(booking.groupCode || "N/A")}</div>
+            </div>
+            <div class="booking-detail-item">
+                <label>Booking Details</label>
+                <div class="detail-value">${escapeHtml(booking.details || "N/A")}</div>
+            </div>
+            <div class="booking-detail-item">
                 <label>Total Amount</label>
-                <div class="detail-value">${booking.totalAmount ? "$" + Number(booking.totalAmount).toLocaleString() : "N/A"}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Number of Guests</label>
-                <div class="detail-value">${booking.numberOfGuests ?? booking.guests ?? 1}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Special Requests</label>
-                <div class="detail-value">${escapeHtml(booking.specialRequests || "None")}</div>
-            </div>
-            <div class="booking-detail-item">
-                <label>Payment Status</label>
-                <div class="detail-value">${escapeHtml(booking.paymentStatus || "Pending")}</div>
+                <div class="detail-value">${booking.totalAmount != null ? Number(booking.totalAmount).toLocaleString("vi-VN") + " VND" : "N/A"}</div>
             </div>
         `;
 

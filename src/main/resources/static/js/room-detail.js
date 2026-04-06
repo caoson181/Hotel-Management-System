@@ -543,36 +543,13 @@ if (selectedRoom) {
   document.querySelector("[data-size]").textContent = selectedRoom.size;
 }
 
-function bookNow(roomType, roomRank) {
-  fetch("/api/bookings", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      customerId: window.customerId,
-      // hardcode for now
-
-      roomType: roomType,
-      roomRank: roomRank,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      alert("Booked successfully!");
-    })
-    .catch((err) => console.error(err));
+function parseTypeRank(name) {
+  const parts = String(name || "").trim().split(/\s+/);
+  return {
+    roomType: parts[0] || "",
+    roomRank: parts.slice(1).join(" ") || "",
+  };
 }
-document.getElementById("bookNowBtn").addEventListener("click", () => {
-  const totalText = document.querySelector(".total-price").innerText;
-
-  console.log("Saving total:", totalText); // test
-
-  localStorage.setItem("bookingTotal", totalText);
-
-  const params = new URLSearchParams(window.location.search);
-  window.location.href = `/confirm-booking?${params.toString()}`;
-});
 
 
 async function loadSimilarPrices() {
@@ -741,20 +718,7 @@ document.getElementById("cartIcon").onclick = () => {
   document.getElementById("cartPopup").classList.toggle("hidden");
 };
 
-document.getElementById("bookNowBtn").onclick = () => {
-  const params = new URLSearchParams(window.location.search);
-
-  params.set("checkin", document.getElementById("checkin").value);
-  params.set("checkout", document.getElementById("checkout").value);
-  params.set("guests", String(window.guestCount));
-  params.set("mode", "single");
-
-  localStorage.removeItem("bookingCart");
-  localStorage.setItem("bookingMode", "single");
-
-  window.location.href = `/confirm-booking?${params.toString()}`;
-};
-document.getElementById("goConfirm").onclick = () => {
+async function checkoutCart(payMode) {
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   if (cart.length === 0) {
@@ -762,63 +726,50 @@ document.getElementById("goConfirm").onclick = () => {
     return;
   }
 
-  const firstRoom = cart[0];
+  const payload = {
+    payMode,
+    items: cart.map((item) => {
+      const parsed = parseTypeRank(item.name);
+      return {
+        roomType: parsed.roomType,
+        roomRank: parsed.roomRank,
+        checkIn: item.checkin,
+        checkOut: item.checkout,
+        guests: item.guests,
+        price: item.price,
+      };
+    }),
+  };
 
-  const params = new URLSearchParams();
-  params.set("type", firstRoom.name.split(" ")[0]);
-  params.set("rank", firstRoom.name.split(" ")[1]);
-  params.set("checkin", firstRoom.checkin);
-  params.set("checkout", firstRoom.checkout);
-
-  // ✅ lưu cart
-  localStorage.setItem("bookingCart", JSON.stringify(cart));
-
-  // ✅ set mode
-  localStorage.setItem("bookingMode", "multi");
-
-  window.location.href = `/confirm-booking?mode=multi`;
-};
-window.addEventListener("pageshow", () => {
-  const params = new URLSearchParams(window.location.search);
-
-  if (params.get("mode") === "single") {
-    localStorage.removeItem("bookingCart");
-  }
-});
-function renderCart() {
-  const cart = JSON.parse(localStorage.getItem("bookingCart")) || [];
-  const cartItems = document.getElementById("cartItems");
-  const cartCount = document.getElementById("cartCount");
-  const cartTotalText = document.getElementById("cartTotalText");
-
-  cartItems.innerHTML = "";
-
-  let total = 0;
-
-  cart.forEach((item, index) => {
-    total += Number(item.price);
-
-    const div = document.createElement("div");
-    div.className = "cart-item";
-    div.innerHTML = `
-      <button class="remove-item" onclick="removeCartItem(${index})">×</button>
-      <div class="cart-item-title">${item.name}</div>
-      <div class="cart-item-meta">
-        📅 ${formatDate(item.checkin)} → ${formatDate(item.checkout)}<br>
-        👤 ${item.guests} guests
-      </div>
-      <div class="cart-item-price">${formatVND(item.price)}</div>
-    `;
-    cartItems.appendChild(div);
+  const response = await fetch("/api/customer-bookings/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
 
-  cartCount.textContent = cart.length;
-  cartTotalText.textContent = formatVND(total);
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err || "Checkout failed");
+  }
+
+  const data = await response.json();
+  localStorage.removeItem("cart");
+  loadCartUI();
+
+  if (payMode === "PAY_NOW") {
+    window.location.href = "/homepage/payment";
+    return;
+  }
+
+  alert("✅ Đã lưu booking trả sau. Manager sẽ assign thủ công.");
 }
 
-function removeCartItem(index) {
-  const cart = JSON.parse(localStorage.getItem("bookingCart")) || [];
-  cart.splice(index, 1);
-  localStorage.setItem("bookingCart", JSON.stringify(cart));
-  renderCart();
+const payNowBtn = document.getElementById("payNowBtn");
+if (payNowBtn) {
+  payNowBtn.onclick = () => checkoutCart("PAY_NOW").catch((e) => alert(e.message));
+}
+
+const payLaterBtn = document.getElementById("payLaterBtn");
+if (payLaterBtn) {
+  payLaterBtn.onclick = () => checkoutCart("PAY_LATER").catch((e) => alert(e.message));
 }

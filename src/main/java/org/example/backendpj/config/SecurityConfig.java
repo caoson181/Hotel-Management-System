@@ -2,11 +2,9 @@ package org.example.backendpj.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.example.backendpj.Service.CustomOAuth2UserService;
 @Configuration
@@ -54,6 +52,14 @@ public class SecurityConfig {
                                 "/components/**",
                                 "/*.html"
                         ).permitAll()
+                        // Customer booking flow
+                        .requestMatchers("/api/customer-bookings/checkout")
+                        .hasAnyAuthority("ROLE_CUSTOMER", "Customer", "ROLE_Customer")
+                        .requestMatchers("/api/customer-bookings/**")
+                        .hasAnyAuthority(
+                                "ROLE_ADMIN", "ROLE_MANAGER", "ROLE_RECEPTIONIST", "ROLE_HOUSEKEEPER",
+                                "Admin", "Manager", "Receptionist", "Housekeeper"
+                        )
                         // Staff VIEW (all staff roles)
                         .requestMatchers("/staff/view/**")
                         .hasAnyRole("ADMIN", "MANAGER", "RECEPTIONIST", "HOUSEKEEPER")

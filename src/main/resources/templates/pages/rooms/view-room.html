@@ -138,9 +138,9 @@
                 <table id="bookingsTable">
                     <thead>
                         <tr>
+                            <th>Booking ID</th>
                             <th>Customer ID</th>
-                            <th>Room Type</th>
-                            <th>Room Rank</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -172,12 +172,12 @@
 
 <script th:inline="javascript">
     window.rooms = [[${rooms}]].map(r => ({
-        room_number: r.roomNumber,
-        room_type: r.roomType,
-        room_rank: r.roomRank,
-        status: r.status.toLowerCase(),
-        description: r.description,
-        id: r.id
+        id: r.id,
+        roomNumber: r.roomNumber,
+        roomType: r.roomType,
+        roomRank: r.roomRank,
+        status: (r.status || "").toLowerCase(),
+        description: r.description
     }));
 </script>
 
