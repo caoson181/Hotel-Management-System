@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.backendpj.Entity.Customer;
 import org.example.backendpj.Repository.CustomerRepository;
 import org.example.backendpj.Repository.UserRepository;
+import org.example.backendpj.Service.CustomerTierService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -21,10 +22,14 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private final UserRepository userRepo;
     private final CustomerRepository customerRepo;
+    private final CustomerTierService customerTierService;
 
-    public OAuth2LoginSuccessHandler(UserRepository userRepo, CustomerRepository customerRepo) {
+    public OAuth2LoginSuccessHandler(UserRepository userRepo,
+                                     CustomerRepository customerRepo,
+                                     CustomerTierService customerTierService) {
         this.userRepo = userRepo;
         this.customerRepo = customerRepo;
+        this.customerTierService = customerTierService;
     }
 
     @Override
@@ -63,10 +68,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             if (user.getCustomer() == null) {
                 Customer customer = new Customer();
                 customer.setUser(user);
+                customer.setMemberLevel("Bronze");
+                customer.setCustomerRank("Normal");
                 customerRepo.save(customer);
             }
 
             if (user != null && user.getRole().equalsIgnoreCase("Customer")) {
+                customerTierService.refreshTierForUser(user);
                 response.sendRedirect("/homepage");
             } else {
                 response.sendRedirect("/index");

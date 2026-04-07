@@ -149,6 +149,9 @@ document.addEventListener("click", () => {
 const historyBtn = document.getElementById("historyBtn");
 const historyModal = document.getElementById("historyModal");
 const closeHistory = document.getElementById("closeHistory");
+const upgradePlanBtn = document.getElementById("upgradePlanBtn");
+const upgradePlanModal = document.getElementById("upgradePlanModal");
+const closeUpgradePlan = document.getElementById("closeUpgradePlan");
 
 if (historyBtn) {
   historyBtn.addEventListener("click", () => {
@@ -167,4 +170,65 @@ window.addEventListener("click", (e) => {
   if (e.target === historyModal) {
     historyModal.style.display = "none";
   }
+  if (e.target === upgradePlanModal) {
+    upgradePlanModal.style.display = "none";
+  }
 });
+
+if (upgradePlanBtn) {
+  upgradePlanBtn.addEventListener("click", () => {
+    upgradePlanModal.style.display = "flex";
+    renderUpgradeProgress();
+  });
+}
+
+if (closeUpgradePlan) {
+  closeUpgradePlan.addEventListener("click", () => {
+    upgradePlanModal.style.display = "none";
+  });
+}
+
+function formatMoney(value) {
+  return Number(value || 0).toLocaleString("vi-VN") + " đ";
+}
+
+function renderUpgradeProgress() {
+  const summary = document.querySelector(".upgrade-plan-summary");
+  const fill = document.getElementById("upgradeProgressFill");
+  const currentEl = document.getElementById("upgradeProgressCurrent");
+  const targetEl = document.getElementById("upgradeProgressTarget");
+  const textEl = document.getElementById("upgradePlanText");
+
+  if (!summary || !fill || !currentEl || !targetEl || !textEl) {
+    return;
+  }
+
+  const totalSpent = Number(summary.dataset.totalSpent || 0);
+  const memberLevel = String(summary.dataset.memberLevel || "Bronze").toLowerCase();
+
+  let baseline = 0;
+  let nextTarget = 50000000;
+  let nextLabel = "Silver / VIP";
+
+  if (memberLevel === "silver") {
+    baseline = 50000000;
+    nextTarget = 100000000;
+    nextLabel = "Gold / VIP";
+  } else if (memberLevel === "gold") {
+    baseline = 100000000;
+    nextTarget = 200000000;
+    nextLabel = "Platinum / VVIP";
+  } else if (memberLevel === "platinum") {
+    fill.style.width = "100%";
+    currentEl.textContent = formatMoney(totalSpent);
+    targetEl.textContent = "Top tier reached";
+    textEl.textContent = "You are already at the highest membership tier. Enjoy all premium privileges.";
+    return;
+  }
+
+  const progress = Math.max(0, Math.min(100, ((totalSpent - baseline) / (nextTarget - baseline)) * 100));
+  fill.style.width = `${progress}%`;
+  currentEl.textContent = formatMoney(totalSpent);
+  targetEl.textContent = formatMoney(nextTarget);
+  textEl.textContent = `Spend ${formatMoney(Math.max(0, nextTarget - totalSpent))} more to upgrade to ${nextLabel}.`;
+}

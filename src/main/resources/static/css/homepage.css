@@ -1095,3 +1095,110 @@ header.scrolled .account-btn:hover,
     background: #4ecdc4;
     color: white;
 }
+
+.tier-upgrade-overlay.hidden {
+    display: none;
+}
+
+.tier-upgrade-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tier-upgrade-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+}
+
+.tier-upgrade-modal {
+    position: relative;
+    z-index: 2;
+    width: min(92vw, 520px);
+    padding: 2.4rem 2.2rem;
+    border-radius: 28px;
+    background: linear-gradient(180deg, #fff9e7 0%, #ffffff 46%);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.28);
+    text-align: center;
+    border: 1px solid rgba(212, 175, 55, 0.28);
+}
+
+.tier-upgrade-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.tier-upgrade-icon {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 30% 30%, #ffe48f, #d4af37);
+    color: #fff;
+    font-size: 2rem;
+    box-shadow: 0 16px 34px rgba(212, 175, 55, 0.35);
+}
+
+.tier-upgrade-label {
+    margin: 0 0 0.35rem;
+    font-size: 0.92rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #b08900;
+    font-weight: 700;
+}
+
+.tier-upgrade-modal h2 {
+    margin: 0;
+    font-size: 2rem;
+    color: #1e293b;
+}
+
+.tier-upgrade-message {
+    margin: 0.9rem auto 0;
+    max-width: 420px;
+    color: #475569;
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+.tier-confetti {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: -18px;
+    width: 10px;
+    height: 18px;
+    border-radius: 999px;
+    opacity: 0.9;
+    animation: confettiFall 2.8s linear forwards;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    100% {
+        transform: translateY(110vh) rotate(540deg);
+    }
+}

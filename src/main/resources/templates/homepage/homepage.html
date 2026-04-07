@@ -37,6 +37,22 @@
     <!-- Navbar (Thymeleaf fragment) -->
     <div th:replace="homepage/navbar :: navbar"></div>
 
+    <div id="tierUpgradeOverlay" class="tier-upgrade-overlay hidden">
+      <div class="tier-upgrade-backdrop"></div>
+      <div class="tier-upgrade-modal">
+        <button id="closeTierUpgrade" class="tier-upgrade-close" type="button">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="tier-upgrade-icon">
+          <i class="fas fa-crown"></i>
+        </div>
+        <p class="tier-upgrade-label">Membership Upgrade</p>
+        <h2>Congratulations!</h2>
+        <p id="tierUpgradeMessage" class="tier-upgrade-message"></p>
+      </div>
+      <div id="tierConfetti" class="tier-confetti"></div>
+    </div>
+
     <!-- Hero Section with Slider -->
     <section id="home" class="hero">
       <div class="swiper-container">
@@ -207,27 +223,60 @@
         }
       });
 
-      const accountBtn = document.getElementById("accountBtn");
-      const accountDropdown = document.getElementById("accountDropdown");
+      (async function initTierUpgradePopup() {
+        const overlay = document.getElementById("tierUpgradeOverlay");
+        const closeBtn = document.getElementById("closeTierUpgrade");
+        const message = document.getElementById("tierUpgradeMessage");
+        const confetti = document.getElementById("tierConfetti");
+        if (!overlay) {
+          return;
+        }
 
-      if (accountBtn && accountDropdown) {
-        accountBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          accountDropdown.classList.toggle("show");
-          const expanded = accountBtn.getAttribute("aria-expanded") === "true";
-          accountBtn.setAttribute("aria-expanded", expanded ? "false" : "true");
-        });
+        let payload;
+        try {
+          const response = await fetch("/profile/tier-upgrade/status", {
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+          });
+          const contentType = response.headers.get("content-type") || "";
+          if (!response.ok || !contentType.includes("application/json")) {
+            return;
+          }
+          payload = await response.json();
+        } catch (error) {
+          return;
+        }
 
-        document.addEventListener("click", (e) => {
-          if (
-            !accountBtn.contains(e.target) &&
-            !accountDropdown.contains(e.target)
-          ) {
-            accountDropdown.classList.remove("show");
-            accountBtn.setAttribute("aria-expanded", "false");
+        if (!payload?.show) {
+          return;
+        }
+
+        const memberLevel = payload.memberLevel || "Silver";
+        const customerRank = payload.customerRank || "VIP";
+        message.textContent = `You have been upgraded to ${memberLevel} / ${customerRank}. Enjoy your new member privileges.`;
+        overlay.classList.remove("hidden");
+
+        for (let i = 0; i < 36; i += 1) {
+          const piece = document.createElement("span");
+          piece.className = "confetti-piece";
+          piece.style.left = `${Math.random() * 100}%`;
+          piece.style.animationDelay = `${Math.random() * 0.7}s`;
+          piece.style.background = ["#d4af37", "#ff6b6b", "#4ecdc4", "#667eea"][i % 4];
+          confetti.appendChild(piece);
+        }
+
+        function closePopup() {
+          overlay.classList.add("hidden");
+          confetti.innerHTML = "";
+          fetch("/profile/tier-upgrade/ack", { method: "POST" }).catch(() => {});
+        }
+
+        closeBtn?.addEventListener("click", closePopup);
+        overlay.addEventListener("click", (event) => {
+          if (event.target === overlay || event.target.classList.contains("tier-upgrade-backdrop")) {
+            closePopup();
           }
         });
-      }
+      })();
     </script>
   </body>
 </html>

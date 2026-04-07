@@ -50,6 +50,9 @@ public class RoomService {
     @Autowired
     private DailyRevenueService dailyRevenueService;
 
+    @Autowired
+    private CustomerTierService customerTierService;
+
     public Page<Room> search(String keyword, int page, String sortField, String sortDir) {
         int pageSize = 20;
         sortField = sortField.trim();
@@ -316,6 +319,7 @@ public class RoomService {
         for (Booking booking : bookings) {
             syncBookingSummary(booking);
             bookingRepository.save(booking);
+            customerTierService.refreshTier(booking.getCustomer());
         }
     }
 

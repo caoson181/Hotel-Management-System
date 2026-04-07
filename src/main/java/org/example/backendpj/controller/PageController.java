@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.example.backendpj.Entity.CustomerBooking;
 import org.example.backendpj.Entity.Room;
 import org.example.backendpj.Repository.CustomerBookingRepository;
+import org.example.backendpj.Service.CustomerTierService;
 import org.example.backendpj.Service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,11 +32,16 @@ public class PageController {
     private final UserRepository userRepository;
     private final UserService userService;
     private final RoomRepository roomRepository;
+    private final CustomerTierService customerTierService;
 
-    public PageController(UserRepository userRepository, UserService userService, RoomRepository roomRepository) {
+    public PageController(UserRepository userRepository,
+                          UserService userService,
+                          RoomRepository roomRepository,
+                          CustomerTierService customerTierService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.roomRepository = roomRepository;
+        this.customerTierService = customerTierService;
     }
 
     // ================= ADMIN HOME =================
@@ -172,6 +178,22 @@ public class PageController {
         model.addAttribute("user", user);
 
         model.addAttribute("bookingHistory", history);
+        if (user.getCustomer() != null) {
+            CustomerTierService.TierUpdateResult tierResult = customerTierService.refreshTier(user.getCustomer());
+            model.addAttribute("member", tierResult.memberLevel());
+            model.addAttribute("rank", tierResult.customerRank());
+            model.addAttribute("memberLevel", tierResult.memberLevel());
+            model.addAttribute("customerRank", tierResult.customerRank());
+            model.addAttribute("totalSpent", tierResult.totalCompletedAmount());
+            model.addAttribute("completedBookingCount", tierResult.completedBookingCount());
+        } else {
+            model.addAttribute("member", "Bronze");
+            model.addAttribute("rank", "Normal");
+            model.addAttribute("memberLevel", "Bronze");
+            model.addAttribute("customerRank", "Normal");
+            model.addAttribute("totalSpent", java.math.BigDecimal.ZERO);
+            model.addAttribute("completedBookingCount", 0L);
+        }
 
         return "homepage/profile";
     }

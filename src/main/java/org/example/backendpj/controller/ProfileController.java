@@ -2,12 +2,14 @@ package org.example.backendpj.controller;
 
 import org.example.backendpj.Entity.User;
 import org.example.backendpj.Entity.UserAvatar;
+import org.example.backendpj.Repository.CustomerRepository;
 import org.example.backendpj.Repository.UserAvatarRepository;
 import org.example.backendpj.Service.AvatarService;
 import org.example.backendpj.Service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,6 +56,9 @@ public class ProfileController {
     @Autowired
     private AvatarService avatarService;
 
+    @Autowired
+    private CustomerRepository customerRepository;
+
     @PostMapping("/avatar/upload")
     public String uploadAvatar(@RequestParam("file") MultipartFile file,
             Principal principal) throws Exception {
@@ -90,6 +95,58 @@ public class ProfileController {
         avatarService.setCurrentAvatar(user.getId(), avatarId);
 
         return "redirect:/profile";
+    }
+
+    @PostMapping("/tier-upgrade/ack")
+    @ResponseBody
+    public String acknowledgeTierUpgrade(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        User user;
+
+        if (principal instanceof OAuth2User oauthUser) {
+            String email = oauthUser.getAttribute("email");
+            user = userService.findByEmail(email);
+        } else {
+            user = userService.findByUsernameOrEmail(authentication.getName());
+        }
+
+        if (user == null || user.getCustomer() == null) {
+            throw new RuntimeException("Customer not found");
+        }
+
+        user.getCustomer().setTierUpgradePending(false);
+        customerRepository.save(user.getCustomer());
+        return "ok";
+    }
+
+    @GetMapping("/tier-upgrade/status")
+    @ResponseBody
+    public ResponseEntity<?> tierUpgradeStatus(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Object principal = authentication.getPrincipal();
+        User user;
+
+        if (principal instanceof OAuth2User oauthUser) {
+            String email = oauthUser.getAttribute("email");
+            user = userService.findByEmail(email);
+        } else {
+            user = userService.findByUsernameOrEmail(authentication.getName());
+        }
+
+        if (user == null || user.getCustomer() == null) {
+            return ResponseEntity.ok(java.util.Map.of(
+                    "show", false
+            ));
+        }
+
+        return ResponseEntity.ok(java.util.Map.of(
+                "show", user.getCustomer().isTierUpgradePending(),
+                "memberLevel", user.getCustomer().getMemberLevel(),
+                "customerRank", user.getCustomer().getCustomerRank()
+        ));
     }
 
 }

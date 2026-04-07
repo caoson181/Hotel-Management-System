@@ -31,11 +31,11 @@
   <div class="container">
     <div class="contact-wrapper profile-wrapper">
       <div class="profile-grid-layout">
-        <div class="profile-summary-card">
-          <div class="profile-chip" th:text="${member} + ' Member'"></div>
+        <div class="profile-summary-card" th:classappend="${' tier-' + #strings.toLowerCase(memberLevel)}">
+          <div class="profile-chip" th:text="${memberLevel + ' • ' + customerRank}"></div>
 
           <div th:if="${user != null}">
-            <div id="openAvatarModal" style="cursor:pointer;">
+            <div id="openAvatarModal" class="profile-avatar-trigger" style="cursor:pointer;">
               <div class="profile-avatar-large">
 
                 <img th:if="${avatar != null}" th:src="${avatar.url}" />
@@ -73,13 +73,21 @@
             <div class="profile-name">Guest</div>
           </div>
 
-          <div class="profile-sub">VIP Member since 2024</div>
-          <div class="profile-stats">
-            <div><span>5,260</span><small>Points</small></div>
-            <div><span>Platinum</span><small>Tier</small></div>
-            <div><span>38</span><small>Bookings</small></div>
+          <div class="member-benefit-box">
+            <div class="member-benefit-icon"><i class="fas fa-star"></i></div>
+            <div>
+              <strong>Member Benefits</strong>
+              <p>Member benefits are active for your account.</p>
+            </div>
           </div>
-          <button class="btn-primary">Upgrade Plan</button>
+          <div class="profile-stats">
+            <div class="tier-stat-card level-card"><span th:text="${memberLevel}"></span><small>Level</small></div>
+            <div class="tier-stat-card rank-card"><span th:text="${customerRank}"></span><small>Rank</small></div>
+          </div>
+          <div class="profile-summary-actions">
+            <button class="btn-primary" type="button" id="upgradePlanBtn">Upgrade Plan</button>
+            <button type="button" class="btn-secondary btn-history-summary" id="historyBtn">Booking History</button>
+          </div>
         </div>
 
         <div class="profile-details-card">
@@ -92,10 +100,6 @@
 
             <button type="button" class="btn-secondary" id="editBtn">
               Edit
-            </button>
-
-            <button type="button" class="btn-secondary" id="historyBtn">
-              Booking History
             </button>
 
           </div>
@@ -134,18 +138,23 @@
               </div>
 
               <div class="row">
+                <div>Gender</div>
+                <div th:text="${user.gender != null and !#strings.isEmpty(user.gender) ? user.gender : 'Not set'}"></div>
+              </div>
+
+              <div class="row">
                 <div>Username</div>
                 <div th:text="${user.username}"></div>
               </div>
 
               <div class="row">
-                <div>Membership</div>
-                <div th:text="${rank}"></div>
+                <div>Role</div>
+                <div th:text="${user.role}"></div>
               </div>
 
               <div class="row">
-                <div>Next Reward</div>
-                <div>Free Spa Treatment</div>
+                <div>Membership</div>
+                <div th:text="${memberLevel + ' / ' + customerRank}"></div>
               </div>
 
             </div>
@@ -258,6 +267,29 @@
         <div th:text="${b.checkOut}"></div>
         <div th:text="${b.price != null ? #numbers.formatDecimal(b.price.doubleValue(),0,'COMMA',0,'POINT') : '0'}"></div>
         <div th:text="${#temporals.format(b.createdAt,'dd/MM/yyyy HH:mm')}"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="upgradePlanModal" class="booking-history-modal">
+  <div class="booking-history-content upgrade-plan-content">
+    <span class="close-btn" id="closeUpgradePlan">&times;</span>
+    <h3>Upgrade Progress</h3>
+    <div class="upgrade-plan-summary"
+         th:attr="data-total-spent=${totalSpent != null ? totalSpent.doubleValue() : 0},data-member-level=${memberLevel},data-customer-rank=${customerRank}">
+      <div class="upgrade-tier-badge" th:text="${memberLevel + ' / ' + customerRank}"></div>
+      <p class="upgrade-plan-text" id="upgradePlanText">Your spending progress toward the next membership tier.</p>
+      <div class="upgrade-amount-row">
+        <span>Total spent</span>
+        <strong th:text="${totalSpent != null ? #numbers.formatDecimal(totalSpent.doubleValue(),0,'COMMA',0,'POINT') + ' đ' : '0 đ'}"></strong>
+      </div>
+      <div class="upgrade-progress-track">
+        <div id="upgradeProgressFill" class="upgrade-progress-fill"></div>
+      </div>
+      <div class="upgrade-progress-meta">
+        <span id="upgradeProgressCurrent">0 đ</span>
+        <span id="upgradeProgressTarget">50.000.000 đ</span>
       </div>
     </div>
   </div>

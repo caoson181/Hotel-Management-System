@@ -18,6 +18,12 @@ public class Customer {
     @Column(name = "member_level", length = 50)
     private String memberLevel;
 
+    @Column(name = "customer_rank", length = 50)
+    private String customerRank;
+
+    @Column(name = "tier_upgrade_pending")
+    private Boolean tierUpgradePending;
+
     public Customer() {
     }
 
@@ -43,6 +49,26 @@ public class Customer {
 
     public void setMemberLevel(String memberLevel) {
         this.memberLevel = memberLevel;
+    }
+
+    public String getCustomerRank() {
+        return customerRank;
+    }
+
+    public void setCustomerRank(String customerRank) {
+        this.customerRank = customerRank;
+    }
+
+    public boolean isTierUpgradePending() {
+        return Boolean.TRUE.equals(tierUpgradePending);
+    }
+
+    public Boolean getTierUpgradePending() {
+        return tierUpgradePending;
+    }
+
+    public void setTierUpgradePending(boolean tierUpgradePending) {
+        this.tierUpgradePending = tierUpgradePending;
     }
 
 }

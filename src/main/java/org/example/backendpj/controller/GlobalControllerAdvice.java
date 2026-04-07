@@ -28,16 +28,12 @@ public class GlobalControllerAdvice {
         if (principal == null)
             return null;
 
-        if (principal instanceof UsernamePasswordAuthenticationToken) {
-            return userService.findByUsernameOrEmail(principal.getName());
-        }
-
         if (principal instanceof OAuth2AuthenticationToken oauth) {
             String email = oauth.getPrincipal().getAttribute("email");
             return userService.findByEmail(email);
         }
 
-        return null;
+        return userService.findByUsernameOrEmail(principal.getName());
     }
 
     // 🔥 THÊM ĐOẠN NÀY
@@ -46,7 +42,13 @@ public class GlobalControllerAdvice {
         if (principal == null)
             return null;
 
-        User user = userService.findByUsernameOrEmail(principal.getName());
+        User user;
+        if (principal instanceof OAuth2AuthenticationToken oauth) {
+            String email = oauth.getPrincipal().getAttribute("email");
+            user = userService.findByEmail(email);
+        } else {
+            user = userService.findByUsernameOrEmail(principal.getName());
+        }
         if (user == null)
             return null;
 

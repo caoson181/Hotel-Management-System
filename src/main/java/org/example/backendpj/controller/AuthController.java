@@ -165,7 +165,8 @@ public class AuthController {
 
         Customer c = new Customer();
         c.setUser(u);
-        c.setMemberLevel("Normal"); // default
+        c.setMemberLevel("Bronze");
+        c.setCustomerRank("Normal");
 
         customerRepository.save(c);
 

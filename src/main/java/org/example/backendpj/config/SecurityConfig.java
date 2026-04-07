@@ -7,15 +7,23 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.example.backendpj.Service.CustomOAuth2UserService;
+import org.example.backendpj.Service.CustomerTierService;
+import org.example.backendpj.Service.UserService;
 @Configuration
 public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final UserService userService;
+    private final CustomerTierService customerTierService;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
-                          OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) {
+                          OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
+                          UserService userService,
+                          CustomerTierService customerTierService) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
+        this.userService = userService;
+        this.customerTierService = customerTierService;
     }
 
 
@@ -103,6 +111,8 @@ public class SecurityConfig {
                                             || a.getAuthority().equalsIgnoreCase("Customer"));
 
                             if (isCustomer) {
+                                var user = userService.findByUsernameOrEmail(authentication.getName());
+                                customerTierService.refreshTierForUser(user);
                                 response.sendRedirect("/homepage");
                             } else {
                                 response.sendRedirect("/index");
