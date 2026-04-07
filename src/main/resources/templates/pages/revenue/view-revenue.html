@@ -1,35 +1,85 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>View Room Status</title>
-    <link rel="stylesheet" th:href="@{/css/global.css}" />
-    <link rel="stylesheet" th:href="@{/css/modal.css}" />
-    <link rel="stylesheet" th:href="@{/css/navbar.css}" />
-    <link rel="stylesheet" th:href="@{/css/profile.css}" />
-  </head>
 
-  <body>
-    <div
-      id="navbar-container"
-      th:replace="~{components/navbar :: navbar}"
-    ></div>
+<head>
+  <meta charset="UTF-8" />
+  <title>View Room Status</title>
+  <link rel="stylesheet" th:href="@{/css/global.css}" />
+  <link rel="stylesheet" th:href="@{/css/modal.css}" />
+  <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/profile.css}" />
+  <link rel="stylesheet" th:href="@{/css/revenue.css}" />
+</head>
 
-    <!-- PAGE CONTENT -->
+<body>
+  <div id="navbar-container" th:replace="~{components/navbar :: navbar}"></div>
 
-    <section class="hero">
-      <div class="welcome-box">
-        <h1>Revenue</h1>
-        <p>View hotel revenue statistics.</p>
+  <!-- PAGE CONTENT -->
+
+  <section class="revenue-page">
+    <div class="container">
+
+      <!-- HEADER -->
+      <div class="header">
+        <h2>Revenue Dashboard</h2>
+        <div class="filter-box">
+          <label>Month:</label>
+          <input type="month" id="monthFilter" value="2026-03" />
+        </div>
       </div>
-    </section>
 
-    <!-- MODALS -->
-    <div th:replace="~{components/modals :: modals}"></div>
+      <!-- TABLE CARD -->
+      <div class="card">
+        <h3>Daily Revenue</h3>
+        <table id="revenueTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Guests</th>
+              <th>Rooms</th>
+              <th>Revenue</th>
+              <th>Profit</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
 
-    <script th:src="@{/js/main.js}"></script>
-    <script th:src="@{/js/account.js}"></script>
-    <script th:src="@{/js/dropdown.js}"></script>
-    <script th:src="@{/js/role.js}"></script>
-  </body>
+      <!-- CHART CARD -->
+      <div class="card chart-card">
+
+        <div class="chart-header">
+          <h3>Profit Chart</h3>
+
+          <div class="kpi-container">
+            <div class="kpi-box">
+              <p>Total Revenue</p>
+              <h4 id="totalRevenue">0</h4>
+            </div>
+
+            <div class="kpi-box">
+              <p>Total Profit</p>
+              <h4 id="totalProfit">0</h4>
+            </div>
+          </div>
+        </div>
+
+        <canvas id="revenueChart"></canvas>
+      </div>
+
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- MODALS -->
+  <div th:replace="~{components/modals :: modals}"></div>
+
+  <script th:src="@{/js/main.js}"></script>
+  <script th:src="@{/js/account.js}"></script>
+  <script th:src="@{/js/dropdown.js}"></script>
+  <script th:src="@{/js/role.js}"></script>
+  <script th:src="@{/js/revenue.js}"></script>
+</body>
+
 </html>
