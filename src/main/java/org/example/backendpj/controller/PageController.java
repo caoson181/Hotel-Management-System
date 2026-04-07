@@ -1,7 +1,9 @@
 package org.example.backendpj.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.backendpj.Entity.CustomerBooking;
 import org.example.backendpj.Entity.Room;
+import org.example.backendpj.Repository.CustomerBookingRepository;
 import org.example.backendpj.Service.UserService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -125,6 +127,9 @@ public class PageController {
         return "pages/users/manage-users";
     }
 
+    @Autowired
+    private CustomerBookingRepository bookingRepo;
+
     @GetMapping("/profile")
     public String profile(Model model, Authentication authentication) {
 
@@ -132,10 +137,7 @@ public class PageController {
 
         if (authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.User userDetails) {
             login = userDetails.getUsername();
-        }
-
-        else if (authentication
-                .getPrincipal() instanceof org.springframework.security.oauth2.core.user.OAuth2User oauthUser) {
+        } else if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.core.user.OAuth2User oauthUser) {
             login = oauthUser.getAttribute("email");
         }
 
@@ -143,15 +145,33 @@ public class PageController {
                 .findByUsernameOrEmail(login, login)
                 .orElse(null);
 
+        // 🔥 tránh crash
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         UserAvatar avatar = avatarRepo
                 .findByUser_IdAndIsCurrentTrue(user.getId())
                 .orElse(null);
 
         List<UserAvatar> avatars = avatarRepo.findByUserId(user.getId());
 
+        // ================= HISTORY =================
+        List<CustomerBooking> history = List.of();
+
+        if (user.getCustomer() != null) {
+            Integer customerId = user.getCustomer().getCustomerId();
+
+            history = bookingRepo
+                    .findByCustomer_CustomerIdOrderByCreatedAtDesc(customerId);
+        }
+
+        // ================= MODEL =================
         model.addAttribute("avatar", avatar);
         model.addAttribute("avatars", avatars);
         model.addAttribute("user", user);
+
+        model.addAttribute("bookingHistory", history);
 
         return "homepage/profile";
     }

@@ -143,3 +143,28 @@ avatarBtn.onclick = (e) => {
 document.addEventListener("click", () => {
   avatarModal.classList.remove("active");
 });
+document.addEventListener("click", () => {
+  avatarModal.classList.remove("active");
+});
+const historyBtn = document.getElementById("historyBtn");
+const historyModal = document.getElementById("historyModal");
+const closeHistory = document.getElementById("closeHistory");
+
+if (historyBtn) {
+  historyBtn.addEventListener("click", () => {
+    historyModal.style.display = "flex";
+  });
+}
+
+if (closeHistory) {
+  closeHistory.addEventListener("click", () => {
+    historyModal.style.display = "none";
+  });
+}
+
+// click ngoài để đóng
+window.addEventListener("click", (e) => {
+  if (e.target === historyModal) {
+    historyModal.style.display = "none";
+  }
+});

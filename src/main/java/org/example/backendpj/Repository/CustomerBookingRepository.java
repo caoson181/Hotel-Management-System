@@ -10,5 +10,8 @@ public interface CustomerBookingRepository extends JpaRepository<CustomerBooking
     List<CustomerBooking> findAllByOrderByCreatedAtDesc();
     List<CustomerBooking> findAllByGroupCodeOrderByIdAsc(String groupCode);
     List<CustomerBooking> findAllByGroupCode(String groupCode);
+
+    List<CustomerBooking> findByCustomer_CustomerIdOrderByCreatedAtDesc(Integer customerId);
+
 }
 

@@ -1,0 +1,52 @@
+.booking-history-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.booking-history-content {
+    background: #fff;
+    width: 90vw;
+    max-width: 1100px;
+    max-height: 80vh;
+    overflow: auto;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.booking-history-modal .history-table {
+    width: 100%;
+    display: block;
+}
+
+.booking-history-modal .history-row {
+    display: grid !important;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1.4fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.booking-history-modal .history-row > div {
+    min-width: 0;
+    word-break: break-word;
+}
+
+.booking-history-modal .history-head {
+    font-weight: bold;
+    background: #f8f8f8;
+}
+
+.booking-history-modal .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+}

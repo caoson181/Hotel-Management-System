@@ -8,228 +8,263 @@
   <link rel="stylesheet" th:href="@{/css/homepage.css}" />
   <link rel="stylesheet" th:href="@{/css/contact.css}" />
   <link rel="stylesheet" th:href="@{/css/modals.css}" />
+  <link rel="stylesheet" th:href="@{/css/history-modal.css}" />
 
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 </head>
 
 <body class="contact-page">
-  <header class="header">
-    <div th:replace="~{homepage/navbar :: navbar}"></div>
-  </header>
+<header class="header">
+  <div th:replace="~{homepage/navbar :: navbar}"></div>
+</header>
 
-  <section class="contact-hero profile-hero">
-    <div class="overlay"></div>
-    <div class="container hero-content">
-      <h1 class="title-anim">My Profile</h1>
-      <p>Manage your account information and member offers.</p>
-    </div>
-  </section>
+<section class="contact-hero profile-hero">
+  <div class="overlay"></div>
+  <div class="container hero-content">
+    <h1 class="title-anim">My Profile</h1>
+    <p>Manage your account information and member offers.</p>
+  </div>
+</section>
 
-  <section class="contact-section profile-section">
-    <div class="container">
-      <div class="contact-wrapper profile-wrapper">
-        <div class="profile-grid-layout">
-          <div class="profile-summary-card">
-            <div class="profile-chip">Gold Member</div>
+<section class="contact-section profile-section">
+  <div class="container">
+    <div class="contact-wrapper profile-wrapper">
+      <div class="profile-grid-layout">
+        <div class="profile-summary-card">
+          <div class="profile-chip" th:text="${member} + ' Member'"></div>
 
-            <div th:if="${user != null}">
-              <div id="openAvatarModal" style="cursor:pointer;">
-                <div class="profile-avatar-large">
+          <div th:if="${user != null}">
+            <div id="openAvatarModal" style="cursor:pointer;">
+              <div class="profile-avatar-large">
 
-                  <img th:if="${avatar != null}" th:src="${avatar.url}" />
-                  <span th:if="${avatar == null}" th:text="${#strings.substring(user.fullName,0,1)}"></span>
+                <img th:if="${avatar != null}" th:src="${avatar.url}" />
+                <span th:if="${avatar == null}" th:text="${#strings.substring(user.fullName,0,1)}"></span>
 
+              </div>
+            </div>
+
+            <div class="profile-name" th:text="${user.fullName}">
+            </div>
+
+            <div class="avatar-gallery avatar-popup" id="avatarModal">
+              <form th:action="@{/profile/avatar/upload}" method="post" enctype="multipart/form-data">
+                <label class="avatar-upload">
+                  ⬆
+                  <input type="file" name="file" hidden onchange="this.form.submit()" />
+                </label>
+              </form>
+              <form th:each="ava : ${avatars}" th:action="@{/profile/avatar/select}" method="post">
+
+                <input type="hidden" name="avatarId" th:value="${ava.id}" />
+
+                <button type="submit" class="avatar-item" th:classappend="${ava.current} ? 'active'">
+
+                  <img th:src="${ava.url}" />
+
+                </button>
+
+              </form>
+            </div>
+          </div>
+
+          <div th:if="${user == null}">
+            <div class="profile-avatar-large">U</div>
+            <div class="profile-name">Guest</div>
+          </div>
+
+          <div class="profile-sub">VIP Member since 2024</div>
+          <div class="profile-stats">
+            <div><span>5,260</span><small>Points</small></div>
+            <div><span>Platinum</span><small>Tier</small></div>
+            <div><span>38</span><small>Bookings</small></div>
+          </div>
+          <button class="btn-primary">Upgrade Plan</button>
+        </div>
+
+        <div class="profile-details-card">
+
+          <div class="profile-details-header">
+            <div>
+              <h3>Account Details</h3>
+              <p>Manage personal info & security</p>
+            </div>
+
+            <button type="button" class="btn-secondary" id="editBtn">
+              Edit
+            </button>
+
+            <button type="button" class="btn-secondary" id="historyBtn">
+              Booking History
+            </button>
+
+          </div>
+
+          <form th:action="@{/profile/update}" method="post">
+
+            <div class="profile-table">
+
+              <div class="row">
+                <div>Name</div>
+                <div>
+                  <span class="view-mode" th:text="${user.fullName}"></span>
+
+                  <input class="edit-mode" type="text" name="fullName" th:value="${user.fullName}"
+                         style="display:none;">
                 </div>
               </div>
 
-              <div class="profile-name" th:text="${user.fullName}">
+              <div class="row">
+                <div>Email</div>
+                <div>
+                  <span class="view-mode" th:text="${user.email}"></span>
+
+                  <input class="edit-mode" type="email" name="email" th:value="${user.email}" style="display:none;">
+                </div>
               </div>
 
-              <div class="avatar-gallery avatar-popup" id="avatarModal">
-                <form th:action="@{/profile/avatar/upload}" method="post" enctype="multipart/form-data">
-                  <label class="avatar-upload">
-                    ⬆
-                    <input type="file" name="file" hidden onchange="this.form.submit()" />
-                  </label>
-                </form>
-                <form th:each="ava : ${avatars}" th:action="@{/profile/avatar/select}" method="post">
+              <div class="row">
+                <div>Phone</div>
+                <div>
+                  <span class="view-mode" th:text="${user.phoneNumber}"></span>
 
-                  <input type="hidden" name="avatarId" th:value="${ava.id}" />
-
-                  <button type="submit" class="avatar-item" th:classappend="${ava.current} ? 'active'">
-
-                    <img th:src="${ava.url}" />
-
-                  </button>
-
-                </form>
-              </div>
-            </div>
-
-            <div th:if="${user == null}">
-              <div class="profile-avatar-large">U</div>
-              <div class="profile-name">Guest</div>
-            </div>
-
-            <div class="profile-sub">VIP Member since 2024</div>
-            <div class="profile-stats">
-              <div><span>5,260</span><small>Points</small></div>
-              <div><span>Platinum</span><small>Tier</small></div>
-              <div><span>38</span><small>Bookings</small></div>
-            </div>
-            <button class="btn-primary">Upgrade Plan</button>
-          </div>
-
-          <div class="profile-details-card">
-
-            <div class="profile-details-header">
-              <div>
-                <h3>Account Details</h3>
-                <p>Manage personal info & security</p>
+                  <input class="edit-mode" type="text" name="phoneNumber" th:value="${user.phoneNumber}"
+                         style="display:none;">
+                </div>
               </div>
 
-              <button type="button" class="btn-secondary" id="editBtn">
-                Edit
+              <div class="row">
+                <div>Username</div>
+                <div th:text="${user.username}"></div>
+              </div>
+
+              <div class="row">
+                <div>Membership</div>
+                <div th:text="${rank}"></div>
+              </div>
+
+              <div class="row">
+                <div>Next Reward</div>
+                <div>Free Spa Treatment</div>
+              </div>
+
+            </div>
+
+            <div class="action-row">
+
+              <button type="submit" class="cta-button" id="saveBtn" style="display:none;">
+                Save Changes
               </button>
+
+              <button type="button" id="ChangePasswordBtn">
+                Change Password
+              </button>
+
             </div>
 
-            <form th:action="@{/profile/update}" method="post">
+          </form>
 
-              <div class="profile-table">
+        </div>
 
-                <div class="row">
-                  <div>Name</div>
-                  <div>
-                    <span class="view-mode" th:text="${user.fullName}"></span>
+</section>
 
-                    <input class="edit-mode" type="text" name="fullName" th:value="${user.fullName}"
-                      style="display:none;">
-                  </div>
-                </div>
+<footer class="footer">
+  <div class="container">
+    <p>&copy; 2026 Gravity Hotel. All rights reserved.</p>
+  </div>
 
-                <div class="row">
-                  <div>Email</div>
-                  <div>
-                    <span class="view-mode" th:text="${user.email}"></span>
+</footer>
 
-                    <input class="edit-mode" type="email" name="email" th:value="${user.email}" style="display:none;">
-                  </div>
-                </div>
+<style>
+  .profile-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
 
-                <div class="row">
-                  <div>Phone</div>
-                  <div>
-                    <span class="view-mode" th:text="${user.phoneNumber}"></span>
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-                    <input class="edit-mode" type="text" name="phoneNumber" th:value="${user.phoneNumber}"
-                      style="display:none;">
-                  </div>
-                </div>
+  .profile-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 🔥 dòng fix chính */
+    border-radius: 50%;
+  }
+</style>
 
-                <div class="row">
-                  <div>Username</div>
-                  <div th:text="${user.username}"></div>
-                </div>
 
-                <div class="row">
-                  <div>Membership</div>
-                  <div>Standard</div>
-                </div>
+<script>
+  const header = document.querySelector('.header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+</script>
+<div id="changePasswordModal" class="modals">
+  <div class="modals-content">
+    <span class="close-btn" id="closeModal">&times;</span>
 
-                <div class="row">
-                  <div>Next Reward</div>
-                  <div>Free Spa Treatment</div>
-                </div>
+    <h3>Change Password</h3>
 
-              </div>
-
-              <div class="action-row">
-
-                <button type="submit" class="cta-button" id="saveBtn" style="display:none;">
-                  Save Changes
-                </button>
-
-                <button type="button" id="ChangePasswordBtn">
-                  Change Password
-                </button>
-
-              </div>
-
-            </form>
-
-          </div>
-
-  </section>
-
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 Gravity Hotel. All rights reserved.</p>
+    <div class="password-field">
+      <input type="password" id="currentPassword" placeholder="Current Password">
+      <i class="fa fa-eye toggle-password" data-target="currentPassword"></i>
     </div>
 
-  </footer>
+    <div class="password-field">
+      <input type="password" id="newPassword" placeholder="New Password">
+      <i class="fa fa-eye toggle-password" data-target="newPassword"></i>
+    </div>
 
-  <style>
-    .profile-avatar-large {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  overflow: hidden;
+    <div id="passwordHint" class="hint"></div>
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    <div class="password-field">
+      <input type="password" id="confirmPassword" placeholder="Confirm New Password">
+      <i class="fa fa-eye toggle-password" data-target="confirmPassword"></i>
+    </div>
 
-.profile-avatar-large img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 🔥 dòng fix chính */
-  border-radius: 50%;
-}
-  </style>
+    <div id="confirmHint" class="hint"></div>
 
 
-  <script>
-    const header = document.querySelector('.header');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-      } else {
-        header.classList.remove('scrolled');
-      }
-    });
-  </script>
-  <div id="changePasswordModal" class="modals">
-    <div class="modals-content">
-      <span class="close-btn" id="closeModal">&times;</span>
+    <button onclick="submitChangePassword()">Update Password</button>
+  </div>
+</div>
 
-      <h3>Change Password</h3>
+<div id="historyModal" class="booking-history-modal">
+  <div class="booking-history-content">
+    <span class="close-btn" id="closeHistory">&times;</span>
+    <h3>Booking History</h3>
 
-      <div class="password-field">
-        <input type="password" id="currentPassword" placeholder="Current Password">
-        <i class="fa fa-eye toggle-password" data-target="currentPassword"></i>
+    <div class="history-table">
+      <div class="history-row history-head">
+        <div>Room</div>
+        <div>Check-in</div>
+        <div>Check-out</div>
+        <div>Price</div>
+        <div>Created</div>
       </div>
 
-      <div class="password-field">
-        <input type="password" id="newPassword" placeholder="New Password">
-        <i class="fa fa-eye toggle-password" data-target="newPassword"></i>
+      <div th:each="b : ${bookingHistory}" class="history-row">
+        <div>
+          <span th:text="${b.roomType}"></span> - <span th:text="${b.roomRank}"></span>
+        </div>
+        <div th:text="${b.checkIn}"></div>
+        <div th:text="${b.checkOut}"></div>
+        <div th:text="${b.price != null ? #numbers.formatDecimal(b.price.doubleValue(),0,'COMMA',0,'POINT') : '0'}"></div>
+        <div th:text="${#temporals.format(b.createdAt,'dd/MM/yyyy HH:mm')}"></div>
       </div>
-
-      <div id="passwordHint" class="hint"></div>
-
-      <div class="password-field">
-        <input type="password" id="confirmPassword" placeholder="Confirm New Password">
-        <i class="fa fa-eye toggle-password" data-target="confirmPassword"></i>
-      </div>
-
-      <div id="confirmHint" class="hint"></div>
-
-
-      <button onclick="submitChangePassword()">Update Password</button>
     </div>
   </div>
-  <script th:src="@{/js/profile.js}"></script>
+</div>
+
+
+<script th:src="@{/js/profile.js}"></script>
 </body>
 
 </html>
