@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -51,4 +52,18 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
     List<BookingDetail> findCheckOutDetailsByDate(
             @Param("room") Room room,
             @Param("targetDate") LocalDate targetDate);
+
+    @Query("""
+            SELECT COUNT(bd)
+            FROM BookingDetail bd
+            WHERE bd.actualCheckOutDate = :targetDate
+            """)
+    long countByActualCheckOutDate(@Param("targetDate") LocalDate targetDate);
+
+    @Query("""
+            SELECT COALESCE(SUM(bd.price), 0)
+            FROM BookingDetail bd
+            WHERE bd.actualCheckOutDate = :targetDate
+            """)
+    BigDecimal sumPriceByActualCheckOutDate(@Param("targetDate") LocalDate targetDate);
 }
