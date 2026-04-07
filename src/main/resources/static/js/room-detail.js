@@ -182,6 +182,10 @@ function parseTypeRank(name) {
   };
 }
 
+function buildRoomDetailUrl(rank, type) {
+  return `/room-detail?rank=${encodeURIComponent(rank || "")}&type=${encodeURIComponent(type || "")}`;
+}
+
 async function fetchRepresentativeRoom(type, rank) {
   const response = await fetch(`/api/rooms/representative?type=${encodeURIComponent(type)}&rank=${encodeURIComponent(rank)}`);
   if (!response.ok) {
@@ -736,7 +740,8 @@ function initBookingCard() {
         addCurrentRoomToCart();
       }
       validateCheckoutCart(readCart());
-      window.location.href = "/checkout/payment";
+      const returnUrl = buildRoomDetailUrl(pageRank, pageType);
+      window.location.href = `/checkout/payment?returnUrl=${encodeURIComponent(returnUrl)}`;
     } catch (error) {
       alert(error.message || "Could not start payment.");
     }

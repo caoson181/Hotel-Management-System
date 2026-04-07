@@ -47,6 +47,9 @@ public class RoomService {
     @Autowired
     private CustomerBookingRepository customerBookingRepository;
 
+    @Autowired
+    private DailyRevenueService dailyRevenueService;
+
     public Page<Room> search(String keyword, int page, String sortField, String sortDir) {
         int pageSize = 20;
         sortField = sortField.trim();
@@ -301,6 +304,7 @@ public class RoomService {
                 .ifPresent(detail -> {
                     detail.setActualCheckOutDate(checkoutDate);
                     bookingDetailRepository.save(detail);
+                    dailyRevenueService.ensureRevenueForDate(checkoutDate);
                 });
     }
 

@@ -12,85 +12,7 @@ function getCurrentDateKey() {
 }
 
 function formatMoney(num) {
-  return num.toLocaleString("vi-VN") + " ₫";
-}
-
-async function fetchData(month) {
-  const res = await fetch(`/api/revenue?month=${month}`);
-  return await res.json();
-}
-
-function renderTable(data) {
-  const tbody = document.querySelector("#revenueTable tbody");
-  tbody.innerHTML = "";
-
-  data.forEach((d) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${d.date}</td>
-        <td>${d.totalGuests}</td>
-        <td>${d.roomsBooked}</td>
-        <td>${formatMoney(d.revenue)}</td>
-        <td>${formatMoney(d.profit)}</td>
-      </tr>
-    `;
-  });
-}
-
-function renderChart(data) {
-  const ctx = document.getElementById("revenueChart").getContext("2d");
-
-  const labels = data.map((d) => d.date.split("-")[2]);
-  const values = data.map((d) => d.profit);
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Profit",
-          data: values,
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true,
-        },
-      ],
-    },
-  });
-}
-
-function updateKPI(data) {
-  let totalRevenue = 0;
-  let totalProfit = 0;
-
-  data.forEach((d) => {
-    totalRevenue += d.revenue;
-    totalProfit += d.profit;
-  });
-
-  document.getElementById("totalRevenue").innerText = formatMoney(totalRevenue);
-  document.getElementById("totalProfit").innerText = formatMoney(totalProfit);
-}
-
-async function updateUI() {
-  const month = document.getElementById("monthFilter").value;
-  const data = await fetchData(month);
-
-  renderTable(data);
-  renderChart(data);
-  updateKPI(data);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  updateUI();
-  document.getElementById("monthFilter").addEventListener("change", updateUI);
-});
-
-function formatMoney(num) {
-  return Number(num || 0).toLocaleString("vi-VN") + " đ";
+  return Math.round(Number(num || 0)).toLocaleString("vi-VN") + " d";
 }
 
 async function fetchData(month) {
@@ -108,7 +30,7 @@ function renderTable(data) {
   if (!data.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5">Chưa có dữ liệu doanh thu cho tháng này.</td>
+        <td colspan="5">Chua c� d? li?u doanh thu cho th�ng n�y.</td>
       </tr>
     `;
     return;
@@ -120,10 +42,27 @@ function renderTable(data) {
         <td>${d.date}</td>
         <td>${d.totalGuests}</td>
         <td>${d.roomsBooked}</td>
-        <td>${formatMoney(d.revenue)}</td>
-        <td>${formatMoney(d.profit)}</td>
+        <td>
+          <button type="button" class="revenue-value-btn" data-kind="revenue" data-date="${d.date}">
+            ${formatMoney(d.revenue)}
+          </button>
+        </td>
+        <td>
+          <button type="button" class="revenue-value-btn" data-kind="profit" data-date="${d.date}">
+            ${formatMoney(d.profit)}
+          </button>
+        </td>
       </tr>
     `;
+  });
+
+  tbody.querySelectorAll(".revenue-value-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const item = data.find((row) => row.date === button.dataset.date);
+      if (item) {
+        openRevenueDetail(item, button.dataset.kind);
+      }
+    });
   });
 }
 
@@ -166,6 +105,68 @@ function updateKPI(data) {
   document.getElementById("totalProfit").innerText = formatMoney(totalProfit);
 }
 
+function openRevenueDetail(item, kind) {
+  const modal = document.getElementById("revenueDetailModal");
+  const title = document.getElementById("revenueDetailTitle");
+  const body = document.getElementById("revenueDetailBody");
+
+  if (!modal || !title || !body) {
+    return;
+  }
+
+  if (kind === "revenue") {
+    title.textContent = `Revenue Details - ${item.date}`;
+    body.innerHTML = `
+      <div class="revenue-detail-row">
+        <span>Booking Revenue</span>
+        <strong>${formatMoney(item.bookingRevenue)}</strong>
+      </div>
+      <div class="revenue-detail-row">
+        <span>Rental Revenue</span>
+        <strong>${formatMoney(item.rentalRevenue)}</strong>
+      </div>
+      <div class="revenue-detail-row total-row">
+        <span>Total Revenue</span>
+        <strong>${formatMoney(item.revenue)}</strong>
+      </div>
+    `;
+  } else {
+    title.textContent = `Profit Details - ${item.date}`;
+    body.innerHTML = `
+      <div class="revenue-detail-row">
+        <span>Booking Revenue</span>
+        <strong>${formatMoney(item.bookingRevenue)}</strong>
+      </div>
+      <div class="revenue-detail-row">
+        <span>Rental Revenue</span>
+        <strong>${formatMoney(item.rentalRevenue)}</strong>
+      </div>
+      <div class="revenue-detail-row">
+        <span>Salary Cost</span>
+        <strong>${formatMoney(item.salaryCost)}</strong>
+      </div>
+      <div class="revenue-detail-row">
+        <span>Other Cost</span>
+        <strong>${formatMoney(item.otherCost)}</strong>
+      </div>
+      <div class="revenue-detail-row total-row">
+        <span>Total Revenue</span>
+        <strong>${formatMoney(item.revenue)}</strong>
+      </div>
+      <div class="revenue-detail-row profit-row">
+        <span>Profit</span>
+        <strong>${formatMoney(item.profit)}</strong>
+      </div>
+    `;
+  }
+
+  modal.classList.remove("hidden");
+}
+
+function closeRevenueDetail() {
+  document.getElementById("revenueDetailModal")?.classList.add("hidden");
+}
+
 async function updateUI() {
   const month = document.getElementById("monthFilter").value;
 
@@ -197,12 +198,20 @@ function startAutoRefresh() {
   }, 60000);
 }
 
-const monthFilter = document.getElementById("monthFilter");
-if (monthFilter) {
-  monthFilter.value = getCurrentMonthValue();
-  startAutoRefresh();
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const monthFilter = document.getElementById("monthFilter");
+  if (monthFilter) {
+    monthFilter.value = getCurrentMonthValue();
+    monthFilter.addEventListener("change", updateUI);
+  }
 
-function formatMoney(num) {
-  return Math.round(Number(num || 0)).toLocaleString("vi-VN") + " đ";
-}
+  document.getElementById("closeRevenueDetail")?.addEventListener("click", closeRevenueDetail);
+  document.getElementById("revenueDetailModal")?.addEventListener("click", (event) => {
+    if (event.target.id === "revenueDetailModal") {
+      closeRevenueDetail();
+    }
+  });
+
+  startAutoRefresh();
+  updateUI();
+});

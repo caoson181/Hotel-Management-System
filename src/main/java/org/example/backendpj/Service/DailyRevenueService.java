@@ -21,6 +21,7 @@ import java.util.List;
 public class DailyRevenueService {
 
     private static final double DEFAULT_OTHER_COST = 2_000_000D;
+    private static final LocalDate RECALC_START_DATE = LocalDate.of(2026, 4, 7);
 
     private final DailyRevenueRepository dailyRevenueRepository;
     private final BookingDetailRepository bookingDetailRepository;
@@ -69,7 +70,7 @@ public class DailyRevenueService {
 
     @Transactional
     public void ensureRevenueForDate(LocalDate targetDate) {
-        if (dailyRevenueRepository.existsById(targetDate)) {
+        if (targetDate.isBefore(RECALC_START_DATE)) {
             return;
         }
 
@@ -126,7 +127,11 @@ public class DailyRevenueService {
                 defaultZero(dailyRevenue.getTotalGuests()).intValue(),
                 defaultZero(dailyRevenue.getRoomsBooked()).intValue(),
                 revenue,
-                profit);
+                profit,
+                booking,
+                rental,
+                salary,
+                other);
     }
 
     private double toDouble(BigDecimal value) {

@@ -19,6 +19,30 @@ function readCart() {
   return JSON.parse(localStorage.getItem("cart")) || [];
 }
 
+function buildRoomDetailUrl(rank, type) {
+  return `/room-detail?rank=${encodeURIComponent(rank || "")}&type=${encodeURIComponent(type || "")}`;
+}
+
+function getReturnUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const explicitReturnUrl = params.get("returnUrl");
+  if (explicitReturnUrl) {
+    return explicitReturnUrl;
+  }
+
+  const cart = readCart();
+  const lastItem = cart[cart.length - 1];
+  if (lastItem?.detailUrl) {
+    return lastItem.detailUrl;
+  }
+
+  if (lastItem?.roomRank && lastItem?.roomType) {
+    return buildRoomDetailUrl(lastItem.roomRank, lastItem.roomType);
+  }
+
+  return "/rooms";
+}
+
 function parseTypeRank(name) {
   const parts = String(name || "").trim().split(/\s+/);
   return {
@@ -134,7 +158,7 @@ backBtn.addEventListener("click", () => {
 });
 
 cancelBtn.addEventListener("click", () => {
-  window.location.href = "/room-detail" + window.location.search;
+  window.location.href = getReturnUrl();
 });
 
 paymentForm.addEventListener("submit", async (event) => {

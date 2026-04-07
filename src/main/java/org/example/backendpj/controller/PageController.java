@@ -210,10 +210,6 @@ public class PageController {
     // public String viewReports(){
     // return "pages/reports/view-reports";
     // }
-    @GetMapping("/confirm-booking")
-    public String confirmBookingPage() {
-        return "homepage/confirm-booking";
-    }
 
     @GetMapping("/checkout/payment")
     public String paymentPage() {

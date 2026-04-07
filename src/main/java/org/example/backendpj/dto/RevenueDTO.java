@@ -11,4 +11,8 @@ public class RevenueDTO {
     private Integer roomsBooked;
     private Double revenue;
     private Double profit;
+    private Double bookingRevenue;
+    private Double rentalRevenue;
+    private Double salaryCost;
+    private Double otherCost;
 }
