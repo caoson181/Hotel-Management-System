@@ -490,7 +490,7 @@ function writeCart(cart) {
 }
 
 function removeRoom(id) {
-  const nextCart = readCart().filter((room) => room.id !== id);
+  const nextCart = readCart().filter((room) => String(room.id) !== String(id));
   writeCart(nextCart);
   loadCartUI();
 }
@@ -502,7 +502,7 @@ function loadCartUI() {
   const totalText = document.getElementById("cartTotalText");
 
   if (count) {
-    count.textContent = String(cart.length);
+    count.textContent = `(${cart.length})`;
   }
 
   if (!container) {
@@ -510,41 +510,74 @@ function loadCartUI() {
   }
 
   container.innerHTML = "";
-  let total = 0;
+  const completeItems = cart.filter((room) => room.checkin && room.checkout);
+  const total = completeItems.reduce((sum, room) => sum + Number(room.price || 0), 0);
 
-  cart.forEach((room) => {
-    total += Number(room.price || 0);
-    const div = document.createElement("div");
-    div.style.border = "1px solid #eee";
-    div.style.borderRadius = "10px";
-    div.style.padding = "10px";
-    div.style.marginBottom = "10px";
-    div.style.background = "#fafafa";
-    div.innerHTML = `
-      <div style="display:flex; justify-content:space-between; gap:10px;">
-        <div>
-          <p style="margin:0; font-weight:600;">${room.name}</p>
-          <small style="color:#666;">${room.checkin} -> ${room.checkout} (${room.nights} nights)</small><br/>
-          <small style="color:#666;">${room.guests} guests</small><br/>
-          <small style="color:#999;">${formatVND(room.price)}</small>
-        </div>
-        <button onclick="removeRoom(${room.id})" style="color:red;border:none;background:none;cursor:pointer;font-size:16px">X</button>
-      </div>
-    `;
-    container.appendChild(div);
-  });
+  if (!cart.length) {
+    container.innerHTML = `<p class="cart-empty-state">${t("booking.empty")}</p>`;
+  } else {
+    container.innerHTML = cart
+      .map((room) => {
+        const detailUrl =
+          room.detailUrl ||
+          `/room-detail?rank=${encodeURIComponent(room.roomRank || pageRank)}&type=${encodeURIComponent(room.roomType || pageType)}`;
 
-  if (totalText) {
-    totalText.textContent = cart.length ? `Total ${formatVND(total)}` : "";
+        return `
+          <div class="cart-item-card ${room.draft ? "draft-item" : ""}">
+            <div class="cart-item-image">
+              <img src="${room.image || roomInfo.image}" alt="${room.name}">
+            </div>
+            <div class="cart-item-body">
+              <h4>${room.name}</h4>
+              <div class="cart-item-meta">
+                <span><i class="fas fa-user"></i> ${room.guests || guestCount} guests</span>
+                ${room.size ? `<span><i class="fas fa-ruler-combined"></i> ${room.size} m²</span>` : ""}
+              </div>
+              <div class="cart-item-price">
+                ${room.draft ? room.priceText || "Select dates to calculate total" : formatVND(room.price)}
+              </div>
+              ${
+                room.draft
+                  ? `<p class="cart-item-note">${t("booking.completeDates")}</p>`
+                  : `
+                    <div class="cart-item-stay">
+                      <div class="stay-date-chip">
+                        <span class="stay-chip-label">${t("booking.checkin")}</span>
+                        <strong>${room.checkin}</strong>
+                      </div>
+                      <div class="stay-arrow"><i class="fas fa-arrow-right"></i></div>
+                      <div class="stay-date-chip">
+                        <span class="stay-chip-label">${t("booking.checkout")}</span>
+                        <strong>${room.checkout}</strong>
+                      </div>
+                      <div class="stay-night-badge">${room.nights} ${t("booking.nights")}</div>
+                    </div>
+                  `
+              }
+              <div class="cart-item-actions">
+                ${
+                  room.draft
+                    ? `<a class="btn-detail" href="${detailUrl}">${t("booking.chooseDates")}</a>`
+                    : ""
+                }
+                <button class="btn-remove-cart" data-id="${room.id}">
+                  <i class="fas fa-trash"></i> Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
   }
 
-  const totalDiv = document.createElement("div");
-  totalDiv.innerHTML = `
-    <div style="margin-top:10px; padding-top:10px; border-top:1px solid #ddd; font-size:16px;">
-      <b>Total: ${formatVND(total)}</b>
-    </div>
-  `;
-  container.appendChild(totalDiv);
+  if (totalText) {
+    totalText.textContent = formatVND(total);
+  }
+
+  container.querySelectorAll(".btn-remove-cart").forEach((button) => {
+    button.addEventListener("click", () => removeRoom(button.dataset.id));
+  });
 }
 
 function buildCartItem() {
@@ -567,7 +600,12 @@ function buildCartItem() {
   const nights = Math.ceil((new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24));
   return {
     id: Date.now(),
+    draft: false,
     name: `${pageType} ${pageRank}`,
+    roomType: pageType,
+    roomRank: pageRank,
+    image: roomInfo.image,
+    size: roomInfo.size,
     price: nights * Number(roomInfo.price || 0),
     checkin,
     checkout,
@@ -578,18 +616,33 @@ function buildCartItem() {
 
 function addCurrentRoomToCart() {
   const room = buildCartItem();
-  const cart = readCart();
+  const cart = readCart().filter(
+    (item) =>
+      !(
+        item.draft &&
+        String(item.roomType).toLowerCase() === pageType &&
+        String(item.roomRank).toLowerCase() === pageRank
+      ),
+  );
   cart.push(room);
   writeCart(cart);
   loadCartUI();
-  showToast("Room added to cart");
+  showToast(t("booking.added"));
+}
+
+function validateCheckoutCart(cart) {
+  const incompleteItem = cart.find((item) => !item.checkin || !item.checkout || item.draft);
+  if (incompleteItem) {
+    throw new Error(t("booking.completeDates"));
+  }
 }
 
 async function checkoutCart(payMode) {
   const cart = readCart();
   if (!cart.length) {
-    throw new Error("Cart is empty.");
+    throw new Error(t("booking.empty"));
   }
+  validateCheckoutCart(cart);
 
   const payload = {
     payMode,
@@ -632,8 +685,10 @@ function initBookingCard() {
   const addRoomBtn = document.getElementById("addRoomBtn");
   const payNowBtn = document.getElementById("payNowBtn");
   const payLaterBtn = document.getElementById("payLaterBtn");
-  const cartIcon = document.getElementById("cartIcon");
-  const cartPopup = document.getElementById("cartPopup");
+  const toggleCartBtn = document.getElementById("toggleCart");
+  const cartModal = document.getElementById("cartModal");
+  const closeCartBtn = document.getElementById("closeCartModal");
+  const clearCartBtn = document.getElementById("clearCartBtn");
 
   if (guestCountSpan) {
     guestCountSpan.textContent = String(guestCount);
@@ -680,6 +735,7 @@ function initBookingCard() {
       if (!readCart().length) {
         addCurrentRoomToCart();
       }
+      validateCheckoutCart(readCart());
       window.location.href = "/checkout/payment";
     } catch (error) {
       alert(error.message || "Could not start payment.");
@@ -697,8 +753,24 @@ function initBookingCard() {
     }
   });
 
-  cartIcon?.addEventListener("click", () => {
-    cartPopup?.classList.toggle("hidden");
+  toggleCartBtn?.addEventListener("click", () => {
+    loadCartUI();
+    cartModal?.classList.add("active");
+  });
+
+  closeCartBtn?.addEventListener("click", () => {
+    cartModal?.classList.remove("active");
+  });
+
+  cartModal?.addEventListener("click", (event) => {
+    if (event.target === cartModal) {
+      cartModal.classList.remove("active");
+    }
+  });
+
+  clearCartBtn?.addEventListener("click", () => {
+    writeCart([]);
+    loadCartUI();
   });
 }
 

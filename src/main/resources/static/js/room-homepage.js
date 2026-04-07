@@ -260,6 +260,7 @@ window.roomData = {
 // ===== GLOBAL VARIABLES =====
 let compareList = [];
 let currentRank = 0;
+const CART_STORAGE_KEY = "cart";
 
 // ===== INITIALIZATION =====
 document.addEventListener("DOMContentLoaded", () => {
@@ -268,6 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initProgressBar();
   initVerticalNav();
   initComparison();
+  initCart();
   initTimeBasedLighting();
   initAOS();
 });
@@ -434,8 +436,9 @@ function initCardFlip() {
     const isCompareCheckbox = e.target.closest(".compare-check");
     const isDetailButton = e.target.closest(".btn-detail");
     const isBackButton = e.target.closest(".btn-back");
+    const isCartButton = e.target.closest(".room-cart-trigger");
 
-    if (isCompareCheckbox || isDetailButton) {
+    if (isCompareCheckbox || isDetailButton || isCartButton) {
       return;
     }
 
@@ -669,7 +672,7 @@ function initComparison() {
   });
 
   // Đặt phòng
-  bookBtn.addEventListener("click", () => {
+  bookBtn?.addEventListener("click", () => {
     if (compareList.length > 0) {
       const roomNames = compareList.map((r) => r.name).join(", ");
       showNotification(`Booking ${compareList.length} rooms: ${roomNames}`);
@@ -712,17 +715,58 @@ function updateComparisonGrid() {
 
   grid.innerHTML = compareList
     .map(
-      (room) => `
+      (room) => {
+        const roomConfig = roomData?.[room.rank]?.rooms?.find(
+          (item) => item.type.toLowerCase() === String(room.type || "").toLowerCase(),
+        );
+        const highlights = (roomConfig?.amenities || []).slice(0, 4).map((amenity) => t(amenity));
+        const bestFor = getCompareBestFor(room.rank, room.type);
+
+        return `
         <div class="compare-item" data-id="${room.id}">
             <div class="room-image-content">${room.image}</div>
-            <h4>${room.name}</h4>
+            <div class="compare-item-header">
+              <div>
+                <h4>${room.name}</h4>
+                <p class="compare-best-for"><span>${t("compare.bestFor")}:</span> ${bestFor}</p>
+              </div>
+              <div class="price-tag">${room.price}</div>
+            </div>
             <div class="room-meta">${room.meta}</div>
-            <div class="price-tag">${room.price}</div>
+            <p class="compare-description">${t(roomConfig?.description || "")}</p>
+            <div class="compare-highlights">
+              ${highlights
+                .map(
+                  (highlight) => `
+                    <span class="compare-highlight-chip"><i class="fas fa-check-circle"></i>${highlight}</span>
+                  `,
+                )
+                .join("")}
+            </div>
+            <div class="compare-specs">
+              <div class="compare-spec-row">
+                <span>${t("compare.comfort")}</span>
+                <strong>${getCompareComfortLabel(room.rank)}</strong>
+              </div>
+              <div class="compare-spec-row">
+                <span>${t("compare.space")}</span>
+                <strong>${roomConfig?.size || "-"} m²</strong>
+              </div>
+              <div class="compare-spec-row">
+                <span>${t("guests")}</span>
+                <strong>${roomConfig?.guests || "-"}</strong>
+              </div>
+              <div class="compare-spec-row">
+                <span>${t("compare.roomStyle")}</span>
+                <strong>${capitalizeWords(room.type)}</strong>
+              </div>
+            </div>
             <button class="btn-detail remove-compare-btn" data-id="${room.id}">
                 <i class="fas fa-trash"></i> ${t("room.remove")}
             </button>
         </div>
-    `,
+    `;
+      },
     )
     .join("");
 
@@ -745,6 +789,266 @@ function updateComparisonGrid() {
       }
     });
   });
+}
+
+function capitalizeWords(value) {
+  return String(value || "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function getCompareComfortLabel(rank) {
+  const labels = {
+    standard: "compare.comfort.standard",
+    superior: "compare.comfort.superior",
+    deluxe: "compare.comfort.deluxe",
+    executive: "compare.comfort.executive",
+    suite: "compare.comfort.suite",
+  };
+  return t(labels[String(rank || "").toLowerCase()] || "compare.comfort.classic");
+}
+
+function getCompareBestFor(rank, type) {
+  return t(`compare.bestfor.${String(rank || "").toLowerCase()}.${String(type || "").toLowerCase()}`);
+}
+
+function readCart() {
+  return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
+}
+
+function writeCart(cart) {
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+}
+
+function buildDraftCartItem(rank, type) {
+  const room = roomData?.[rank]?.rooms?.find(
+    (item) => item.type.toLowerCase() === String(type || "").toLowerCase(),
+  );
+  if (!room) {
+    throw new Error("Room data not found.");
+  }
+
+  const card = document.querySelector(
+    `.room-card[data-rank="${rank}"][data-type="${String(type).toLowerCase()}"]`,
+  );
+  const displayName = room.displayName
+    ? t(room.displayName)
+    : `${t(roomData[rank].title)} ${t(room.type)}`;
+  const priceText = card?.querySelector(".price-tag")?.textContent?.trim() || "";
+  const image = room.image || "";
+
+  return {
+    id: `draft-${rank}-${String(type).toLowerCase()}`,
+    draft: true,
+    roomRank: rank,
+    roomType: String(type).toLowerCase(),
+    name: displayName,
+    guests: room.guests,
+    size: room.size,
+    image,
+    priceText,
+    detailUrl: `/room-detail?rank=${rank}&type=${room.type}`,
+  };
+}
+
+function addDraftRoomToCart(rank, type) {
+  const cart = readCart().filter(
+    (item) =>
+      !(
+        item.draft &&
+        item.roomRank === rank &&
+        String(item.roomType).toLowerCase() === String(type).toLowerCase()
+      ),
+  );
+  cart.push(buildDraftCartItem(rank, type));
+  writeCart(cart);
+  updateCartButton();
+  updateCartGrid();
+  showNotification("Added to booking");
+}
+
+function removeCartItem(id) {
+  writeCart(readCart().filter((item) => item.id !== id));
+  updateCartButton();
+  updateCartGrid();
+}
+
+function validateBookingItems(cart) {
+  const incompleteItem = cart.find((item) => !item.checkin || !item.checkout || item.draft);
+  if (incompleteItem) {
+    throw new Error(t("booking.completeDates"));
+  }
+}
+
+async function checkoutBookingList(payMode) {
+  const cart = readCart();
+  if (!cart.length) {
+    throw new Error(t("booking.empty"));
+  }
+  validateBookingItems(cart);
+
+  const payload = {
+    payMode,
+    items: cart.map((item) => ({
+      roomType: item.roomType,
+      roomRank: item.roomRank,
+      checkIn: item.checkin,
+      checkOut: item.checkout,
+      guests: item.guests,
+      price: item.price,
+    })),
+  };
+
+  const response = await fetch("/api/customer-bookings/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Checkout failed");
+  }
+
+  await response.json();
+  writeCart([]);
+  updateCartButton();
+  updateCartGrid();
+  showNotification(t("booking.saved"));
+}
+
+function updateCartButton() {
+  const btn = document.getElementById("toggleCart");
+  const count = btn?.querySelector(".cart-count");
+  if (count) {
+    count.textContent = `(${readCart().length})`;
+  }
+}
+
+function updateCartGrid() {
+  const grid = document.getElementById("roomsCartGrid");
+  if (!grid) {
+    return;
+  }
+
+  const cart = readCart();
+  if (!cart.length) {
+    grid.innerHTML = `
+      <p class="cart-empty-state">${t("booking.empty")}</p>
+    `;
+    return;
+  }
+
+  grid.innerHTML = cart
+    .map(
+      (item) => `
+        <div class="cart-item-card ${item.draft ? "draft-item" : ""}" data-id="${item.id}">
+          <div class="cart-item-image">
+            <img src="${item.image || "https://via.placeholder.com/400x200?text=Room"}" alt="${item.name}">
+          </div>
+          <div class="cart-item-body">
+            <h4>${item.name}</h4>
+            <div class="cart-item-meta">
+              <span><i class="fas fa-user"></i> ${item.guests || "-"} ${t("guests")}</span>
+              <span><i class="fas fa-ruler-combined"></i> ${item.size || "-"} m²</span>
+            </div>
+            <div class="cart-item-price">${item.draft ? item.priceText || t("booking.completeDates") : formatVND(item.price)}</div>
+            ${
+              item.draft
+                ? `<p class="cart-item-note">${t("booking.completeDates")}</p>`
+                : `
+                  <div class="cart-item-stay">
+                    <div class="stay-date-chip">
+                      <span class="stay-chip-label">${t("booking.checkin")}</span>
+                      <strong>${item.checkin}</strong>
+                    </div>
+                    <div class="stay-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="stay-date-chip">
+                      <span class="stay-chip-label">${t("booking.checkout")}</span>
+                      <strong>${item.checkout}</strong>
+                    </div>
+                    <div class="stay-night-badge">${item.nights} ${t("booking.nights")}</div>
+                  </div>
+                `
+            }
+            <div class="cart-item-actions">
+              <a class="btn-detail" href="${item.detailUrl || `/room-detail?rank=${item.roomRank}&type=${item.roomType}`}">
+                ${item.draft ? t("booking.chooseDates") : t("viewDetail")}
+              </a>
+              <button class="btn-remove-cart" data-id="${item.id}">
+                <i class="fas fa-trash"></i> Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+
+  grid.querySelectorAll(".btn-remove-cart").forEach((button) => {
+    button.addEventListener("click", () => removeCartItem(button.dataset.id));
+  });
+}
+
+function initCart() {
+  const toggleBtn = document.getElementById("toggleCart");
+  const modal = document.getElementById("cartModal");
+  const closeBtn = document.getElementById("closeCartModal");
+  const clearBtn = document.getElementById("clearRoomsCart");
+  const payNowBtn = document.getElementById("roomsPayNowBtn");
+  const payLaterBtn = document.getElementById("roomsPayLaterBtn");
+
+  document.addEventListener("click", (event) => {
+    const trigger = event.target.closest(".room-cart-trigger");
+    if (!trigger) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    addDraftRoomToCart(trigger.dataset.rank, trigger.dataset.type);
+  });
+
+  toggleBtn?.addEventListener("click", () => {
+    updateCartGrid();
+    modal?.classList.add("active");
+  });
+
+  closeBtn?.addEventListener("click", () => modal?.classList.remove("active"));
+  modal?.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      modal.classList.remove("active");
+    }
+  });
+
+  clearBtn?.addEventListener("click", () => {
+    writeCart([]);
+    updateCartButton();
+    updateCartGrid();
+    modal?.classList.remove("active");
+  });
+
+  payNowBtn?.addEventListener("click", () => {
+    try {
+      validateBookingItems(readCart());
+      window.location.href = "/checkout/payment";
+    } catch (error) {
+      alert(error.message || "Could not start payment.");
+    }
+  });
+
+  payLaterBtn?.addEventListener("click", async () => {
+    try {
+      await checkoutBookingList("PAY_LATER");
+      modal?.classList.remove("active");
+    } catch (error) {
+      alert(error.message || "Checkout failed.");
+    }
+  });
+
+  updateCartButton();
+  updateCartGrid();
 }
 
 // ===== TIME-BASED LIGHTING =====

@@ -211,24 +211,30 @@
           </div>
         </div>
 
-        <div id="floatingCart" class="floating-cart">
-
-          <button id="cartIcon" class="cart-btn">
-            <span>🛒</span>
-            <span id="cartCount" class="cart-badge">0</span>
+        <div class="cart-toolbar detail-cart-toolbar">
+          <button class="cart-toggle-btn" id="toggleCart">
+            <i class="fas fa-calendar-check"></i>
+            <span th:text="#{booking.title}">Booking</span>
+            <span id="cartCount" class="cart-count">(0)</span>
           </button>
+        </div>
 
-          <div id="cartPopup" class="cart-popup hidden">
-            <div class="cart-header">
-              <h4>Your Cart</h4>
-              <span id="cartTotalText"></span>
+        <div class="cart-modal" id="cartModal">
+          <div class="cart-content">
+            <h3>
+              <i class="fas fa-calendar-check"></i>
+              <span th:text="#{booking.title}">Your Booking</span>
+            </h3>
+            <button class="close-cart" id="closeCartModal"><i class="fas fa-times"></i></button>
+            <div class="cart-summary-row">
+              <span>Total</span>
+              <strong id="cartTotalText">0 d</strong>
             </div>
-
-            <div id="cartItems" class="cart-items"></div>
-
-            <div class="cart-footer" style="display:flex; gap:8px;">
-              <button id="payNowBtn" class="cart-confirm-btn" style="flex:1;">Trả tiền trước</button>
-              <button id="payLaterBtn" class="cart-confirm-btn" style="flex:1; background:#6c757d;">Trả tiền sau</button>
+            <div id="cartItems" class="cart-grid"></div>
+            <div class="cart-actions detail-cart-actions">
+              <button id="clearCartBtn" class="btn-clear-cart" th:text="#{booking.clear}">Clear All</button>
+              <button id="payNowBtn" class="btn-pay-primary" th:text="#{booking.payNow}">Pay Now</button>
+              <button id="payLaterBtn" class="btn-pay-secondary" th:text="#{booking.payLater}">Pay Later</button>
             </div>
           </div>
         </div>
@@ -387,6 +393,20 @@
         "amenity.butler": /*[[#{amenity.butler}]]*/ "",
         "amenity.luxbath": /*[[#{amenity.luxbath}]]*/ "",
         "amenity.lux": /*[[#{amenity.lux}]]*/ "",
+      };
+      const i18n = {
+        "booking.title": /*[[#{booking.title}]]*/ "Your Booking",
+        "booking.empty": /*[[#{booking.empty}]]*/ "",
+        "booking.completeDates": /*[[#{booking.completeDates}]]*/ "",
+        "booking.checkin": /*[[#{booking.checkin}]]*/ "Check-in",
+        "booking.checkout": /*[[#{booking.checkout}]]*/ "Check-out",
+        "booking.nights": /*[[#{booking.nights}]]*/ "nights",
+        "booking.clear": /*[[#{booking.clear}]]*/ "Clear All",
+        "booking.payNow": /*[[#{booking.payNow}]]*/ "Pay Now",
+        "booking.payLater": /*[[#{booking.payLater}]]*/ "Pay Later",
+        "booking.chooseDates": /*[[#{booking.chooseDates}]]*/ "Choose Dates",
+        "booking.saved": /*[[#{booking.saved}]]*/ "",
+        "booking.added": /*[[#{booking.added}]]*/ "",
       };
     </script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>

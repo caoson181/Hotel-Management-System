@@ -50,6 +50,14 @@
     </button>
   </div>
 
+  <div class="cart-toolbar">
+    <button class="cart-toggle-btn" id="toggleCart">
+      <i class="fas fa-calendar-check"></i>
+      <span>Booking</span>
+      <span class="cart-count">(0)</span>
+    </button>
+  </div>
+
   <div class="comparison-modal">
     <div class="comparison-content">
       <h3>
@@ -62,9 +70,22 @@
         <button class="btn-clear" th:text="#{room.clear.all}">
           Clear All
         </button>
-        <button class="btn-book" th:text="#{room.select.book}">
-          Book Selected
-        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cart-modal" id="cartModal">
+    <div class="cart-content">
+      <h3>
+        <i class="fas fa-calendar-check"></i>
+        <span th:text="#{booking.title}">Your Booking</span>
+      </h3>
+      <button class="close-cart" id="closeCartModal"><i class="fas fa-times"></i></button>
+      <div class="cart-grid" id="roomsCartGrid"></div>
+      <div class="cart-actions">
+        <button class="btn-clear-cart" id="clearRoomsCart" th:text="#{booking.clear}">Clear All</button>
+        <button class="btn-pay-primary" id="roomsPayNowBtn" th:text="#{booking.payNow}">Pay Now</button>
+        <button class="btn-pay-secondary" id="roomsPayLaterBtn" th:text="#{booking.payLater}">Pay Later</button>
       </div>
     </div>
   </div>
@@ -92,6 +113,36 @@
       "compare.min": /*[[#{compare.min}]]*/ "",
       "compare.cleared": /*[[#{compare.cleared}]]*/ "",
       "compare.empty": /*[[#{compare.empty}]]*/ "",
+      "compare.bestFor": /*[[#{compare.bestFor}]]*/ "Best for",
+      "compare.comfort": /*[[#{compare.comfort}]]*/ "Comfort",
+      "compare.space": /*[[#{compare.space}]]*/ "Space",
+      "compare.roomStyle": /*[[#{compare.roomStyle}]]*/ "Room Style",
+      "booking.title": /*[[#{booking.title}]]*/ "Your Booking",
+      "booking.empty": /*[[#{booking.empty}]]*/ "",
+      "booking.completeDates": /*[[#{booking.completeDates}]]*/ "",
+      "booking.checkin": /*[[#{booking.checkin}]]*/ "Check-in",
+      "booking.checkout": /*[[#{booking.checkout}]]*/ "Check-out",
+      "booking.nights": /*[[#{booking.nights}]]*/ "nights",
+      "booking.clear": /*[[#{booking.clear}]]*/ "Clear All",
+      "booking.payNow": /*[[#{booking.payNow}]]*/ "Pay Now",
+      "booking.payLater": /*[[#{booking.payLater}]]*/ "Pay Later",
+      "booking.chooseDates": /*[[#{booking.chooseDates}]]*/ "Choose Dates",
+      "booking.saved": /*[[#{booking.saved}]]*/ "",
+      "booking.added": /*[[#{booking.added}]]*/ "",
+      "compare.bestfor.standard.single": /*[[#{compare.bestfor.standard.single}]]*/ "",
+      "compare.bestfor.standard.double": /*[[#{compare.bestfor.standard.double}]]*/ "",
+      "compare.bestfor.standard.twin": /*[[#{compare.bestfor.standard.twin}]]*/ "",
+      "compare.bestfor.superior.single": /*[[#{compare.bestfor.superior.single}]]*/ "",
+      "compare.bestfor.superior.double": /*[[#{compare.bestfor.superior.double}]]*/ "",
+      "compare.bestfor.superior.twin": /*[[#{compare.bestfor.superior.twin}]]*/ "",
+      "compare.bestfor.superior.triple": /*[[#{compare.bestfor.superior.triple}]]*/ "",
+      "compare.bestfor.deluxe.double": /*[[#{compare.bestfor.deluxe.double}]]*/ "",
+      "compare.bestfor.deluxe.twin": /*[[#{compare.bestfor.deluxe.twin}]]*/ "",
+      "compare.bestfor.deluxe.family": /*[[#{compare.bestfor.deluxe.family}]]*/ "",
+      "compare.bestfor.executive.double": /*[[#{compare.bestfor.executive.double}]]*/ "",
+      "compare.bestfor.executive.twin": /*[[#{compare.bestfor.executive.twin}]]*/ "",
+      "compare.bestfor.suite.double": /*[[#{compare.bestfor.suite.double}]]*/ "",
+      "compare.bestfor.suite.family": /*[[#{compare.bestfor.suite.family}]]*/ "",
 
       guest: /*[[#{ui.guest}]]*/ "Guest",
       guests: /*[[#{ui.guests}]]*/ "Guests",
