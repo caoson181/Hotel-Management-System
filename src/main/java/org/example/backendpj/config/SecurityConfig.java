@@ -50,7 +50,8 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**",
                                 "/components/**",
-                                "/*.html"
+                                "/*.html",
+                                "/api/rooms/**"
                         ).permitAll()
                         // Customer booking flow
                         .requestMatchers("/api/customer-bookings/checkout")

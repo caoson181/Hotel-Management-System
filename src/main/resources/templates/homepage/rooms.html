@@ -50,7 +50,7 @@
     </button>
   </div>
 
-  <div class="cart-toolbar">
+  <div class="cart-toolbar" sec:authorize="isAuthenticated()">
     <button class="cart-toggle-btn" id="toggleCart">
       <i class="fas fa-calendar-check"></i>
       <span>Booking</span>
