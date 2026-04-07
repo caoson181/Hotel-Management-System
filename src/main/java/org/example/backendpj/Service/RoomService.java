@@ -139,6 +139,11 @@ public class RoomService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
+        if (!room.getRoomType().equalsIgnoreCase(customerBooking.getRoomType())
+                || !room.getRoomRank().equalsIgnoreCase(customerBooking.getRoomRank())) {
+            throw new RuntimeException("Selected room does not match the requested room type/rank");
+        }
+
         if (!isRoomAssignableForDates(room, checkIn, checkOut, List.of())) {
             throw new RuntimeException("Room is not available for the selected dates");
         }
