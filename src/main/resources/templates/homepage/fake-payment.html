@@ -13,7 +13,7 @@
             <div>
                 <p class="eyebrow">Checkout Gateway</p>
                 <h1>Choose a payment gateway</h1>
-                <p class="subtext">This is a demo payment page that simulates VNPay or MoMo before the booking is saved as paid.</p>
+                <p class="subtext">Enter your account information manually. The payment will continue only when your profile and wallet code match the database.</p>
             </div>
             <button class="ghost-btn" id="backBtn" type="button">Back to Cart</button>
         </div>
@@ -32,6 +32,8 @@
         </div>
 
         <form class="payment-form" id="paymentForm">
+            <div class="payment-alert" id="paymentAlert" hidden></div>
+
             <div class="field-grid">
                 <label class="field">
                     <span>Account Holder</span>
@@ -45,7 +47,7 @@
 
             <div class="field-grid">
                 <label class="field">
-                    <span id="codeLabel">Bank / Wallet Code</span>
+                    <span id="codeLabel">VNPay Code</span>
                     <input id="paymentCode" type="text" placeholder="VNPAY-998877" required>
                 </label>
                 <label class="field">
@@ -55,7 +57,7 @@
             </div>
 
             <div class="notice-box">
-                <p id="gatewayHint">VNPay demo mode: enter any 6-digit OTP to simulate a successful transaction.</p>
+                <p id="gatewayHint">Enter your account holder, phone number, and VNPay code. The system will verify your user info and wallet before charging.</p>
             </div>
 
             <div class="form-actions">
@@ -80,13 +82,13 @@
             <ol>
                 <li>Review room selection</li>
                 <li>Choose VNPay or MoMo</li>
-                <li>Confirm simulated payment</li>
-                <li>Booking saved as paid and sent to staff</li>
+                <li>Enter account info and payment code</li>
+                <li>Booking saved as paid if wallet balance is enough</li>
             </ol>
         </div>
     </aside>
 </main>
 
-<script src="/js/fake-payment.js"></script>
+<script src="/js/fake-payment-v2.js"></script>
 </body>
 </html>

@@ -13,6 +13,7 @@ import org.example.backendpj.Repository.CustomerRepository;
 import org.example.backendpj.Repository.PaymentRepository;
 import org.example.backendpj.Repository.UserRepository;
 import org.example.backendpj.Service.RoomService;
+import org.example.backendpj.Service.WalletService;
 import org.example.backendpj.dto.CustomerCheckoutRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -42,6 +43,7 @@ public class CustomerBookingController {
     private final BookingDetailRepository bookingDetailRepository;
     private final PaymentRepository paymentRepository;
     private final RoomService roomService;
+    private final WalletService walletService;
 
     public CustomerBookingController(
             CustomerBookingRepository customerBookingRepository,
@@ -50,7 +52,8 @@ public class CustomerBookingController {
             BookingRepository bookingRepository,
             BookingDetailRepository bookingDetailRepository,
             PaymentRepository paymentRepository,
-            RoomService roomService) {
+            RoomService roomService,
+            WalletService walletService) {
         this.customerBookingRepository = customerBookingRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
@@ -58,6 +61,7 @@ public class CustomerBookingController {
         this.bookingDetailRepository = bookingDetailRepository;
         this.paymentRepository = paymentRepository;
         this.roomService = roomService;
+        this.walletService = walletService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -127,6 +131,17 @@ public class CustomerBookingController {
 
         if ("PAY_NOW".equals(payMode)) {
             BigDecimal finalTotal = total;
+            String paymentMethod = req.getPaymentMethod() == null || req.getPaymentMethod().isBlank()
+                    ? "VNPAY"
+                    : req.getPaymentMethod().trim().toUpperCase();
+            walletService.validateAndDebit(
+                    user,
+                    paymentMethod,
+                    req.getAccountName(),
+                    req.getPhoneNumber(),
+                    req.getPaymentCode(),
+                    finalTotal
+            );
             LocalDate minCheckIn = createdBookings.stream()
                     .map(CustomerBooking::getCheckIn)
                     .min(LocalDate::compareTo)
@@ -156,11 +171,7 @@ public class CustomerBookingController {
             Payment payment = new Payment();
             payment.setBooking(booking);
             payment.setAmount(total);
-            payment.setPaymentMethod(
-                    req.getPaymentMethod() == null || req.getPaymentMethod().isBlank()
-                            ? "VNPAY"
-                            : req.getPaymentMethod().trim().toUpperCase()
-            );
+            payment.setPaymentMethod(paymentMethod);
             payment.setPaymentDate(now);
             payment.setStatus("SUCCESS");
             paymentRepository.save(payment);
