@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -99,6 +100,7 @@ public class RoomService {
                 .orElseThrow(() -> new RuntimeException("No no-show candidate found for today"));
 
         targetDetail.setStatus("NO_SHOW");
+        targetDetail.setFinalAmount(BigDecimal.ZERO);
         bookingDetailRepository.save(targetDetail);
 
         Booking booking = targetDetail.getBooking();
@@ -271,6 +273,7 @@ public class RoomService {
         detail.setCheckOutDate(customerBooking.getCheckOut());
         detail.setActualCheckOutDate(null);
         detail.setStatus("ASSIGNED");
+        detail.setFinalAmount(calculateDetailAmount(detail));
         bookingDetailRepository.save(detail);
 
         customerBooking.setBooking(booking);
@@ -306,6 +309,7 @@ public class RoomService {
                 .findFirst()
                 .ifPresent(detail -> {
                     detail.setActualCheckOutDate(checkoutDate);
+                    detail.setFinalAmount(calculateDetailAmount(detail));
                     bookingDetailRepository.save(detail);
                     dailyRevenueService.ensureRevenueForDate(checkoutDate);
                 });
@@ -406,11 +410,30 @@ public class RoomService {
         List<BookingDetail> details = bookingDetailRepository.findAllByBooking(booking);
         BigDecimal total = BigDecimal.ZERO;
         for (BookingDetail detail : details) {
-            if (detail.getPrice() != null) {
-                total = total.add(detail.getPrice());
+            BigDecimal lineAmount = detail.getFinalAmount() != null ? detail.getFinalAmount() : calculateDetailAmount(detail);
+            if (lineAmount != null) {
+                total = total.add(lineAmount);
             }
         }
         return total;
+    }
+
+    private BigDecimal calculateDetailAmount(BookingDetail detail) {
+        if (detail == null || detail.getPrice() == null || detail.getCheckInDate() == null) {
+            return BigDecimal.ZERO;
+        }
+
+        LocalDate effectiveCheckOut = getEffectiveCheckOutDate(detail);
+        if (effectiveCheckOut == null) {
+            effectiveCheckOut = detail.getCheckOutDate();
+        }
+
+        long nights = 1;
+        if (effectiveCheckOut != null) {
+            nights = Math.max(1, ChronoUnit.DAYS.between(detail.getCheckInDate(), effectiveCheckOut));
+        }
+
+        return detail.getPrice().multiply(BigDecimal.valueOf(nights));
     }
 
     private void syncBookingSummary(Booking booking) {

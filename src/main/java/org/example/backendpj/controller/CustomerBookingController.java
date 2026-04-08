@@ -1,10 +1,12 @@
 package org.example.backendpj.controller;
 
 import org.example.backendpj.Entity.Booking;
+import org.example.backendpj.Entity.BookingDetail;
 import org.example.backendpj.Entity.Customer;
 import org.example.backendpj.Entity.CustomerBooking;
 import org.example.backendpj.Entity.Payment;
 import org.example.backendpj.Entity.User;
+import org.example.backendpj.Repository.BookingDetailRepository;
 import org.example.backendpj.Repository.BookingRepository;
 import org.example.backendpj.Repository.CustomerBookingRepository;
 import org.example.backendpj.Repository.CustomerRepository;
@@ -37,6 +39,7 @@ public class CustomerBookingController {
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
     private final BookingRepository bookingRepository;
+    private final BookingDetailRepository bookingDetailRepository;
     private final PaymentRepository paymentRepository;
     private final RoomService roomService;
 
@@ -45,12 +48,14 @@ public class CustomerBookingController {
             UserRepository userRepository,
             CustomerRepository customerRepository,
             BookingRepository bookingRepository,
+            BookingDetailRepository bookingDetailRepository,
             PaymentRepository paymentRepository,
             RoomService roomService) {
         this.customerBookingRepository = customerBookingRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
         this.bookingRepository = bookingRepository;
+        this.bookingDetailRepository = bookingDetailRepository;
         this.paymentRepository = paymentRepository;
         this.roomService = roomService;
     }
@@ -173,6 +178,13 @@ public class CustomerBookingController {
         List<CustomerBooking> all = customerBookingRepository.findAllByOrderByCreatedAtDesc();
         List<Map<String, Object>> result = new ArrayList<>();
         for (CustomerBooking customerBooking : all) {
+            BookingDetail linkedDetail = resolveBookingDetail(customerBooking);
+            boolean completed = linkedDetail != null
+                    && (linkedDetail.getActualCheckOutDate() != null
+                    || "NO_SHOW".equalsIgnoreCase(linkedDetail.getStatus()));
+            String completionState = linkedDetail != null && "NO_SHOW".equalsIgnoreCase(linkedDetail.getStatus())
+                    ? "NO_SHOW"
+                    : (completed ? "COMPLETED" : null);
             String details = customerBooking.getRoomType() + " " + customerBooking.getRoomRank()
                     + " (" + customerBooking.getCheckIn() + " -> " + customerBooking.getCheckOut() + ")";
             Map<String, Object> row = new LinkedHashMap<>();
@@ -182,16 +194,45 @@ public class CustomerBookingController {
             row.put("details", details);
             row.put("status", customerBooking.getStatus());
             row.put("assigned", customerBooking.isAssigned());
-            row.put("displayStatus", customerBooking.getStatus() + "/" + (customerBooking.isAssigned() ? "ASSIGNED" : "UNASSIGNED"));
+            row.put("completed", completed);
+            row.put("completedReason", completionState);
+            row.put("displayStatus", buildDisplayStatus(customerBooking, completionState));
             row.put("totalAmount", customerBooking.getPrice() == null ? BigDecimal.ZERO : customerBooking.getPrice());
             row.put("checkIn", customerBooking.getCheckIn());
             row.put("checkOut", customerBooking.getCheckOut());
             row.put("roomType", customerBooking.getRoomType());
             row.put("roomRank", customerBooking.getRoomRank());
             row.put("roomNumber", customerBooking.getAssignedRoom() != null ? customerBooking.getAssignedRoom().getRoomNumber() : null);
+            row.put("actualCheckOut", linkedDetail != null ? linkedDetail.getActualCheckOutDate() : null);
             result.add(row);
         }
         return result;
+    }
+
+    private BookingDetail resolveBookingDetail(CustomerBooking customerBooking) {
+        if (customerBooking == null
+                || customerBooking.getBooking() == null
+                || customerBooking.getAssignedRoom() == null) {
+            return null;
+        }
+
+        return bookingDetailRepository.findTopByBookingAndRoomAndCheckInDateAndCheckOutDateOrderByIdDesc(
+                        customerBooking.getBooking(),
+                        customerBooking.getAssignedRoom(),
+                        customerBooking.getCheckIn(),
+                        customerBooking.getCheckOut())
+                .orElse(null);
+    }
+
+    private String buildDisplayStatus(CustomerBooking customerBooking, String completionState) {
+        String paymentState = customerBooking.getStatus() == null ? "UNPAID" : customerBooking.getStatus();
+        if ("NO_SHOW".equalsIgnoreCase(completionState)) {
+            return paymentState + "/NO_SHOW";
+        }
+        if ("COMPLETED".equalsIgnoreCase(completionState)) {
+            return paymentState + "/COMPLETED";
+        }
+        return paymentState + "/" + (customerBooking.isAssigned() ? "ASSIGNED" : "UNASSIGNED");
     }
 
     @PostMapping("/groups/{groupCode}/assign")

@@ -1,6 +1,7 @@
 package org.example.backendpj.Service;
 
 import org.example.backendpj.Entity.DailyRevenue;
+import org.example.backendpj.Entity.BookingDetail;
 import org.example.backendpj.Repository.BookingDetailRepository;
 import org.example.backendpj.Repository.DailyRevenueRepository;
 import org.example.backendpj.Repository.RentalContractRepository;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -97,8 +99,15 @@ public class DailyRevenueService {
         YearMonth yearMonth = YearMonth.from(targetDate);
         int daysInMonth = yearMonth.lengthOfMonth();
 
-        long checkoutCount = bookingDetailRepository.countByActualCheckOutDate(targetDate);
-        double bookingRevenue = toDouble(bookingDetailRepository.sumPriceByActualCheckOutDate(targetDate));
+        List<BookingDetail> checkedOutDetails = bookingDetailRepository.findAllByActualCheckOutDate(targetDate)
+                .stream()
+                .filter(this::isRevenueEligible)
+                .toList();
+        long checkoutCount = checkedOutDetails.size();
+        double bookingRevenue = checkedOutDetails.stream()
+                .map(this::resolveRecognizedAmount)
+                .mapToDouble(BigDecimal::doubleValue)
+                .sum();
         double rentalRevenue = toDouble(rentalContractRepository.sumActiveMonthlyRevenueByDate(targetDate)) / daysInMonth;
         double salaryCost = defaultZero(staffRepository.sumAllSalary()) / daysInMonth;
 
@@ -136,6 +145,31 @@ public class DailyRevenueService {
 
     private double toDouble(BigDecimal value) {
         return value != null ? value.doubleValue() : 0D;
+    }
+
+    private boolean isRevenueEligible(BookingDetail detail) {
+        return detail != null
+                && (detail.getStatus() == null || !"NO_SHOW".equalsIgnoreCase(detail.getStatus()));
+    }
+
+    private BigDecimal resolveRecognizedAmount(BookingDetail detail) {
+        if (detail == null) {
+            return BigDecimal.ZERO;
+        }
+        if (detail.getFinalAmount() != null) {
+            return detail.getFinalAmount();
+        }
+        if (detail.getPrice() == null || detail.getCheckInDate() == null) {
+            return BigDecimal.ZERO;
+        }
+
+        LocalDate effectiveCheckOut = detail.getActualCheckOutDate() != null
+                ? detail.getActualCheckOutDate()
+                : detail.getCheckOutDate();
+        long nights = effectiveCheckOut == null
+                ? 1
+                : Math.max(1, ChronoUnit.DAYS.between(detail.getCheckInDate(), effectiveCheckOut));
+        return detail.getPrice().multiply(BigDecimal.valueOf(nights));
     }
 
     private Double defaultZero(Double value) {

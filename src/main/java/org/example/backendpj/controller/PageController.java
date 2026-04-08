@@ -1,9 +1,11 @@
 package org.example.backendpj.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.backendpj.Entity.CustomerBooking;
+import org.example.backendpj.Entity.Booking;
+import org.example.backendpj.Entity.BookingDetail;
 import org.example.backendpj.Entity.Room;
-import org.example.backendpj.Repository.CustomerBookingRepository;
+import org.example.backendpj.Repository.BookingDetailRepository;
+import org.example.backendpj.Repository.BookingRepository;
 import org.example.backendpj.Service.CustomerTierService;
 import org.example.backendpj.Service.UserService;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +25,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Controller
 public class PageController {
@@ -33,15 +38,21 @@ public class PageController {
     private final UserService userService;
     private final RoomRepository roomRepository;
     private final CustomerTierService customerTierService;
+    private final BookingRepository bookingRepository;
+    private final BookingDetailRepository bookingDetailRepository;
 
     public PageController(UserRepository userRepository,
                           UserService userService,
                           RoomRepository roomRepository,
-                          CustomerTierService customerTierService) {
+                          CustomerTierService customerTierService,
+                          BookingRepository bookingRepository,
+                          BookingDetailRepository bookingDetailRepository) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.roomRepository = roomRepository;
         this.customerTierService = customerTierService;
+        this.bookingRepository = bookingRepository;
+        this.bookingDetailRepository = bookingDetailRepository;
     }
 
     // ================= ADMIN HOME =================
@@ -133,9 +144,6 @@ public class PageController {
         return "pages/users/manage-users";
     }
 
-    @Autowired
-    private CustomerBookingRepository bookingRepo;
-
     @GetMapping("/profile")
     public String profile(Model model, Authentication authentication) {
 
@@ -163,13 +171,12 @@ public class PageController {
         List<UserAvatar> avatars = avatarRepo.findByUserId(user.getId());
 
         // ================= HISTORY =================
-        List<CustomerBooking> history = List.of();
+        List<Map<String, Object>> history = List.of();
 
         if (user.getCustomer() != null) {
-            Integer customerId = user.getCustomer().getCustomerId();
-
-            history = bookingRepo
-                    .findByCustomer_CustomerIdOrderByCreatedAtDesc(customerId);
+            history = bookingRepository.findAllByCustomerOrderByIdDesc(user.getCustomer()).stream()
+                    .map(this::toBookingHistoryItem)
+                    .toList();
         }
 
         // ================= MODEL =================
@@ -196,6 +203,37 @@ public class PageController {
         }
 
         return "homepage/profile";
+    }
+
+    private Map<String, Object> toBookingHistoryItem(Booking booking) {
+        List<Map<String, Object>> details = bookingDetailRepository.findAllByBooking(booking).stream()
+                .map(this::toBookingDetailHistoryItem)
+                .toList();
+
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("id", booking.getId());
+        item.put("groupCode", booking.getGroupCode());
+        item.put("status", booking.getStatus());
+        item.put("checkIn", booking.getCheckInDate());
+        item.put("checkOut", booking.getCheckOutDate());
+        item.put("totalAmount", booking.getTotalAmount() == null ? BigDecimal.ZERO : booking.getTotalAmount());
+        item.put("details", details);
+        return item;
+    }
+
+    private Map<String, Object> toBookingDetailHistoryItem(BookingDetail detail) {
+        Room room = detail.getRoom();
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("roomNumber", room != null ? room.getRoomNumber() : "N/A");
+        item.put("roomType", room != null ? room.getRoomType() : "");
+        item.put("roomRank", room != null ? room.getRoomRank() : "");
+        item.put("price", detail.getPrice() == null ? BigDecimal.ZERO : detail.getPrice());
+        item.put("finalAmount", detail.getFinalAmount() == null ? BigDecimal.ZERO : detail.getFinalAmount());
+        item.put("checkIn", detail.getCheckInDate());
+        item.put("checkOut", detail.getCheckOutDate());
+        item.put("actualCheckOut", detail.getActualCheckOutDate());
+        item.put("status", detail.getStatus() == null ? "" : detail.getStatus());
+        return item;
     }
 
     @Autowired

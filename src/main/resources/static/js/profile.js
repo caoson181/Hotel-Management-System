@@ -1,6 +1,46 @@
 const editBtn = document.getElementById("editBtn");
 const saveBtn = document.getElementById("saveBtn");
 
+const HISTORY_ROOM_IMAGE_CATALOG = {
+  standard: {
+    single: "https://images.pexels.com/photos/271618/pexels-photo-271618.jpeg?auto=compress&cs=tinysrgb&w=800",
+    double: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    twin: "https://images.unsplash.com/photo-1595576508898-0ad5c879a061?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+  },
+  superior: {
+    single: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    double: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    twin: "https://www.royalgardenhotel.co.uk/_img/videos/deluxe-twin.png",
+    triple: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+  },
+  deluxe: {
+    double: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    twin: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=800",
+    family: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+  },
+  executive: {
+    double: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    twin: "https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+  },
+  suite: {
+    double: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    family: "https://images.pexels.com/photos/258154/pexels-photo-258154.jpeg",
+  },
+};
+
+function applyHistoryRoomImages() {
+  document.querySelectorAll(".history-detail-image img[data-rank][data-type]").forEach((img) => {
+    const rank = String(img.dataset.rank || "").toLowerCase();
+    const type = String(img.dataset.type || "").toLowerCase();
+    const imageUrl = HISTORY_ROOM_IMAGE_CATALOG?.[rank]?.[type];
+
+    if (imageUrl) {
+      img.src = imageUrl;
+      img.alt = `${rank} ${type}`;
+    }
+  });
+}
+
 editBtn.addEventListener("click", function () {
   document.querySelectorAll(".view-mode").forEach((el) => {
     el.style.display = "none";
@@ -155,6 +195,7 @@ const closeUpgradePlan = document.getElementById("closeUpgradePlan");
 
 if (historyBtn) {
   historyBtn.addEventListener("click", () => {
+    applyHistoryRoomImages();
     historyModal.style.display = "flex";
   });
 }
@@ -232,3 +273,5 @@ function renderUpgradeProgress() {
   targetEl.textContent = formatMoney(nextTarget);
   textEl.textContent = `Spend ${formatMoney(Math.max(0, nextTarget - totalSpent))} more to upgrade to ${nextLabel}.`;
 }
+
+applyHistoryRoomImages();

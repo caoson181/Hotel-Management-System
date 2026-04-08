@@ -580,30 +580,50 @@ function fetchBookingsData() {
 
 function sortBookingsByGroup(bookings) {
   const groups = new Map();
+  const groupOrder = new Map();
 
   bookings.forEach((booking) => {
     const groupKey = booking.groupCode || `__single__${booking.bookingId || booking.booking_id}`;
     if (!groups.has(groupKey)) {
       groups.set(groupKey, []);
+      groupOrder.set(groupKey, Number(booking.bookingId || booking.booking_id || 0));
     }
     groups.get(groupKey).push(booking);
   });
 
-  const sortedGroups = Array.from(groups.values())
-    .map((group) =>
-      [...group].sort((a, b) => {
+  const unfinishedGroups = [];
+  const completedRows = [];
+
+  Array.from(groups.entries())
+    .sort((a, b) => (groupOrder.get(a[0]) || 0) - (groupOrder.get(b[0]) || 0))
+    .forEach(([, group]) => {
+      const sortedGroup = [...group].sort((a, b) => {
         const idA = Number(a.bookingId || a.booking_id || 0);
         const idB = Number(b.bookingId || b.booking_id || 0);
         return idA - idB;
-      }),
-    )
-    .sort((groupA, groupB) => {
-      const firstA = Number(groupA[0]?.bookingId || groupA[0]?.booking_id || 0);
-      const firstB = Number(groupB[0]?.bookingId || groupB[0]?.booking_id || 0);
-      return firstA - firstB;
+      });
+
+      const activeRows = sortedGroup.filter((booking) => !booking.completed);
+      const doneRows = sortedGroup.filter((booking) => booking.completed);
+
+      if (activeRows.length > 0) {
+        unfinishedGroups.push(activeRows);
+      }
+      completedRows.push(...doneRows);
     });
 
-  return sortedGroups.flat();
+  completedRows.sort((a, b) => {
+    const dateA = a.actualCheckOut || a.checkOut || "";
+    const dateB = b.actualCheckOut || b.checkOut || "";
+    if (dateA !== dateB) {
+      return dateA.localeCompare(dateB);
+    }
+    const idA = Number(a.bookingId || a.booking_id || 0);
+    const idB = Number(b.bookingId || b.booking_id || 0);
+    return idA - idB;
+  });
+
+  return [...unfinishedGroups.flat(), ...completedRows];
 }
 
 // Populate bookings table
@@ -629,11 +649,15 @@ function populateBookingsTable(bookings) {
     const nextBooking = index < bookings.length - 1 ? bookings[index + 1] : null;
     const sameGroupAsPrevious =
       previousBooking &&
+      !previousBooking.completed &&
+      !booking.completed &&
       previousBooking.groupCode &&
       booking.groupCode &&
       previousBooking.groupCode === booking.groupCode;
     const sameGroupAsNext =
       nextBooking &&
+      !nextBooking.completed &&
+      !booking.completed &&
       nextBooking.groupCode &&
       booking.groupCode &&
       nextBooking.groupCode === booking.groupCode;
@@ -641,6 +665,9 @@ function populateBookingsTable(bookings) {
     const row = bookingsTableBody.insertRow();
     row.className = "booking-row";
     row.style.cursor = "pointer";
+    if (booking.completed) {
+      row.classList.add("booking-row-completed");
+    }
     if (sameGroupAsPrevious) {
       row.classList.add("booking-row-group-member");
     } else {

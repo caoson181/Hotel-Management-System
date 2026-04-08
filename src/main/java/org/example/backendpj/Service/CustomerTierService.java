@@ -2,11 +2,16 @@ package org.example.backendpj.Service;
 
 import org.example.backendpj.Entity.Customer;
 import org.example.backendpj.Entity.User;
+import org.example.backendpj.Entity.BookingDetail;
+import org.example.backendpj.Repository.BookingDetailRepository;
 import org.example.backendpj.Repository.BookingRepository;
 import org.example.backendpj.Repository.CustomerRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class CustomerTierService {
@@ -16,10 +21,14 @@ public class CustomerTierService {
     private static final BigDecimal PLATINUM_THRESHOLD = new BigDecimal("200000000");
 
     private final BookingRepository bookingRepository;
+    private final BookingDetailRepository bookingDetailRepository;
     private final CustomerRepository customerRepository;
 
-    public CustomerTierService(BookingRepository bookingRepository, CustomerRepository customerRepository) {
+    public CustomerTierService(BookingRepository bookingRepository,
+                               BookingDetailRepository bookingDetailRepository,
+                               CustomerRepository customerRepository) {
         this.bookingRepository = bookingRepository;
+        this.bookingDetailRepository = bookingDetailRepository;
         this.customerRepository = customerRepository;
     }
 
@@ -44,8 +53,16 @@ public class CustomerTierService {
         String previousLevel = customer.getMemberLevel();
         String previousRank = customer.getCustomerRank();
 
-        BigDecimal totalCompletedAmount = bookingRepository.sumCompletedTotalAmountByCustomer(customer);
-        long completedBookingCount = bookingRepository.countByCustomerAndStatusIgnoreCase(customer, "COMPLETED");
+        List<BookingDetail> checkedOutDetails = bookingDetailRepository
+                .findAllByBooking_CustomerAndActualCheckOutDateIsNotNull(customer)
+                .stream()
+                .filter(this::isTierEligible)
+                .toList();
+
+        BigDecimal totalCompletedAmount = checkedOutDetails.stream()
+                .map(this::resolveRecognizedAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        long completedBookingCount = checkedOutDetails.size();
 
         Tier targetTier = resolveTier(totalCompletedAmount);
         boolean upgraded = tierScore(targetTier.memberLevel(), targetTier.customerRank())
@@ -121,6 +138,31 @@ public class CustomerTierService {
             return 1;
         }
         return 0;
+    }
+
+    private boolean isTierEligible(BookingDetail detail) {
+        return detail != null
+                && (detail.getStatus() == null || !"NO_SHOW".equalsIgnoreCase(detail.getStatus()));
+    }
+
+    private BigDecimal resolveRecognizedAmount(BookingDetail detail) {
+        if (detail == null) {
+            return BigDecimal.ZERO;
+        }
+        if (detail.getFinalAmount() != null) {
+            return detail.getFinalAmount();
+        }
+        if (detail.getPrice() == null || detail.getCheckInDate() == null) {
+            return BigDecimal.ZERO;
+        }
+
+        LocalDate effectiveCheckOut = detail.getActualCheckOutDate() != null
+                ? detail.getActualCheckOutDate()
+                : detail.getCheckOutDate();
+        long nights = effectiveCheckOut == null
+                ? 1
+                : Math.max(1, ChronoUnit.DAYS.between(detail.getCheckInDate(), effectiveCheckOut));
+        return detail.getPrice().multiply(BigDecimal.valueOf(nights));
     }
 
     private record Tier(String memberLevel, String customerRank) {

@@ -622,6 +622,16 @@ tr:hover td {
   background: #f8f9fa;
 }
 
+#bookingsTable .booking-row-completed td {
+  color: #98a2b3;
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+
+#bookingsTable .booking-row-completed .view-details-btn {
+  opacity: 0.72;
+}
+
 #bookingsTable .booking-row-no-divider td {
   border-bottom-color: transparent;
 }

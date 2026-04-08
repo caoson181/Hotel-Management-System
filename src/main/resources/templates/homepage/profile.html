@@ -250,24 +250,61 @@
     <span class="close-btn" id="closeHistory">&times;</span>
     <h3>Booking History</h3>
 
-    <div class="history-table">
-      <div class="history-row history-head">
-        <div>Room</div>
-        <div>Check-in</div>
-        <div>Check-out</div>
-        <div>Price</div>
-        <div>Created</div>
-      </div>
-
-      <div th:each="b : ${bookingHistory}" class="history-row">
-        <div>
-          <span th:text="${b.roomType}"></span> - <span th:text="${b.roomRank}"></span>
+    <div class="history-booking-list" th:if="${!#lists.isEmpty(bookingHistory)}">
+      <div class="history-booking-card" th:each="b : ${bookingHistory}">
+        <div class="history-booking-header">
+          <div>
+            <h4 th:text="${'Booking #' + b.id}"></h4>
+            <p th:text="${'Group: ' + (b.groupCode != null ? b.groupCode : 'N/A')}"></p>
+          </div>
+          <div class="history-booking-summary">
+            <span class="history-status" th:text="${b.status}"></span>
+            <strong th:text="${#numbers.formatDecimal(b.totalAmount != null ? b.totalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' đ'}"></strong>
+            <small th:text="${b.checkIn + ' → ' + b.checkOut}"></small>
+          </div>
         </div>
-        <div th:text="${b.checkIn}"></div>
-        <div th:text="${b.checkOut}"></div>
-        <div th:text="${b.price != null ? #numbers.formatDecimal(b.price.doubleValue(),0,'COMMA',0,'POINT') : '0'}"></div>
-        <div th:text="${#temporals.format(b.createdAt,'dd/MM/yyyy HH:mm')}"></div>
+
+        <div class="history-detail-list">
+          <div class="history-detail-card" th:each="detail : ${b.details}">
+            <div class="history-detail-image">
+              <img
+                src="https://via.placeholder.com/320x180?text=Room"
+                alt="Room image"
+                th:attr="data-rank=${detail.roomRank},data-type=${detail.roomType}" />
+            </div>
+            <div class="history-detail-body">
+              <div class="history-detail-title-row">
+                <h5 th:text="${detail.roomRank + ' ' + detail.roomType}"></h5>
+                <span class="history-detail-room" th:text="${'Room ' + detail.roomNumber}"></span>
+              </div>
+
+              <div class="history-detail-meta">
+                <span th:text="${'Price/night: ' + #numbers.formatDecimal(detail.price != null ? detail.price.doubleValue() : 0,0,'COMMA',0,'POINT') + ' đ'}"></span>
+                <span th:text="${'Final: ' + #numbers.formatDecimal(detail.finalAmount != null ? detail.finalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' đ'}"></span>
+              </div>
+
+              <div class="history-detail-dates">
+                <div>
+                  <label>Stay</label>
+                  <strong th:text="${detail.checkIn + ' → ' + detail.checkOut}"></strong>
+                </div>
+                <div>
+                  <label>Actual Check-out</label>
+                  <strong th:text="${detail.actualCheckOut != null ? detail.actualCheckOut : '—'}"></strong>
+                </div>
+                <div>
+                  <label>Status</label>
+                  <strong th:text="${detail.status != null && !#strings.isEmpty(detail.status) ? detail.status : 'ASSIGNED'}"></strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+
+    <div class="history-empty-state" th:if="${#lists.isEmpty(bookingHistory)}">
+      No booking history yet.
     </div>
   </div>
 </div>

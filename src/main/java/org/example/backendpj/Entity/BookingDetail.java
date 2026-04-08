@@ -24,6 +24,9 @@ public class BookingDetail {
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(name = "final_amount", precision = 12, scale = 2)
+    private BigDecimal finalAmount;
+
     @Column(name = "check_in")
     private LocalDate checkInDate;
 
@@ -69,6 +72,14 @@ public class BookingDetail {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getFinalAmount() {
+        return finalAmount;
+    }
+
+    public void setFinalAmount(BigDecimal finalAmount) {
+        this.finalAmount = finalAmount;
     }
 
     public LocalDate getCheckInDate() {
