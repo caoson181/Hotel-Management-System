@@ -110,6 +110,8 @@ public class DailyRevenueService {
                 .sum();
         double rentalRevenue = toDouble(rentalContractRepository.sumActiveMonthlyRevenueByDate(targetDate)) / daysInMonth;
         double salaryCost = defaultZero(staffRepository.sumAllSalary()) / daysInMonth;
+        double totalRevenue = bookingRevenue + rentalRevenue;
+        double profit = totalRevenue - salaryCost - DEFAULT_OTHER_COST;
 
         DailyRevenue dailyRevenue = new DailyRevenue();
         dailyRevenue.setDate(targetDate);
@@ -119,6 +121,7 @@ public class DailyRevenueService {
         dailyRevenue.setRentalRevenue(rentalRevenue);
         dailyRevenue.setSalaryCost(salaryCost);
         dailyRevenue.setOtherCost(DEFAULT_OTHER_COST);
+        dailyRevenue.setProfit(profit);
 
         return dailyRevenue;
     }
@@ -129,7 +132,9 @@ public class DailyRevenueService {
         double salary = defaultZero(dailyRevenue.getSalaryCost());
         double other = defaultZero(dailyRevenue.getOtherCost());
         double revenue = booking + rental;
-        double profit = revenue - salary - other;
+        double profit = dailyRevenue.getProfit() != null
+                ? dailyRevenue.getProfit()
+                : revenue - salary - other;
 
         return new RevenueDTO(
                 dailyRevenue.getDate().toString(),

@@ -34,4 +34,7 @@ public class DailyRevenue {
     @Column(name = "other_cost")
     private Double otherCost;
 
+    @Column(name = "profit")
+    private Double profit;
+
 }
