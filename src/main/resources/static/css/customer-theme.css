@@ -53,8 +53,30 @@ body.gravity-news-detail-body .gravity-starfield {
   position: absolute;
   background: #ffffff;
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.55);
-  animation: gravityStarTwinkle 3s infinite alternate;
+  box-shadow:
+    0 0 5px rgba(255, 255, 255, 0.62),
+    0 0 10px rgba(125, 211, 252, 0.28);
+  opacity: 0.62;
+  transform-origin: center;
+  transform: scale(1);
+  transition: opacity 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.gravity-star.is-bright {
+  opacity: 1;
+  transform: scale(1.9);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 1),
+    0 0 22px rgba(125, 211, 252, 0.78),
+    0 0 34px rgba(252, 211, 77, 0.32);
+}
+
+.gravity-star.is-dim {
+  opacity: 0.22;
+  transform: scale(0.82);
+  box-shadow:
+    0 0 2px rgba(255, 255, 255, 0.22),
+    0 0 5px rgba(125, 211, 252, 0.12);
 }
 
 body.customer-theme-dark .header {
@@ -410,13 +432,8 @@ body.customer-theme-dark .theme-toggle-btn.is-dark {
   border-color: transparent !important;
 }
 
-@keyframes gravityStarTwinkle {
-  0% { opacity: 0.2; transform: scale(1); }
-  100% { opacity: 1; transform: scale(1.2); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .gravity-star {
-    animation: none;
+    transition: none;
   }
 }

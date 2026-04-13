@@ -192,7 +192,39 @@
     }
 
     function removeCustomerStarfield() {
+      if (window.gravityStarfieldTimer) {
+        window.clearInterval(window.gravityStarfieldTimer);
+        window.gravityStarfieldTimer = null;
+      }
       document.getElementById("gravityStarfield")?.remove();
+    }
+
+    function twinkleCustomerStars(starfield) {
+      const stars = Array.from(starfield.querySelectorAll(".gravity-star"));
+      if (!stars.length) return;
+
+      if (window.gravityStarfieldTimer) {
+        window.clearInterval(window.gravityStarfieldTimer);
+      }
+
+      window.gravityStarfieldTimer = window.setInterval(() => {
+        const flashCount = Math.max(4, Math.floor(stars.length * 0.05));
+
+        for (let i = 0; i < flashCount; i += 1) {
+          const star = stars[Math.floor(Math.random() * stars.length)];
+          star.classList.add("is-bright");
+          star.classList.remove("is-dim");
+
+          window.setTimeout(() => {
+            star.classList.remove("is-bright");
+            star.classList.add("is-dim");
+          }, Math.random() * 420 + 260);
+
+          window.setTimeout(() => {
+            star.classList.remove("is-dim");
+          }, Math.random() * 780 + 620);
+        }
+      }, 420);
     }
 
     function syncCustomerStarfield(isDark) {
@@ -212,19 +244,17 @@
       const starCount = Math.min(260, Math.max(140, Math.floor(window.innerWidth / 5)));
       for (let i = 0; i < starCount; i += 1) {
         const star = document.createElement("span");
-        const size = Math.random() * 2.2 + 0.8;
+        const size = Math.random() * 2.8 + 1.2;
         star.className = "gravity-star";
         star.style.width = `${size}px`;
         star.style.height = `${size}px`;
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
-        star.style.animationDelay = `${Math.random() * 5}s`;
-        star.style.animationDuration = `${Math.random() * 3 + 1}s`;
-        star.style.opacity = `${Math.random() * 0.6 + 0.2}`;
         starfield.appendChild(star);
       }
 
       document.body.prepend(starfield);
+      twinkleCustomerStars(starfield);
     }
 
     function applyCustomerTheme(theme) {
