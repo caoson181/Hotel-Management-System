@@ -22,8 +22,53 @@ body {
 }
 
 body.customer-theme-dark {
-  background: #0b1220;
+  position: relative;
   color: #e5edf7;
+  isolation: isolate;
+}
+
+body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body) {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(45, 212, 191, 0.18), transparent 28%),
+    radial-gradient(circle at 82% 12%, rgba(244, 114, 182, 0.14), transparent 24%),
+    radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.22), transparent 34%),
+    linear-gradient(135deg, #06111f 0%, #11162f 48%, #061626 100%);
+}
+
+body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::before,
+body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::before {
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.6px),
+    radial-gradient(circle, rgba(153, 246, 228, 0.72) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(191, 219, 254, 0.72) 0 1.1px, transparent 1.8px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.45) 0 0.8px, transparent 1.4px);
+  background-position: 12px 22px, 88px 54px, 38px 112px, 128px 86px;
+  background-size: 150px 150px, 190px 190px, 230px 230px, 110px 110px;
+  opacity: 0.58;
+  animation: gravityStarTwinkle 4.8s ease-in-out infinite alternate;
+}
+
+body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::after {
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1.2px, transparent 2px),
+    radial-gradient(circle, rgba(252, 211, 77, 0.66) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(125, 211, 252, 0.62) 0 0.9px, transparent 1.7px);
+  background-position: 46px 34px, 116px 132px, 172px 74px;
+  background-size: 260px 260px, 310px 310px, 360px 360px;
+  opacity: 0.38;
+  animation: gravityStarTwinkle 7.2s ease-in-out infinite alternate-reverse;
+}
+
+body.customer-theme-dark .header {
+  z-index: 1000;
 }
 
 body.customer-theme-dark .header.scrolled {
@@ -162,13 +207,11 @@ body.customer-theme-dark .service-detail-page,
 body.customer-theme-dark .contact-section,
 body.customer-theme-dark .profile-section,
 body.customer-theme-dark .bookshelf-section,
-body.customer-theme-dark .solar-news-section,
 body.customer-theme-dark .gallery,
 body.customer-theme-dark .service-nav,
-body.customer-theme-dark footer:not(.customer-footer),
 body.customer-theme-dark .fake-payment-page,
 body.customer-theme-dark .payment-page {
-  background: #0f172a !important;
+  background: transparent !important;
 }
 
 body.customer-theme-dark .about h2,
@@ -190,7 +233,6 @@ body.customer-theme-dark .booking-card .price,
 body.customer-theme-dark .similar-row h2,
 body.customer-theme-dark .review-form-card h3,
 body.customer-theme-dark .solar-header-section h1,
-body.customer-theme-dark .solar-news-card h3,
 body.customer-theme-dark .room-category,
 body.customer-theme-dark #roomTitle,
 body.customer-theme-dark .bookshelf-title,
@@ -222,7 +264,6 @@ body.customer-theme-dark .service-sidebar-copy p,
 body.customer-theme-dark .service-banner-overlay p,
 body.customer-theme-dark .service-page-hero-content p,
 body.customer-theme-dark .solar-header-section p,
-body.customer-theme-dark .solar-news-card p,
 body.customer-theme-dark .featured-info,
 body.customer-theme-dark .basic-info,
 body.customer-theme-dark .profile-breadcrumb,
@@ -264,8 +305,6 @@ body.customer-theme-dark .reviews-summary-card,
 body.customer-theme-dark .review-form-card,
 body.customer-theme-dark .reviews-list-card,
 body.customer-theme-dark .similar-card,
-body.customer-theme-dark .solar-news-card,
-body.customer-theme-dark .solar-filter-bar,
 body.customer-theme-dark .service-sidebar-copy,
 body.customer-theme-dark .service-detail-menu a,
 body.customer-theme-dark .rank-progress-bar {
@@ -279,8 +318,7 @@ body.customer-theme-dark .service-detail-menu a:hover,
 body.customer-theme-dark .service-sidebar a:hover,
 body.customer-theme-dark .settings-link-card:hover,
 body.customer-theme-dark .account-nav-card:hover,
-body.customer-theme-dark .security-row-card:hover,
-body.customer-theme-dark .solar-filter-btn:hover {
+body.customer-theme-dark .security-row-card:hover {
   background: rgba(96, 165, 250, 0.12) !important;
   color: #f8fafc !important;
 }
@@ -293,7 +331,6 @@ body.customer-theme-dark .history-booking-header,
 body.customer-theme-dark .history-detail-card,
 body.customer-theme-dark .history-detail-body,
 body.customer-theme-dark .compact-history-item,
-body.customer-theme-dark .solar-news-card,
 body.customer-theme-dark .customer-footer-bottom {
   border-color: rgba(148, 163, 184, 0.12) !important;
 }
@@ -336,11 +373,24 @@ body.customer-theme-dark .password-field input::placeholder {
 }
 
 body.customer-theme-dark .customer-footer {
+  position: relative;
+  z-index: 1;
   background:
     radial-gradient(circle at top left, rgba(59, 130, 246, 0.22), transparent 26%),
     radial-gradient(circle at top right, rgba(30, 64, 175, 0.22), transparent 28%),
     linear-gradient(90deg, #07111f 0%, #0d1728 55%, #121d31 100%);
   border-top-color: rgba(148, 163, 184, 0.12);
+}
+
+body.customer-theme-dark .rooms-hero,
+body.customer-theme-dark .rank-section,
+body.customer-theme-dark .contact-hero,
+body.customer-theme-dark .profile-hero,
+body.customer-theme-dark .service-page-hero,
+body.customer-theme-dark .service-detail-hero,
+body.customer-theme-dark .room-hero,
+body.customer-theme-dark .about::before {
+  z-index: 1;
 }
 
 body.customer-theme-dark .customer-footer-brand p,
@@ -368,4 +418,16 @@ body.customer-theme-dark .theme-toggle-btn.is-dark {
   background: linear-gradient(135deg, #2563eb, #0ea5e9) !important;
   color: #fff !important;
   border-color: transparent !important;
+}
+
+@keyframes gravityStarTwinkle {
+  0% { opacity: 0.18; transform: scale(1); }
+  100% { opacity: 0.88; transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::before,
+  body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::after {
+    animation: none;
+  }
 }

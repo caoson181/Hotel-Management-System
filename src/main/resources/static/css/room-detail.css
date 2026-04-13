@@ -1740,6 +1740,17 @@ body.customer-theme-dark .reviews-heading h2 {
     text-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
 }
 
+body.customer-theme-dark .similar-row h2,
+body.customer-theme-dark .similar-row h2 span {
+    color: #f8fafc !important;
+    text-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+
+body.customer-theme-dark .similar-row h2 i {
+    color: #f4c542 !important;
+    text-shadow: 0 0 12px rgba(244, 197, 66, 0.35);
+}
+
 body.customer-theme-dark .reviews-heading p,
 body.customer-theme-dark .reviews-list-header h3 {
     color: #dbe7f5 !important;
