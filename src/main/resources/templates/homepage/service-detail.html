@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${service.title} + ' - Gravity Hotel'"></title>
+
+    <link rel="stylesheet" th:href="@{/css/homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/services.css}" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css"
+    />
+  </head>
+
+  <body class="light-bg service-navbar-transparent">
+    <div th:replace="homepage/navbar :: navbar"></div>
+
+    <section
+      class="service-page-hero service-page-hero-detail"
+      th:style="'background-image: linear-gradient(180deg, rgba(10, 22, 34, 0.22), rgba(10, 22, 34, 0.58)), url(' + ${service.heroImage} + ');'"
+    >
+      <div class="service-page-hero-overlay"></div>
+      <div class="service-page-hero-content">
+        <span class="service-page-hero-label" th:text="${service.eyebrow}"></span>
+        <h1 th:text="${service.title}"></h1>
+        <p th:text="${service.highlight}"></p>
+      </div>
+    </section>
+
+    <section class="service-detail-page">
+      <div class="service-detail-shell">
+        <div class="service-detail-layout">
+          <aside class="service-detail-sidebar">
+            <div class="service-sidebar-copy">
+              <span class="service-sidebar-label">All Services</span>
+              <h2>Discover more</h2>
+              <p>
+                Switch between service pages and open the one you want to explore.
+              </p>
+            </div>
+
+            <nav class="service-detail-menu">
+              <a
+                th:each="item : ${services}"
+                th:href="@{/services/{slug}(slug=${item.slug})}"
+                th:text="${item.menuLabel}"
+                th:classappend="${item.slug == service.slug} ? ' active' : ''"
+              ></a>
+            </nav>
+          </aside>
+
+          <div class="service-detail-content-wrap">
+            <article class="service-banner-card">
+              <img th:src="${service.heroImage}" th:alt="${service.title}" />
+              <div class="service-banner-overlay">
+                <span th:text="${service.eyebrow}"></span>
+                <h1 th:text="${service.menuLabel}"></h1>
+                <p th:text="${service.highlight}"></p>
+              </div>
+            </article>
+
+            <section class="service-detail-hero">
+              <div class="service-detail-gallery">
+                <div class="service-detail-main">
+                  <img
+                    id="service-main-image"
+                    th:src="${service.heroImage}"
+                    th:alt="${service.title}"
+                  />
+                </div>
+
+                <div class="service-detail-thumbs">
+                  <button
+                    type="button"
+                    class="service-thumb"
+                    th:each="image, imageStat : ${service.thumbnailImages}"
+                    th:data-image="${image}"
+                    th:classappend="${imageStat.first} ? ' active' : ''"
+                  >
+                    <img th:src="${image}" th:alt="${service.title}" />
+                  </button>
+                </div>
+              </div>
+
+              <article class="service-detail-content">
+                <div class="service-detail-tag" th:text="${service.eyebrow}"></div>
+                <h2 th:text="${service.title}"></h2>
+                <div class="service-detail-copy">
+                  <p class="service-detail-summary" th:text="${service.description}"></p>
+                  <p
+                    class="service-detail-paragraph"
+                    th:each="paragraph : ${service.detailParagraphs}"
+                    th:text="${paragraph}"
+                  ></p>
+                </div>
+
+                <div class="service-detail-meta">
+                  <div class="service-detail-meta-card">
+                    <span>Opening Hours</span>
+                    <strong th:text="${service.openingHours}"></strong>
+                  </div>
+                  <div class="service-detail-meta-card">
+                    <span>Location</span>
+                    <strong th:text="${service.location}"></strong>
+                  </div>
+                </div>
+
+                <div class="service-detail-features">
+                  <div th:each="feature : ${service.features}">
+                    <i class="fas fa-check-circle"></i>
+                    <span th:text="${feature}"></span>
+                  </div>
+                </div>
+
+                <div class="service-detail-footnote" th:text="${service.footnote}"></div>
+              </article>
+            </section>
+
+            <section class="service-related service-related-panel">
+              <div class="section-heading">
+                <span>Explore More</span>
+                <h2>Other experiences at Gravity Hotel</h2>
+              </div>
+
+              <div class="service-related-grid">
+                <a
+                  class="service-related-card"
+                  th:each="item : ${relatedServices}"
+                  th:href="@{/services/{slug}(slug=${item.slug})}"
+                >
+                  <img th:src="${item.coverImage}" th:alt="${item.title}" />
+                  <div class="service-related-info">
+                    <h3 th:text="${item.menuLabel}"></h3>
+                    <p th:text="${item.highlight}"></p>
+                  </div>
+                </a>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <p th:text="#{footer.copy}"></p>
+      </div>
+    </footer>
+
+    <script src="/js/services.js"></script>
+  </body>
+</html>

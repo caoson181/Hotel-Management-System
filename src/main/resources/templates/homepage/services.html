@@ -18,134 +18,65 @@
     />
   </head>
 
-  <body class="light-bg">
+  <body class="light-bg service-navbar-transparent">
     <div th:replace="homepage/navbar :: navbar"></div>
+
+    <section class="service-page-hero service-page-hero-list">
+      <div class="service-page-hero-overlay"></div>
+      <div class="service-page-hero-content">
+        <span class="service-page-hero-label">Gravity Hotel</span>
+        <h1>Signature Services & Wellness Spaces</h1>
+        <p>
+          Discover restorative rituals, leisure facilities, fitness experiences,
+          and dining moments designed to make every stay feel more complete.
+        </p>
+      </div>
+    </section>
 
     <section class="services-page">
       <div class="services-layout">
-        <!-- Sidebar -->
         <div class="service-sidebar">
-          <a href="#spa" class="nav-link active" th:text="#{service.spa}"></a>
-          <a href="#pool" class="nav-link" th:text="#{service.pool}"></a>
-          <a href="#gym" class="nav-link" th:text="#{service.gym}"></a>
           <a
-            href="#restaurant"
+            th:each="item, itemStat : ${services}"
+            th:href="'#' + ${item.slug}"
             class="nav-link"
-            th:text="#{service.restaurant}"
+            th:classappend="${itemStat.first} ? ' active' : ''"
+            th:text="${item.menuLabel}"
           ></a>
         </div>
 
-        <!-- Content -->
         <div class="services-content">
-          <div id="spa" class="service-card">
-            <div class="service-image">
-              <img th:src="@{/images/slide1.jpg}" alt="Spa" />
+          <div
+            th:each="item, itemStat : ${services}"
+            th:id="${item.slug}"
+            class="service-card"
+            th:classappend="${itemStat.index % 2 == 1} ? ' reverse' : ''"
+          >
+            <div class="service-image service-image-link">
+              <a th:href="@{/services/{slug}(slug=${item.slug})}">
+                <img th:src="${item.coverImage}" th:alt="${item.title}" />
+                <div class="service-image-overlay">
+                  <span>View Details</span>
+                  <i class="fas fa-arrow-right"></i>
+                </div>
+              </a>
             </div>
             <div class="service-info">
-              <h2 th:text="#{service.title1}"></h2>
-              <p th:text="#{service.info1}"></p>
+              <h2 th:text="${item.title}"></h2>
+              <p th:text="${item.description}"></p>
               <div class="service-features">
-                <div>
+                <div th:each="feature : ${item.features}">
                   <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature1.1}"></span>
-                </div>
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature1.2}"></span>
-                </div>
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature1.3}"></span>
+                  <span th:text="${feature}"></span>
                 </div>
               </div>
-              <div class="service-cta">
+              <a
+                class="service-cta service-detail-link"
+                th:href="@{/services/{slug}(slug=${item.slug})}"
+              >
                 <i class="fas fa-info-circle"></i>
-                <span th:text="#{service.cta1}"></span>
-              </div>
-            </div>
-          </div>
-
-          <div id="pool" class="service-card reverse">
-            <div class="service-image">
-              <img th:src="@{/images/slide2.jpg}" alt="Pool" />
-            </div>
-            <div class="service-info">
-              <h2 th:text="#{service.title2}"></h2>
-              <p th:text="#{service.info2}"></p>
-              <div class="service-features">
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature2.1}"></span>
-                </div>
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature2.2}"></span>
-                </div>
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature2.3}"></span>
-                </div>
-              </div>
-              <div class="service-cta">
-                <i class="fas fa-info-circle"></i>
-                <span th:text="#{service.cta2}"></span>
-              </div>
-            </div>
-          </div>
-
-          <div id="gym" class="service-card">
-            <div class="service-image">
-              <img th:src="@{/images/slide6.jpg}" alt="Gym" />
-            </div>
-            <div class="service-info">
-              <h2 th:text="#{service.title3}"></h2>
-              <p th:text="#{service.info3}"></p>
-              <div class="service-features">
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature3.1}"></span>
-                </div>
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature3.2}"></span>
-                </div>
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature3.3}"></span>
-                </div>
-              </div>
-              <div class="service-cta">
-                <i class="fas fa-info-circle"></i>
-                <span th:text="#{service.cta3}"></span>
-              </div>
-            </div>
-          </div>
-
-          <div id="restaurant" class="service-card reverse">
-            <div class="service-image">
-              <img th:src="@{/images/slide4.jpg}" alt="Restaurant" />
-            </div>
-            <div class="service-info">
-              <h2 th:text="#{service.title4}"></h2>
-              <p th:text="#{service.info4}"></p>
-              <div class="service-features">
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature4.1}"></span>
-                </div>
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature4.2}"></span>
-                </div>
-                <div>
-                  <i class="fas fa-check-circle"></i>
-                  <span th:text="#{service.feature4.3}"></span>
-                </div>
-              </div>
-              <div class="service-cta">
-                <i class="fas fa-info-circle"></i>
-                <span th:text="#{service.cta4}"></span>
-              </div>
+                <span th:text="${item.highlight}"></span>
+              </a>
             </div>
           </div>
         </div>

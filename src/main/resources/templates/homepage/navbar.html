@@ -1,4 +1,8 @@
-<div th:fragment="navbar">
+<div
+  th:fragment="navbar"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
   <header class="header">
     <nav th:fragment="navbar" class="navbar">
       <div class="logo">
@@ -9,31 +13,43 @@
 
       <ul class="nav-links">
         <li>
-          <a th:href="@{/rooms}" th:text="#{navbar.room}" class="nav-link"></a>
-        </li>
-        <li>
           <a
-            th:href="@{/services}"
-            th:text="#{navbar.services}"
+            th:href="@{/rooms}"
+            th:text="${#locale.language == 'vi'} ? 'Phòng' : 'Rooms'"
             class="nav-link"
           ></a>
         </li>
         <li>
-          <a th:href="@{/about}" th:text="#{navbar.about}" class="nav-link"></a>
+          <a
+            th:href="@{/services}"
+            th:text="${#locale.language == 'vi'} ? 'Dịch vụ' : 'Services'"
+            class="nav-link"
+          ></a>
         </li>
         <li>
-          <a th:href="@{/gravity-news}" th:text="#{navbar.news}" class="nav-link"></a>
+          <a
+            th:href="@{/about}"
+            th:text="${#locale.language == 'vi'} ? 'Giới thiệu' : 'About'"
+            class="nav-link"
+          ></a>
+        </li>
+        <li>
+          <a
+            th:href="@{/gravity-news}"
+            th:text="${#locale.language == 'vi'} ? 'Tin tức' : 'News'"
+            class="nav-link"
+          ></a>
         </li>
         <li>
           <a
             th:href="@{/contact}"
-            th:text="#{navbar.contact}"
+            th:text="${#locale.language == 'vi'} ? 'Liên hệ' : 'Contact'"
             class="nav-link"
           ></a>
         </li>
         <li class="language-parent" id="languageBtn">
           <button class="account-btn" type="button">
-            <span th:text="#{navbar.language}"></span>
+            <span th:text="${#locale.language == 'vi'} ? 'Ngôn ngữ' : 'Language'"></span>
             <i class="fa fa-caret-down"></i>
           </button>
 
@@ -58,7 +74,7 @@
         <li sec:authorize="isAnonymous()">
           <a
             th:href="@{/auth/login}"
-            th:text="#{navbar.login}"
+            th:text="${#locale.language == 'vi'} ? 'Đăng nhập' : 'Login'"
             class="nav-link"
           ></a>
         </li>
@@ -71,19 +87,22 @@
             aria-expanded="false"
           >
             <span class="account-avatar">👤</span>
-            <span class="account-text" th:text="#{account.title}"></span>
+            <span
+              class="account-text"
+              th:text="${#locale.language == 'vi'} ? 'Tài khoản' : 'My Account'"
+            ></span>
             <i class="fa fa-caret-down"></i>
           </button>
           <div class="account-dropdown" id="accountDropdown">
             <a th:href="@{/profile}" class="dropdown-link">
               <i class="fa fa-user"></i>
-              <span th:text="#{account.profile}"></span>
+              <span th:text="${#locale.language == 'vi'} ? 'Hồ sơ' : 'Profile'"></span>
             </a>
 
             <form th:action="@{/logout}" method="post" class="dropdown-form">
               <button class="dropdown-link logout-btn" type="submit">
                 <i class="fa fa-sign-out"></i>
-                <span th:text="#{account.logout}"></span>
+                <span th:text="${#locale.language == 'vi'} ? 'Đăng xuất' : 'Logout'"></span>
               </button>
             </form>
           </div>
