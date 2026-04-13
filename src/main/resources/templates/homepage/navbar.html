@@ -186,6 +186,47 @@
       }
     }
 
+    function shouldUseCustomerStarfield() {
+      return !document.body.classList.contains("gravity-news-body")
+        && !document.body.classList.contains("gravity-news-detail-body");
+    }
+
+    function removeCustomerStarfield() {
+      document.getElementById("gravityStarfield")?.remove();
+    }
+
+    function syncCustomerStarfield(isDark) {
+      if (!isDark || !shouldUseCustomerStarfield()) {
+        removeCustomerStarfield();
+        return;
+      }
+
+      if (document.getElementById("gravityStarfield")) {
+        return;
+      }
+
+      const starfield = document.createElement("div");
+      starfield.id = "gravityStarfield";
+      starfield.className = "gravity-starfield";
+
+      const starCount = Math.min(260, Math.max(140, Math.floor(window.innerWidth / 5)));
+      for (let i = 0; i < starCount; i += 1) {
+        const star = document.createElement("span");
+        const size = Math.random() * 2.2 + 0.8;
+        star.className = "gravity-star";
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 5}s`;
+        star.style.animationDuration = `${Math.random() * 3 + 1}s`;
+        star.style.opacity = `${Math.random() * 0.6 + 0.2}`;
+        starfield.appendChild(star);
+      }
+
+      document.body.prepend(starfield);
+    }
+
     function applyCustomerTheme(theme) {
       const resolvedTheme = theme === "dark" ? "dark" : "light";
       const isDark = resolvedTheme === "dark";
@@ -195,6 +236,7 @@
       document.body.classList.toggle("profile-theme-dark", isDark);
       localStorage.setItem(CUSTOMER_THEME_STORAGE_KEY, resolvedTheme);
       syncThemeControls(resolvedTheme);
+      syncCustomerStarfield(isDark);
 
       window.dispatchEvent(
         new CustomEvent("customer-theme-change", { detail: { theme: resolvedTheme } })

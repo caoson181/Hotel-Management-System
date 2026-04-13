@@ -35,36 +35,26 @@ body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body) 
     linear-gradient(135deg, #06111f 0%, #11162f 48%, #061626 100%);
 }
 
-body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::before,
-body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::after {
-  content: "";
+.gravity-starfield {
   position: fixed;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
   pointer-events: none;
 }
 
-body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::before {
-  background-image:
-    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.6px),
-    radial-gradient(circle, rgba(153, 246, 228, 0.72) 0 1px, transparent 1.7px),
-    radial-gradient(circle, rgba(191, 219, 254, 0.72) 0 1.1px, transparent 1.8px),
-    radial-gradient(circle, rgba(255, 255, 255, 0.45) 0 0.8px, transparent 1.4px);
-  background-position: 12px 22px, 88px 54px, 38px 112px, 128px 86px;
-  background-size: 150px 150px, 190px 190px, 230px 230px, 110px 110px;
-  opacity: 0.58;
-  animation: gravityStarTwinkle 4.8s ease-in-out infinite alternate;
+body:not(.customer-theme-dark) .gravity-starfield,
+body.gravity-news-body .gravity-starfield,
+body.gravity-news-detail-body .gravity-starfield {
+  display: none;
 }
 
-body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::after {
-  background-image:
-    radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1.2px, transparent 2px),
-    radial-gradient(circle, rgba(252, 211, 77, 0.66) 0 1px, transparent 1.8px),
-    radial-gradient(circle, rgba(125, 211, 252, 0.62) 0 0.9px, transparent 1.7px);
-  background-position: 46px 34px, 116px 132px, 172px 74px;
-  background-size: 260px 260px, 310px 310px, 360px 360px;
-  opacity: 0.38;
-  animation: gravityStarTwinkle 7.2s ease-in-out infinite alternate-reverse;
+.gravity-star {
+  position: absolute;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.55);
+  animation: gravityStarTwinkle 3s infinite alternate;
 }
 
 body.customer-theme-dark .header {
@@ -421,13 +411,12 @@ body.customer-theme-dark .theme-toggle-btn.is-dark {
 }
 
 @keyframes gravityStarTwinkle {
-  0% { opacity: 0.18; transform: scale(1); }
-  100% { opacity: 0.88; transform: scale(1.08); }
+  0% { opacity: 0.2; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.2); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::before,
-  body.customer-theme-dark:not(.gravity-news-body):not(.gravity-news-detail-body)::after {
+  .gravity-star {
     animation: none;
   }
 }
