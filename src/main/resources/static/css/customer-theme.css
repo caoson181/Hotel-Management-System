@@ -1,0 +1,371 @@
+html[data-customer-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.light-bg .account-btn,
+.header.scrolled .account-btn,
+.contact-page .header.scrolled .account-btn {
+  color: #1e293b;
+}
+
+.light-bg .account-btn i,
+.light-bg .account-btn span,
+.header.scrolled .account-btn i,
+.header.scrolled .account-btn span,
+.contact-page .header.scrolled .account-btn i,
+.contact-page .header.scrolled .account-btn span {
+  color: inherit;
+}
+
+body.customer-theme-dark {
+  background: #0b1220;
+  color: #e5edf7;
+}
+
+body.customer-theme-dark .header.scrolled {
+  background: rgba(8, 15, 29, 0.92);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+}
+
+body.customer-theme-dark .header.scrolled .nav-link,
+body.customer-theme-dark .header.scrolled .account-btn,
+body.customer-theme-dark .header.scrolled .logo h1 a,
+body.customer-theme-dark .light-bg .nav-link,
+body.customer-theme-dark .light-bg .account-btn,
+body.customer-theme-dark .light-bg #currentFlag,
+body.customer-theme-dark .service-sidebar a.nav-link {
+  color: #e5edf7 !important;
+}
+
+body.customer-theme-dark .header.scrolled .account-btn,
+body.customer-theme-dark .contact-page .header.scrolled .account-btn,
+body.customer-theme-dark .light-bg .account-btn {
+  background: rgba(148, 163, 184, 0.12) !important;
+  border-color: rgba(148, 163, 184, 0.32) !important;
+  color: #e5edf7 !important;
+}
+
+body.customer-theme-dark .header.scrolled .account-btn i,
+body.customer-theme-dark .header.scrolled .account-btn span,
+body.customer-theme-dark .contact-page .header.scrolled .account-btn i,
+body.customer-theme-dark .contact-page .header.scrolled .account-btn span,
+body.customer-theme-dark .light-bg .account-btn i,
+body.customer-theme-dark .light-bg .account-btn span {
+  color: inherit !important;
+}
+
+body.customer-theme-dark .light-bg .header,
+body.customer-theme-dark .contact-page .navbar,
+body.customer-theme-dark .header.scrolled .navbar {
+  background: rgba(8, 15, 29, 0.92) !important;
+  backdrop-filter: blur(14px);
+}
+
+body.customer-theme-dark .account-btn,
+body.customer-theme-dark .theme-toggle-btn {
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.32);
+  color: #e5edf7;
+}
+
+body.customer-theme-dark .account-btn:hover,
+body.customer-theme-dark .theme-toggle-btn:hover {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+body.customer-theme-dark .account-dropdown,
+body.customer-theme-dark .language-submenu,
+body.customer-theme-dark .notification-dropdown,
+body.customer-theme-dark .profile-password-content,
+body.customer-theme-dark .booking-history-content,
+body.customer-theme-dark .comparison-content,
+body.customer-theme-dark .cart-content,
+body.customer-theme-dark #roomModal,
+body.customer-theme-dark .modal,
+body.customer-theme-dark .welcome-box {
+  background: #111c31;
+  color: #e5edf7;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+}
+
+body.customer-theme-dark .account-dropdown a,
+body.customer-theme-dark .account-dropdown button,
+body.customer-theme-dark .language-item,
+body.customer-theme-dark .notification-header,
+body.customer-theme-dark .notification-content,
+body.customer-theme-dark .notification-content strong,
+body.customer-theme-dark .notification-empty,
+body.customer-theme-dark .notification-clear-btn {
+  color: #e5edf7;
+}
+
+body.customer-theme-dark .account-dropdown i,
+body.customer-theme-dark .account-dropdown .dropdown-link i,
+body.customer-theme-dark .account-dropdown .logout-btn i,
+body.customer-theme-dark .header.scrolled .account-dropdown i,
+body.customer-theme-dark .contact-page .header.scrolled .account-dropdown i {
+  color: #cbd5e1 !important;
+}
+
+body.customer-theme-dark .account-dropdown .logout-btn i {
+  color: #fca5a5 !important;
+}
+
+body.customer-theme-dark .notification-content p,
+body.customer-theme-dark .notification-meta,
+body.customer-theme-dark .notification-meta span,
+body.customer-theme-dark .notification-meta time,
+body.customer-theme-dark .notification-amount {
+  color: #cbd5e1 !important;
+}
+
+body.customer-theme-dark .notification-content strong,
+body.customer-theme-dark .notification-header,
+body.customer-theme-dark .notification-clear-btn {
+  color: #f8fafc !important;
+}
+
+body.customer-theme-dark .account-dropdown a:hover,
+body.customer-theme-dark .account-dropdown button:hover,
+body.customer-theme-dark .language-item:hover {
+  background: rgba(148, 163, 184, 0.12);
+}
+
+body.customer-theme-dark .notification-item {
+  background: #111c31;
+  border-bottom-color: rgba(148, 163, 184, 0.12);
+}
+
+body.customer-theme-dark .notification-item.is-unread {
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.18), #111c31 34%);
+}
+
+body.customer-theme-dark .notification-icon {
+  background: rgba(96, 165, 250, 0.14);
+  color: #93c5fd;
+}
+
+body.customer-theme-dark .notification-icon i,
+body.customer-theme-dark .header.scrolled .notification-icon i,
+body.customer-theme-dark .contact-page .header.scrolled .notification-icon i {
+  color: #93c5fd !important;
+}
+
+body.customer-theme-dark .about,
+body.customer-theme-dark .services-page,
+body.customer-theme-dark .service-detail-page,
+body.customer-theme-dark .contact-section,
+body.customer-theme-dark .profile-section,
+body.customer-theme-dark .bookshelf-section,
+body.customer-theme-dark .solar-news-section,
+body.customer-theme-dark .gallery,
+body.customer-theme-dark .service-nav,
+body.customer-theme-dark footer:not(.customer-footer),
+body.customer-theme-dark .fake-payment-page,
+body.customer-theme-dark .payment-page {
+  background: #0f172a !important;
+}
+
+body.customer-theme-dark .about h2,
+body.customer-theme-dark .gallery h2,
+body.customer-theme-dark .service-info h2,
+body.customer-theme-dark .contact-info h3,
+body.customer-theme-dark .info-column h3,
+body.customer-theme-dark .panel-header h3,
+body.customer-theme-dark .reviews-heading h2,
+body.customer-theme-dark .reviews-list-header h3,
+body.customer-theme-dark .service-sidebar-copy h2,
+body.customer-theme-dark .service-banner-overlay h1,
+body.customer-theme-dark .service-page-hero-content h1,
+body.customer-theme-dark .service-detail-hero h2,
+body.customer-theme-dark .info-card h3,
+body.customer-theme-dark .amenities-card h2,
+body.customer-theme-dark .description-card h2,
+body.customer-theme-dark .booking-card .price,
+body.customer-theme-dark .similar-row h2,
+body.customer-theme-dark .review-form-card h3,
+body.customer-theme-dark .solar-header-section h1,
+body.customer-theme-dark .solar-news-card h3,
+body.customer-theme-dark .room-category,
+body.customer-theme-dark #roomTitle,
+body.customer-theme-dark .bookshelf-title,
+body.customer-theme-dark .profile-name,
+body.customer-theme-dark .settings-detail-card h4,
+body.customer-theme-dark .info-stat-card strong,
+body.customer-theme-dark .history-booking-header h4,
+body.customer-theme-dark .history-detail-title-row h5 {
+  color: #f8fafc !important;
+}
+
+body.customer-theme-dark .about-text p,
+body.customer-theme-dark .gallery p,
+body.customer-theme-dark .service-info p,
+body.customer-theme-dark .service-sidebar a,
+body.customer-theme-dark .contact-info p,
+body.customer-theme-dark .contact-info strong,
+body.customer-theme-dark .info-column p,
+body.customer-theme-dark .input-group input,
+body.customer-theme-dark .input-group textarea,
+body.customer-theme-dark .profile-table .row > div,
+body.customer-theme-dark .history-detail-meta span,
+body.customer-theme-dark .history-detail-dates strong,
+body.customer-theme-dark .history-detail-dates label,
+body.customer-theme-dark .summary-note,
+body.customer-theme-dark .review-form-card p,
+body.customer-theme-dark .reviews-empty-state,
+body.customer-theme-dark .service-sidebar-copy p,
+body.customer-theme-dark .service-banner-overlay p,
+body.customer-theme-dark .service-page-hero-content p,
+body.customer-theme-dark .solar-header-section p,
+body.customer-theme-dark .solar-news-card p,
+body.customer-theme-dark .featured-info,
+body.customer-theme-dark .basic-info,
+body.customer-theme-dark .profile-breadcrumb,
+body.customer-theme-dark .empty-state-box,
+body.customer-theme-dark .compact-history-item p,
+body.customer-theme-dark .member-benefit-box p,
+body.customer-theme-dark .settings-option-box p,
+body.customer-theme-dark .security-row-card p {
+  color: #cbd5e1 !important;
+}
+
+body.customer-theme-dark .contact-wrapper,
+body.customer-theme-dark .location-info,
+body.customer-theme-dark .info-column,
+body.customer-theme-dark .profile-wrapper,
+body.customer-theme-dark .service-card,
+body.customer-theme-dark .service-detail-sidebar,
+body.customer-theme-dark .service-detail-menu,
+body.customer-theme-dark .service-detail-content-wrap,
+body.customer-theme-dark .service-banner-card,
+body.customer-theme-dark .profile-summary-card,
+body.customer-theme-dark .profile-details-card,
+body.customer-theme-dark .member-benefit-box,
+body.customer-theme-dark .account-nav-card,
+body.customer-theme-dark .settings-summary-card,
+body.customer-theme-dark .settings-link-card,
+body.customer-theme-dark .profile-table,
+body.customer-theme-dark .info-stat-card,
+body.customer-theme-dark .compact-history-item,
+body.customer-theme-dark .history-booking-card,
+body.customer-theme-dark .history-detail-card,
+body.customer-theme-dark .settings-option-box,
+body.customer-theme-dark .security-row-card,
+body.customer-theme-dark .info-card,
+body.customer-theme-dark .amenities-card,
+body.customer-theme-dark .description-card,
+body.customer-theme-dark .booking-card,
+body.customer-theme-dark .reviews-summary-card,
+body.customer-theme-dark .review-form-card,
+body.customer-theme-dark .reviews-list-card,
+body.customer-theme-dark .similar-card,
+body.customer-theme-dark .solar-news-card,
+body.customer-theme-dark .solar-filter-bar,
+body.customer-theme-dark .service-sidebar-copy,
+body.customer-theme-dark .service-detail-menu a,
+body.customer-theme-dark .rank-progress-bar {
+  background: #111c31 !important;
+  color: #e5edf7;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+body.customer-theme-dark .service-detail-menu a:hover,
+body.customer-theme-dark .service-sidebar a:hover,
+body.customer-theme-dark .settings-link-card:hover,
+body.customer-theme-dark .account-nav-card:hover,
+body.customer-theme-dark .security-row-card:hover,
+body.customer-theme-dark .solar-filter-btn:hover {
+  background: rgba(96, 165, 250, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+body.customer-theme-dark .profile-table .row,
+body.customer-theme-dark .notification-header,
+body.customer-theme-dark .service-detail-menu a,
+body.customer-theme-dark .reviews-list-header,
+body.customer-theme-dark .history-booking-header,
+body.customer-theme-dark .history-detail-card,
+body.customer-theme-dark .history-detail-body,
+body.customer-theme-dark .compact-history-item,
+body.customer-theme-dark .solar-news-card,
+body.customer-theme-dark .customer-footer-bottom {
+  border-color: rgba(148, 163, 184, 0.12) !important;
+}
+
+body.customer-theme-dark .history-detail-body {
+  background: #0f1b31 !important;
+}
+
+body.customer-theme-dark .history-booking-summary strong,
+body.customer-theme-dark .history-booking-summary small,
+body.customer-theme-dark .history-booking-header p,
+body.customer-theme-dark .history-detail-room,
+body.customer-theme-dark .profile-breadcrumb,
+body.customer-theme-dark .member-benefit-box strong {
+  color: #dbe7f5 !important;
+}
+
+body.customer-theme-dark .history-status {
+  background: rgba(226, 232, 240, 0.14) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(226, 232, 240, 0.2);
+}
+
+body.customer-theme-dark .input-group input,
+body.customer-theme-dark .input-group textarea,
+body.customer-theme-dark .date-input,
+body.customer-theme-dark .review-textarea,
+body.customer-theme-dark .profile-table input,
+body.customer-theme-dark .password-field input {
+  background: #0b1220 !important;
+  color: #e5edf7 !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+}
+
+body.customer-theme-dark .input-group input::placeholder,
+body.customer-theme-dark .input-group textarea::placeholder,
+body.customer-theme-dark .review-textarea::placeholder,
+body.customer-theme-dark .password-field input::placeholder {
+  color: #94a3b8;
+}
+
+body.customer-theme-dark .customer-footer {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.22), transparent 26%),
+    radial-gradient(circle at top right, rgba(30, 64, 175, 0.22), transparent 28%),
+    linear-gradient(90deg, #07111f 0%, #0d1728 55%, #121d31 100%);
+  border-top-color: rgba(148, 163, 184, 0.12);
+}
+
+body.customer-theme-dark .customer-footer-brand p,
+body.customer-theme-dark .customer-footer-contact p,
+body.customer-theme-dark .customer-footer-bottom p,
+body.customer-theme-dark .customer-footer-links a {
+  color: rgba(226, 232, 240, 0.9);
+}
+
+body.customer-theme-dark .customer-footer-socials a {
+  background: rgba(148, 163, 184, 0.08);
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+body.customer-theme-dark .swiper-pagination-bullet {
+  background: rgba(226, 232, 240, 0.5);
+}
+
+body.customer-theme-dark .swiper-pagination-bullet-active {
+  background: #f8fafc;
+}
+
+body.customer-theme-dark .settings-pill--theme.is-active,
+body.customer-theme-dark .theme-toggle-btn.is-dark {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}

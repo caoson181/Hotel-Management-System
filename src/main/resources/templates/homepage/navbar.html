@@ -47,7 +47,7 @@
             class="nav-link"
           ></a>
         </li>
-        <li class="language-parent" id="languageBtn">
+        <li class="language-parent nav-item-compact" id="languageBtn">
           <button class="account-btn" type="button">
             <span th:text="${#locale.language == 'vi'} ? 'Ngôn ngữ' : 'Language'"></span>
             <i class="fa fa-caret-down"></i>
@@ -63,7 +63,7 @@
             </div>
           </div>
         </li>
-        <li>
+        <li class="nav-item-flag">
           <span
             id="currentFlag"
             th:class="'fi ' + (${#locale.language} == 'vi' ? 'fi-vn' : 'fi-gb')"
@@ -71,7 +71,19 @@
           ></span>
         </li>
 
-        <li class="notification-menu" sec:authorize="isAuthenticated()">
+        <li class="nav-item-theme">
+          <button
+            class="account-btn theme-toggle-btn"
+            id="themeToggleBtn"
+            type="button"
+            aria-pressed="false"
+          >
+            <i class="fa fa-moon" id="themeToggleIcon"></i>
+            <span id="themeToggleText">Dark</span>
+          </button>
+        </li>
+
+        <li class="notification-menu nav-item-compact" sec:authorize="isAuthenticated()">
           <button
             class="account-btn notification-btn"
             id="notificationBtn"
@@ -104,7 +116,7 @@
           ></a>
         </li>
 
-        <li class="account-menu" sec:authorize="isAuthenticated()">
+        <li class="account-menu nav-item-account" sec:authorize="isAuthenticated()">
           <button
             class="account-btn"
             id="accountBtn"
@@ -137,11 +149,14 @@
   </header>
 
   <script th:inline="javascript">
+    const CUSTOMER_THEME_STORAGE_KEY = "customerTheme";
     const accountBtn = document.getElementById("accountBtn");
     const accountDropdown = document.getElementById("accountDropdown");
-
     const languageBtn = document.getElementById("languageBtn");
     const languageMenu = document.getElementById("languageMenu");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const themeToggleIcon = document.getElementById("themeToggleIcon");
+    const themeToggleText = document.getElementById("themeToggleText");
     const notificationBtn = document.getElementById("notificationBtn");
     const notificationDropdown = document.getElementById("notificationDropdown");
     const notificationBadge = document.getElementById("notificationBadge");
@@ -152,6 +167,49 @@
     const NOTIFICATION_STORAGE_KEY = "gravity.notifications";
     const NOTIFICATION_AUTO_OPEN_KEY = "gravity.notifications.autoOpen";
     const MAX_NOTIFICATIONS = 10;
+
+    function getStoredCustomerTheme() {
+      return localStorage.getItem(CUSTOMER_THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
+    }
+
+    function syncThemeControls(theme) {
+      const isDark = theme === "dark";
+      themeToggleBtn?.classList.toggle("is-dark", isDark);
+      themeToggleBtn?.setAttribute("aria-pressed", isDark ? "true" : "false");
+
+      if (themeToggleIcon) {
+        themeToggleIcon.className = isDark ? "fa fa-sun" : "fa fa-moon";
+      }
+
+      if (themeToggleText) {
+        themeToggleText.textContent = isDark ? "Light" : "Dark";
+      }
+    }
+
+    function applyCustomerTheme(theme) {
+      const resolvedTheme = theme === "dark" ? "dark" : "light";
+      const isDark = resolvedTheme === "dark";
+
+      document.documentElement.setAttribute("data-customer-theme", resolvedTheme);
+      document.body.classList.toggle("customer-theme-dark", isDark);
+      document.body.classList.toggle("profile-theme-dark", isDark);
+      localStorage.setItem(CUSTOMER_THEME_STORAGE_KEY, resolvedTheme);
+      syncThemeControls(resolvedTheme);
+
+      window.dispatchEvent(
+        new CustomEvent("customer-theme-change", { detail: { theme: resolvedTheme } })
+      );
+    }
+
+    window.CustomerTheme = {
+      get: getStoredCustomerTheme,
+      set: applyCustomerTheme,
+      init() {
+        applyCustomerTheme(getStoredCustomerTheme());
+      },
+    };
+
+    window.CustomerTheme.init();
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -300,6 +358,16 @@
     };
 
     renderNotifications();
+
+    themeToggleBtn?.addEventListener("click", () => {
+      applyCustomerTheme(getStoredCustomerTheme() === "dark" ? "light" : "dark");
+    });
+
+    window.addEventListener("storage", (event) => {
+      if (event.key === CUSTOMER_THEME_STORAGE_KEY) {
+        applyCustomerTheme(event.newValue === "dark" ? "dark" : "light");
+      }
+    });
 
     if (sessionStorage.getItem(NOTIFICATION_AUTO_OPEN_KEY) === "true") {
       sessionStorage.removeItem(NOTIFICATION_AUTO_OPEN_KEY);

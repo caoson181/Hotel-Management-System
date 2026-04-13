@@ -863,3 +863,55 @@ html {
     font-size: 24px;
   }
 }
+
+/* ===== CUSTOMER DARK THEME ===== */
+body.customer-theme-dark .service-sidebar a,
+body.customer-theme-dark .service-detail-menu a,
+body.customer-theme-dark .service-info p,
+body.customer-theme-dark .service-features div,
+body.customer-theme-dark .service-cta,
+body.customer-theme-dark .service-detail-link,
+body.customer-theme-dark .service-sidebar-copy p,
+body.customer-theme-dark .service-detail-summary,
+body.customer-theme-dark .service-detail-paragraph,
+body.customer-theme-dark .service-detail-features div,
+body.customer-theme-dark .service-detail-footnote,
+body.customer-theme-dark .service-related-info p {
+  color: #dbe7f5 !important;
+}
+
+body.customer-theme-dark .service-info h2,
+body.customer-theme-dark .service-sidebar-copy h2,
+body.customer-theme-dark .service-detail-content h2,
+body.customer-theme-dark .section-heading h2,
+body.customer-theme-dark .service-related-info h3 {
+  color: #f8fafc !important;
+}
+
+body.customer-theme-dark .service-sidebar-label,
+body.customer-theme-dark .service-detail-tag,
+body.customer-theme-dark .section-heading span {
+  color: #9dd7cf !important;
+}
+
+body.customer-theme-dark .service-detail-meta-card {
+  background: #16253c;
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+body.customer-theme-dark .service-detail-meta-card span {
+  color: #a9b9cb !important;
+}
+
+body.customer-theme-dark .service-detail-meta-card strong {
+  color: #f8fafc !important;
+}
+
+body.customer-theme-dark .service-detail-features {
+  border-bottom-color: rgba(148, 163, 184, 0.14);
+}
+
+body.customer-theme-dark .service-related-card {
+  background: #16253c;
+  border-color: rgba(148, 163, 184, 0.18);
+}

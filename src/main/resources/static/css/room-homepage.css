@@ -1610,3 +1610,155 @@ h4 {
         flex-direction: column;
     }
 }
+
+/* ===== CUSTOMER DARK THEME ===== */
+body.customer-theme-dark.rooms-page {
+    background: #08111f;
+    color: #e5edf7;
+}
+
+body.customer-theme-dark .rank-progress-bar {
+    background: rgba(15, 23, 42, 0.72);
+}
+
+body.customer-theme-dark .rank-dot {
+    background: rgba(148, 163, 184, 0.5);
+}
+
+body.customer-theme-dark .rank-section::before {
+    background: rgba(8, 15, 29, 0.78);
+    backdrop-filter: blur(8px);
+}
+
+body.customer-theme-dark .rank-title h2,
+body.customer-theme-dark .room-info h3,
+body.customer-theme-dark .price-tag,
+body.customer-theme-dark .comparison-content h3,
+body.customer-theme-dark .compare-item-title,
+body.customer-theme-dark .compare-item h4,
+body.customer-theme-dark .compare-item .price-tag,
+body.customer-theme-dark .cart-content h3,
+body.customer-theme-dark .cart-item-price,
+body.customer-theme-dark .stay-date-chip strong,
+body.customer-theme-dark .room-cart-trigger,
+body.customer-theme-dark .close-compare,
+body.customer-theme-dark .close-cart {
+    color: #f8fafc;
+}
+
+body.customer-theme-dark .room-card-front,
+body.customer-theme-dark .comparison-modal,
+body.customer-theme-dark .compare-item,
+body.customer-theme-dark .cart-modal,
+body.customer-theme-dark .cart-item,
+body.customer-theme-dark .cart-empty-state,
+body.customer-theme-dark .stay-date-chip,
+body.customer-theme-dark .room-cart-trigger {
+    background: #0f1b31;
+    border-color: rgba(148, 163, 184, 0.18);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.3);
+}
+
+body.customer-theme-dark .room-meta,
+body.customer-theme-dark .price-tag small,
+body.customer-theme-dark .room-description,
+body.customer-theme-dark .compare-item,
+body.customer-theme-dark .compare-spec-row,
+body.customer-theme-dark .compare-item .room-meta,
+body.customer-theme-dark .compare-description,
+body.customer-theme-dark .cart-item-note,
+body.customer-theme-dark .stay-chip-label,
+body.customer-theme-dark .cart-empty-state,
+body.customer-theme-dark .compare-check label {
+    color: #cbd5e1;
+}
+
+body.customer-theme-dark .compare-check,
+body.customer-theme-dark .cart-actions,
+body.customer-theme-dark .compare-spec-row,
+body.customer-theme-dark .compare-item,
+body.customer-theme-dark .compare-specs,
+body.customer-theme-dark .room-cart-trigger {
+    border-color: rgba(148, 163, 184, 0.16);
+}
+
+body.customer-theme-dark .compare-highlight-chip {
+    background: rgba(212, 175, 55, 0.16);
+    color: #f8fafc;
+}
+
+body.customer-theme-dark .compare-highlight-chip i {
+    color: var(--primary-gold);
+}
+
+body.customer-theme-dark .compare-specs {
+    background: #16253c;
+}
+
+body.customer-theme-dark .compare-spec-row {
+    color: #e5edf7;
+}
+
+body.customer-theme-dark .compare-spec-row span {
+    color: #dbe7f5;
+}
+
+body.customer-theme-dark .compare-item .btn-detail {
+    background: #16253c;
+    border-color: rgba(148, 163, 184, 0.24);
+    color: #fca5a5;
+}
+
+body.customer-theme-dark .compare-item .btn-detail:hover {
+    background: rgba(127, 29, 29, 0.24);
+    border-color: rgba(248, 113, 113, 0.45);
+    color: #fecaca;
+}
+
+body.customer-theme-dark .btn-clear {
+    border-color: rgba(148, 163, 184, 0.28);
+    color: #dbe7f5;
+}
+
+body.customer-theme-dark .btn-clear:hover {
+    background: #16253c;
+}
+
+body.customer-theme-dark .btn-detail {
+    border-color: #93c5fd;
+    color: #dbeafe;
+}
+
+body.customer-theme-dark .btn-detail:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #fff;
+}
+
+body.customer-theme-dark .btn-clear-cart {
+    background: #132238;
+    border-color: rgba(148, 163, 184, 0.24);
+    color: #e2e8f0;
+}
+
+body.customer-theme-dark .btn-remove-cart {
+    background: rgba(127, 29, 29, 0.2);
+    border-color: rgba(248, 113, 113, 0.4);
+    color: #fca5a5;
+}
+
+body.customer-theme-dark .cart-count,
+body.customer-theme-dark .compare-count {
+    background: var(--primary-gold);
+    color: #1e293b;
+}
+
+body.customer-theme-dark .comparison-modal.active,
+body.customer-theme-dark .cart-modal.active {
+    background: #0f1b31;
+}
+
+body.customer-theme-dark .close-compare:hover,
+body.customer-theme-dark .close-cart:hover {
+    background: rgba(212, 175, 55, 0.12);
+}

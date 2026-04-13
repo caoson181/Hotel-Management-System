@@ -6,6 +6,7 @@ const breadcrumb = document.getElementById("profileBreadcrumb");
 const panels = Array.from(document.querySelectorAll(".profile-panel"));
 const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
 const themeButtons = Array.from(document.querySelectorAll("[data-theme-value]"));
+const PROFILE_THEME_STORAGE_KEY = "customerTheme";
 
 const panelTitles = {
   overview: "Account",
@@ -343,7 +344,9 @@ function formatMoney(value) {
 function applyTheme(theme) {
   const selectedTheme = theme === "dark" ? "dark" : "light";
   document.body.classList.toggle("profile-theme-dark", selectedTheme === "dark");
-  localStorage.setItem("profileTheme", selectedTheme);
+  document.body.classList.toggle("customer-theme-dark", selectedTheme === "dark");
+  document.documentElement.setAttribute("data-customer-theme", selectedTheme);
+  localStorage.setItem(PROFILE_THEME_STORAGE_KEY, selectedTheme);
 
   themeButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.themeValue === selectedTheme);
@@ -362,10 +365,18 @@ window.profileChangeLang = profileChangeLang;
 if (themeButtons.length) {
   themeButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      applyTheme(button.dataset.themeValue);
+      if (window.CustomerTheme?.set) {
+        window.CustomerTheme.set(button.dataset.themeValue);
+      } else {
+        applyTheme(button.dataset.themeValue);
+      }
     });
   });
 }
+
+window.addEventListener("customer-theme-change", (event) => {
+  applyTheme(event.detail?.theme);
+});
 
 function renderUpgradeProgress() {
   const summary = document.querySelector(".upgrade-plan-summary");
@@ -410,7 +421,7 @@ function renderUpgradeProgress() {
 
 applyHistoryRoomImages();
 resetEditMode();
-applyTheme(localStorage.getItem("profileTheme"));
+applyTheme(window.CustomerTheme?.get?.() || localStorage.getItem(PROFILE_THEME_STORAGE_KEY));
 
 const initialPanel = new URL(window.location.href).searchParams.get("panel") || "overview";
 activatePanel(initialPanel);

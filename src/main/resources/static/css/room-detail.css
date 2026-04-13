@@ -1606,3 +1606,166 @@ h1, h2, h3, h4 {
         width: 100%;
     }
 }
+
+/* ===== CUSTOMER DARK THEME ===== */
+body.customer-theme-dark .amenities-card,
+body.customer-theme-dark .description-card,
+body.customer-theme-dark .booking-card,
+body.customer-theme-dark .reviews-summary-card,
+body.customer-theme-dark .review-form-card,
+body.customer-theme-dark .reviews-list-card,
+body.customer-theme-dark .cart-item-card {
+    background: #162238;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
+}
+
+body.customer-theme-dark .reviews-section {
+    background: #0f172a;
+    padding: 1rem 0 1.4rem;
+    border-radius: 24px;
+}
+
+body.customer-theme-dark .amenities-card h2,
+body.customer-theme-dark .description-card h2,
+body.customer-theme-dark .booking-card .price,
+body.customer-theme-dark .reviews-heading h2,
+body.customer-theme-dark .reviews-list-header h3,
+body.customer-theme-dark .review-form-card h3,
+body.customer-theme-dark .summary-score,
+body.customer-theme-dark .review-author-meta strong {
+    color: #f8fafc;
+}
+
+body.customer-theme-dark .amenities-card p,
+body.customer-theme-dark .description-card p,
+body.customer-theme-dark .booking-card label,
+body.customer-theme-dark .booking-card .price small,
+body.customer-theme-dark .reviews-heading p,
+body.customer-theme-dark .review-form-card > p,
+body.customer-theme-dark .summary-label,
+body.customer-theme-dark .summary-note,
+body.customer-theme-dark .rating-breakdown-row,
+body.customer-theme-dark .review-author-meta span,
+body.customer-theme-dark .review-content,
+body.customer-theme-dark .reviews-empty-state,
+body.customer-theme-dark .review-form-message,
+body.customer-theme-dark .secure-text {
+    color: #cbd5e1 !important;
+}
+
+body.customer-theme-dark .amenities-grid > *,
+body.customer-theme-dark .availability-box,
+body.customer-theme-dark .total-price,
+body.customer-theme-dark .guest-control,
+body.customer-theme-dark .reviews-filter,
+body.customer-theme-dark .reviews-dropdown-menu,
+body.customer-theme-dark .review-textarea,
+body.customer-theme-dark .date-input {
+    background: #0f172a;
+    border-color: rgba(148, 163, 184, 0.2);
+    color: #e5edf7;
+}
+
+body.customer-theme-dark .date-input,
+body.customer-theme-dark .review-textarea,
+body.customer-theme-dark .date-input::placeholder,
+body.customer-theme-dark .review-textarea::placeholder {
+    color: #e5edf7;
+}
+
+body.customer-theme-dark .availability-box strong,
+body.customer-theme-dark .availability-box p,
+body.customer-theme-dark .total-price span:first-child,
+body.customer-theme-dark .guest-control span,
+body.customer-theme-dark .reviews-dropdown-trigger,
+body.customer-theme-dark .reviews-dropdown-option {
+    color: #dbe7f5 !important;
+}
+
+body.customer-theme-dark .guest-control button {
+    background: #1e293b;
+    color: #f8fafc;
+}
+
+body.customer-theme-dark .guest-control button:hover {
+    background: #d4af37;
+    color: #111827;
+}
+
+body.customer-theme-dark .reviews-filter {
+    background: #fff7e6;
+    border-color: rgba(212, 175, 55, 0.35);
+}
+
+body.customer-theme-dark .reviews-dropdown-trigger {
+    color: #1e293b !important;
+}
+
+body.customer-theme-dark .reviews-dropdown-trigger::after {
+    border-color: #c79d2b;
+}
+
+body.customer-theme-dark .reviews-dropdown-menu {
+    background: #162238;
+}
+
+body.customer-theme-dark .reviews-dropdown-option:hover {
+    background: rgba(212, 175, 55, 0.12);
+    color: #f8fafc;
+}
+
+body.customer-theme-dark .review-star-btn {
+    background: #f8fafc;
+    border-color: #dbe5f0;
+    color: #cbd5e1;
+}
+
+body.customer-theme-dark .review-star-btn.active,
+body.customer-theme-dark .review-star-btn:hover {
+    background: #fff7e6;
+    color: #d4af37;
+    border-color: #ead8a0;
+}
+
+body.customer-theme-dark .rating-breakdown-bar {
+    background: rgba(226, 232, 240, 0.24);
+}
+
+body.customer-theme-dark .review-item {
+    border-bottom-color: rgba(148, 163, 184, 0.14);
+}
+
+body.customer-theme-dark .reviews-heading h2 {
+    text-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+body.customer-theme-dark .reviews-heading p,
+body.customer-theme-dark .reviews-list-header h3 {
+    color: #dbe7f5 !important;
+}
+
+body.customer-theme-dark .summary-stars i,
+body.customer-theme-dark .review-rating i {
+    color: #f4c542;
+    text-shadow: 0 0 10px rgba(244, 197, 66, 0.32);
+}
+
+body.customer-theme-dark .review-star-btn {
+    background: #f8fafc;
+    border: 2px solid #d7e0ed;
+    color: #b9c5d6;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+}
+
+body.customer-theme-dark .review-star-btn i {
+    font-size: 1.08rem;
+}
+
+body.customer-theme-dark .review-star-btn.active,
+body.customer-theme-dark .review-star-btn:hover {
+    background: #fff7e6;
+    color: #d4af37;
+    border-color: #f2d37a;
+    box-shadow: 0 10px 22px rgba(212, 175, 55, 0.24);
+}

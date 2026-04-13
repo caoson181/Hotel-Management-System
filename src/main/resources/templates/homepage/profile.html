@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Profile - Gravity Hotel</title>
   <link rel="stylesheet" th:href="@{/css/homepage.css}" />
+  <link rel="stylesheet" th:href="@{/css/customer-theme.css}" />
   <link rel="stylesheet" th:href="@{/css/contact.css}" />
   <link rel="stylesheet" th:href="@{/css/profile.css}" />
   <link rel="stylesheet" th:href="@{/css/modals.css}" />
@@ -14,9 +15,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.6.6/css/flag-icons.min.css" />
 </head>
 <body class="contact-page">
-<header class="header">
-  <div th:replace="~{homepage/navbar :: navbar}"></div>
-</header>
+<div th:replace="~{homepage/navbar :: navbar}"></div>
 
 <section class="contact-hero profile-hero">
   <div class="overlay"></div>

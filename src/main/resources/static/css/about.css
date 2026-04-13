@@ -2,8 +2,26 @@
 
 /* About Section */
 .about {
-    padding: 80px 0;
+    position: relative;
+    padding: 180px 0 80px;
     background: #fff;
+    overflow: hidden;
+}
+
+.about::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 240px;
+    background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.25) 0%, rgba(15, 23, 42, 0.72) 100%),
+        url("/images/slide4.jpg") center/cover no-repeat;
+    z-index: 0;
+}
+
+.about .container {
+    position: relative;
+    z-index: 1;
 }
 
 .about h2 {
@@ -45,7 +63,11 @@
 .about-text h2 {
     text-align: left;
     margin-bottom: 20px;
-    
+}
+
+.about-top .about-text h2 {
+    color: #f8fafc;
+    text-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
 }
 
 .about-text p {
@@ -112,27 +134,40 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Light background styles for navbar */
-.light-bg .header {
-    background: rgba(255, 255, 255, 0.95);
+/* About navbar: transparent at top, solid when scrolled. */
+.about-page .header {
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+.about-page .navbar {
+    background: transparent !important;
+}
+
+.about-page .header.scrolled {
+    background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(10px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
 }
 
-.light-bg .nav-link {
-    color: #333;
+.about-page .header.scrolled .navbar {
+    background: transparent !important;
 }
 
-.light-bg .hamburger span {
-    background: #333;
+body.customer-theme-dark.about-page .header.scrolled {
+    background: rgba(8, 15, 29, 0.92) !important;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35) !important;
 }
 
-.light-bg .logo h1 {
-    color: #fff;
-    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+body.customer-theme-dark .about {
+    background: #0f172a;
+}
+
+body.customer-theme-dark .about::before {
+    background:
+        linear-gradient(180deg, rgba(2, 6, 23, 0.22) 0%, rgba(2, 6, 23, 0.78) 100%),
+        url("/images/slide4.jpg") center/cover no-repeat;
 }
 
 /* Responsive */
