@@ -31,6 +31,7 @@
 
     <!-- Navbar CSS -->
     <link rel="stylesheet" th:href="@{/css/homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/customer-footer.css}" />
 
     <!-- Room Detail CSS -->
     <link rel="stylesheet" th:href="@{/css/room-detail.css}" />
@@ -303,12 +304,6 @@
       <i class="fas fa-check-circle"></i> Booked successfully!
     </div>
 
-    <footer class="footer">
-      <div class="container">
-        <p th:text="#{footer.copy}"></p>
-      </div>
-    </footer>
-
     <!-- Scripts -->
     <script th:inline="javascript">
       /*<![CDATA[*/
@@ -409,6 +404,8 @@
         "booking.added": /*[[#{booking.added}]]*/ "",
       };
     </script>
+    <div th:replace="~{homepage/customer-footer :: customerFooter}"></div>
+
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script th:src="@{/js/room-detail.js}"></script>
     <script src="/js/room-homepage.js"></script>

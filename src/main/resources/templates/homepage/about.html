@@ -10,6 +10,7 @@
     <title>About Gravity Hotel</title>
     <link rel="stylesheet" th:href="@{/css/homepage.css}" />
     <link rel="stylesheet" th:href="@{/css/about.css}" />
+    <link rel="stylesheet" th:href="@{/css/customer-footer.css}" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -92,14 +93,9 @@
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <p th:text="#{footer.copy}"></p>
-      </div>
-    </footer>
-
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <div th:replace="~{homepage/customer-footer :: customerFooter}"></div>
+
     <script>
       // Load navbar
       fetch("navbar.html")

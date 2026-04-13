@@ -12,6 +12,7 @@
     <!-- Local CSS -->
     <link rel="stylesheet" href="/css/homepage.css" />
     <link rel="stylesheet" href="/css/room-card.css" />
+    <link rel="stylesheet" href="/css/customer-footer.css" />
 
     <!-- External CSS -->
     <link
@@ -199,11 +200,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <p th:text="#{footer.copy}"></p>
-      </div>
-    </footer>
+    <div th:replace="~{homepage/customer-footer :: customerFooter}"></div>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>

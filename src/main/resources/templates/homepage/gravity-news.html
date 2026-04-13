@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -18,7 +18,8 @@
     />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/homepage.css" />
-    <link rel="stylesheet" th:href="@{/css/gravity-news.css}" /></head>
+    <link rel="stylesheet" th:href="@{/css/gravity-news.css}" />
+    <link rel="stylesheet" th:href="@{/css/customer-footer.css}" /></head>
 <body>
 <div th:replace="~{homepage/navbar :: navbar}"></div>
 
@@ -43,6 +44,7 @@
     <span th:text="#{solar.pause}">Pause Orbits</span>
 
     </button>
+</div>
 </div>
 
 <div class="solar-system-container">
@@ -82,18 +84,13 @@
     <div class="solar-news-grid" id="solarNewsGrid"></div>
 </div>
 
-<div id="solarDetailModal" class="solar-detail-overlay">
-    <div class="solar-detail-container">
-        <button class="solar-close-detail" id="solarCloseModalBtn"><i class="fas fa-times"></i></button>
-        <div id="solarDetailDynamicContent"></div>
-    </div>
-</div>
-
 <footer class="solar-footer">
     <i class="fas fa-gravity"></i> <span th:text="#{solar.footer}">
         Gravity Hotel — Where achievements orbit around excellence
     </span>
 </footer>
+
+<div th:replace="~{homepage/customer-footer :: customerFooter}"></div>
 
 <!-- I18N for JS -->
 <script th:inline="javascript">
@@ -110,35 +107,11 @@
 
         modalFooter: /*[[#{solar.modalFooter}]]*/ "Where excellence defies gravity"
     };
-    const i18nArticles = {
-        "article.1.title": /*[[#{article.1.title}]]*/ "",
-        "article.1.excerpt": /*[[#{article.1.excerpt}]]*/ "",
-        "article.1.content": /*[[#{article.1.content}]]*/ "",
-
-        "article.2.title": /*[[#{article.2.title}]]*/ "",
-        "article.2.excerpt": /*[[#{article.2.excerpt}]]*/ "",
-        "article.2.content": /*[[#{article.2.content}]]*/ "",
-
-        "article.3.title": /*[[#{article.3.title}]]*/ "",
-        "article.3.excerpt": /*[[#{article.3.excerpt}]]*/ "",
-        "article.3.content": /*[[#{article.3.content}]]*/ "",
-
-        "article.4.title": /*[[#{article.4.title}]]*/ "",
-        "article.4.excerpt": /*[[#{article.4.excerpt}]]*/ "",
-        "article.4.content": /*[[#{article.4.content}]]*/ "",
-
-        "article.5.title": /*[[#{article.5.title}]]*/ "",
-        "article.5.excerpt": /*[[#{article.5.excerpt}]]*/ "",
-        "article.5.content": /*[[#{article.5.content}]]*/ "",
-
-        "article.6.title": /*[[#{article.6.title}]]*/ "",
-        "article.6.excerpt": /*[[#{article.6.excerpt}]]*/ "",
-        "article.6.content": /*[[#{article.6.content}]]*/ ""
-    };
+    const solarArticles = /*[[${articles}]]*/ [];
 </script>
 
 <!-- Custom JS -->
-    <script th:src="@{/js/gravity-news.js}"></script>
+    <script th:src="@{/js/gravity-news-page.js}"></script>
     <script th:src="@{/js/homepage.js}"></script>
 </body>
 </html>

@@ -1,5 +1,20 @@
 const editBtn = document.getElementById("editBtn");
 const saveBtn = document.getElementById("saveBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+const profileEditForm = document.getElementById("profileEditForm");
+const breadcrumb = document.getElementById("profileBreadcrumb");
+const panels = Array.from(document.querySelectorAll(".profile-panel"));
+const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
+const themeButtons = Array.from(document.querySelectorAll("[data-theme-value]"));
+
+const panelTitles = {
+  overview: "Account",
+  profile: "Account > Profile",
+  wallet: "Account > Wallet & Transactions",
+  bookings: "Account > Booking & Refunds",
+  settings: "Account > General Settings",
+  security: "Account > Security",
+};
 
 const HISTORY_ROOM_IMAGE_CATALOG = {
   standard: {
@@ -41,35 +56,122 @@ function applyHistoryRoomImages() {
   });
 }
 
-editBtn.addEventListener("click", function () {
+function activatePanel(panelName) {
+  panels.forEach((panel) => {
+    panel.classList.toggle("is-active", panel.dataset.panel === panelName);
+  });
+
+  if (breadcrumb) {
+    breadcrumb.textContent = panelTitles[panelName] || panelTitles.overview;
+    breadcrumb.classList.toggle("is-link", panelName !== "overview");
+  }
+
+  if (panelName === "bookings") {
+    applyHistoryRoomImages();
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("panel", panelName);
+  window.history.replaceState({}, "", url.toString());
+}
+
+if (tabButtons.length) {
+  tabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      activatePanel(button.dataset.tabTarget || "overview");
+    });
+  });
+}
+
+if (breadcrumb) {
+  breadcrumb.addEventListener("click", () => {
+    if (breadcrumb.classList.contains("is-link")) {
+      activatePanel("overview");
+    }
+  });
+}
+
+function resetEditMode() {
   document.querySelectorAll(".view-mode").forEach((el) => {
-    el.style.display = "none";
+    el.style.display = "";
   });
 
   document.querySelectorAll(".edit-mode").forEach((el) => {
-    el.style.display = "inline-block";
+    el.hidden = true;
+    el.style.display = "none";
   });
 
-  editBtn.style.display = "none";
-  saveBtn.style.display = "inline-block";
-});
+  if (profileEditForm) {
+    profileEditForm.reset();
+  }
+
+  if (editBtn) {
+    editBtn.style.display = "inline-flex";
+  }
+
+  if (saveBtn) {
+    saveBtn.hidden = true;
+    saveBtn.style.display = "none";
+  }
+
+  if (cancelEditBtn) {
+    cancelEditBtn.hidden = true;
+    cancelEditBtn.style.display = "none";
+  }
+}
+
+if (editBtn && saveBtn && cancelEditBtn) {
+  editBtn.addEventListener("click", () => {
+    document.querySelectorAll(".view-mode").forEach((el) => {
+      el.style.display = "none";
+    });
+
+    document.querySelectorAll(".edit-mode").forEach((el) => {
+      el.hidden = false;
+      el.style.display = "inline-block";
+    });
+
+    editBtn.style.display = "none";
+    saveBtn.hidden = false;
+    saveBtn.style.display = "inline-flex";
+    cancelEditBtn.hidden = false;
+    cancelEditBtn.style.display = "inline-flex";
+  });
+
+  cancelEditBtn.addEventListener("click", resetEditMode);
+}
+
 const modal = document.getElementById("changePasswordModal");
 const openBtn = document.getElementById("ChangePasswordBtn");
+const securityPasswordBtn = document.getElementById("securityPasswordBtn");
 const closeBtn = document.getElementById("closeModal");
 
-openBtn.addEventListener("click", () => {
-  modal.style.display = "block";
-});
+function openPasswordModal() {
+  if (modal) {
+    modal.style.display = "block";
+  }
+}
 
-closeBtn.addEventListener("click", () => {
-  modal.style.display = "none";
-});
+if (openBtn) {
+  openBtn.addEventListener("click", openPasswordModal);
+}
+
+if (securityPasswordBtn) {
+  securityPasswordBtn.addEventListener("click", openPasswordModal);
+}
+
+if (closeBtn) {
+  closeBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+}
 
 window.addEventListener("click", (e) => {
   if (e.target === modal) {
     modal.style.display = "none";
   }
 });
+
 function submitChangePassword() {
   const current = document.getElementById("currentPassword").value;
   const newPass = document.getElementById("newPassword").value;
@@ -91,10 +193,11 @@ function submitChangePassword() {
     }),
   })
     .then((res) => {
-      if (!res.ok)
+      if (!res.ok) {
         return res.text().then((text) => {
           throw new Error(text);
         });
+      }
       return res.text();
     })
     .then((msg) => {
@@ -106,9 +209,10 @@ function submitChangePassword() {
     });
 }
 
+window.submitChangePassword = submitChangePassword;
+
 const newPassword = document.getElementById("newPassword");
 const confirmPassword = document.getElementById("confirmPassword");
-
 const passwordHint = document.getElementById("passwordHint");
 const confirmHint = document.getElementById("confirmHint");
 
@@ -116,49 +220,53 @@ function validatePassword(pw) {
   const hasLength = pw.length >= 8;
   const hasLetter = /[a-zA-Z]/.test(pw);
   const hasNumber = /[0-9]/.test(pw);
-
   return hasLength && hasLetter && hasNumber;
 }
 
-// validate password
-newPassword.addEventListener("input", () => {
-  const pw = newPassword.value;
+if (newPassword && passwordHint) {
+  newPassword.addEventListener("input", () => {
+    const pw = newPassword.value;
 
-  if (!pw) {
-    passwordHint.innerText = "";
-    return;
-  }
+    if (!pw) {
+      passwordHint.innerText = "";
+      return;
+    }
 
-  if (!validatePassword(pw)) {
-    passwordHint.innerText =
-      "Password must be at least 8 characters and include letters + numbers";
-    passwordHint.className = "hint error";
-  } else {
-    passwordHint.innerText = "Strong password ✅";
-    passwordHint.className = "hint success";
-  }
-});
+    if (!validatePassword(pw)) {
+      passwordHint.innerText = "Password must be at least 8 characters and include letters + numbers";
+      passwordHint.className = "hint error";
+    } else {
+      passwordHint.innerText = "Strong password";
+      passwordHint.className = "hint success";
+    }
+  });
+}
 
-// validate confirm
-confirmPassword.addEventListener("input", () => {
-  if (!confirmPassword.value) {
-    confirmHint.innerText = "";
-    return;
-  }
+if (confirmPassword && confirmHint) {
+  confirmPassword.addEventListener("input", () => {
+    if (!confirmPassword.value) {
+      confirmHint.innerText = "";
+      return;
+    }
 
-  if (confirmPassword.value !== newPassword.value) {
-    confirmHint.innerText = "Passwords do not match";
-    confirmHint.className = "hint error";
-  } else {
-    confirmHint.innerText = "Passwords match ✅";
-    confirmHint.className = "hint success";
-  }
-});
+    if (confirmPassword.value !== newPassword.value) {
+      confirmHint.innerText = "Passwords do not match";
+      confirmHint.className = "hint error";
+    } else {
+      confirmHint.innerText = "Passwords match";
+      confirmHint.className = "hint success";
+    }
+  });
+}
 
 document.querySelectorAll(".toggle-password").forEach((icon) => {
   icon.addEventListener("click", () => {
     const inputId = icon.getAttribute("data-target");
     const input = document.getElementById(inputId);
+
+    if (!input) {
+      return;
+    }
 
     if (input.type === "password") {
       input.type = "text";
@@ -175,17 +283,17 @@ document.querySelectorAll(".toggle-password").forEach((icon) => {
 const avatarBtn = document.getElementById("openAvatarModal");
 const avatarModal = document.getElementById("avatarModal");
 
-avatarBtn.onclick = (e) => {
-  e.stopPropagation();
-  avatarModal.classList.toggle("active");
-};
+if (avatarBtn && avatarModal) {
+  avatarBtn.onclick = (e) => {
+    e.stopPropagation();
+    avatarModal.classList.toggle("active");
+  };
 
-document.addEventListener("click", () => {
-  avatarModal.classList.remove("active");
-});
-document.addEventListener("click", () => {
-  avatarModal.classList.remove("active");
-});
+  document.addEventListener("click", () => {
+    avatarModal.classList.remove("active");
+  });
+}
+
 const historyBtn = document.getElementById("historyBtn");
 const historyModal = document.getElementById("historyModal");
 const closeHistory = document.getElementById("closeHistory");
@@ -193,20 +301,19 @@ const upgradePlanBtn = document.getElementById("upgradePlanBtn");
 const upgradePlanModal = document.getElementById("upgradePlanModal");
 const closeUpgradePlan = document.getElementById("closeUpgradePlan");
 
-if (historyBtn) {
+if (historyBtn && historyModal) {
   historyBtn.addEventListener("click", () => {
     applyHistoryRoomImages();
     historyModal.style.display = "flex";
   });
 }
 
-if (closeHistory) {
+if (closeHistory && historyModal) {
   closeHistory.addEventListener("click", () => {
     historyModal.style.display = "none";
   });
 }
 
-// click ngoài để đóng
 window.addEventListener("click", (e) => {
   if (e.target === historyModal) {
     historyModal.style.display = "none";
@@ -216,21 +323,48 @@ window.addEventListener("click", (e) => {
   }
 });
 
-if (upgradePlanBtn) {
+if (upgradePlanBtn && upgradePlanModal) {
   upgradePlanBtn.addEventListener("click", () => {
     upgradePlanModal.style.display = "flex";
     renderUpgradeProgress();
   });
 }
 
-if (closeUpgradePlan) {
+if (closeUpgradePlan && upgradePlanModal) {
   closeUpgradePlan.addEventListener("click", () => {
     upgradePlanModal.style.display = "none";
   });
 }
 
 function formatMoney(value) {
-  return Number(value || 0).toLocaleString("vi-VN") + " đ";
+  return Number(value || 0).toLocaleString("vi-VN") + " VND";
+}
+
+function applyTheme(theme) {
+  const selectedTheme = theme === "dark" ? "dark" : "light";
+  document.body.classList.toggle("profile-theme-dark", selectedTheme === "dark");
+  localStorage.setItem("profileTheme", selectedTheme);
+
+  themeButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.themeValue === selectedTheme);
+  });
+}
+
+function profileChangeLang(lang) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("lang", lang);
+  url.searchParams.set("panel", "settings");
+  window.location.href = url.toString();
+}
+
+window.profileChangeLang = profileChangeLang;
+
+if (themeButtons.length) {
+  themeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      applyTheme(button.dataset.themeValue);
+    });
+  });
 }
 
 function renderUpgradeProgress() {
@@ -275,3 +409,8 @@ function renderUpgradeProgress() {
 }
 
 applyHistoryRoomImages();
+resetEditMode();
+applyTheme(localStorage.getItem("profileTheme"));
+
+const initialPanel = new URL(window.location.href).searchParams.get("panel") || "overview";
+activatePanel(initialPanel);

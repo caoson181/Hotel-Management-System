@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${article.title} + ' - Gravity Hotel'">Gravity Hotel News</title>
+    <link rel="stylesheet" th:href="@{/css/homepage.css}" />
+    <link rel="stylesheet" th:href="@{/css/gravity-news.css}" />
+    <link rel="stylesheet" th:href="@{/css/customer-footer.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css" />
+</head>
+<body class="gravity-news-detail-body">
+<div th:replace="~{homepage/navbar :: navbar}"></div>
+
+<section class="news-article-hero" th:style="'background-image: linear-gradient(180deg, rgba(7, 10, 23, 0.42), rgba(7, 10, 23, 0.84)), url(' + ${article.heroImage} + ');'">
+    <div class="news-article-hero-inner">
+        <div class="news-article-topline">
+            <a th:href="@{/gravity-news}" class="news-back-link">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to News</span>
+            </a>
+            <span class="news-pill" th:text="${#strings.toUpperCase(article.category)}">ACHIEVEMENT</span>
+        </div>
+        <h1 th:text="${article.title}">Gravity Hotel Earns Luxury Hospitality Award 2025</h1>
+        <p class="news-article-lead" th:text="${article.excerpt}"></p>
+        <div class="news-article-meta">
+            <span><i class="far fa-calendar-alt"></i> <span th:text="${article.dateDisplay}"></span></span>
+            <span><i class="far fa-clock"></i> <span th:text="${article.readTime}"></span></span>
+        </div>
+    </div>
+</section>
+
+<main class="news-article-page">
+    <div class="news-article-shell">
+        <div class="news-article-layout">
+            <article class="news-article-main">
+                <div class="news-article-master-card">
+                    <section class="news-copy-card">
+                        <p th:each="paragraph : ${article.paragraphs}" th:text="${paragraph}"></p>
+                    </section>
+
+                    <section class="news-content-card news-section-panel">
+                        <h2>Key Highlights</h2>
+                        <div class="news-section-inner">
+                            <ul class="news-bullet-list">
+                                <li th:each="item : ${article.highlights}" th:text="${item}"></li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <figure class="news-image-card">
+                        <img th:src="${article.bodyImage}" th:alt="${article.title}">
+                        <figcaption th:text="${article.bodyImageCaption}"></figcaption>
+                    </figure>
+
+                    <section class="news-content-card news-section-panel news-section-panel-last">
+                        <h2>What Comes Next</h2>
+                        <div class="news-section-inner">
+                            <ul class="news-bullet-list">
+                                <li th:each="step : ${article.nextSteps}" th:text="${step}"></li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </article>
+
+            <aside class="news-article-sidebar">
+                <section class="news-sidebar-card">
+                    <h3>Story Snapshot</h3>
+                    <p th:text="${article.snapshot}"></p>
+                </section>
+
+                <section class="news-sidebar-card">
+                    <h3>More From Gravity</h3>
+                    <a class="news-related-item" th:each="item : ${relatedArticles}" th:href="@{/gravity-news/{slug}(slug=${item.slug})}">
+                        <img th:src="${item.coverImage}" th:alt="${item.title}">
+                        <div>
+                            <span class="news-related-category" th:text="${#strings.toUpperCase(item.category)}"></span>
+                            <strong th:text="${item.title}"></strong>
+                        </div>
+                    </a>
+                </section>
+            </aside>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{homepage/customer-footer :: customerFooter}"></div>
+
+<script th:src="@{/js/homepage.js}"></script>
+<script>
+    function syncNewsDetailNavbar() {
+        const header = document.querySelector(".header");
+        if (!header) return;
+        header.classList.toggle("scrolled", window.scrollY > 24);
+    }
+
+    window.addEventListener("scroll", syncNewsDetailNavbar);
+    window.addEventListener("load", syncNewsDetailNavbar);
+    syncNewsDetailNavbar();
+</script>
+</body>
+</html>

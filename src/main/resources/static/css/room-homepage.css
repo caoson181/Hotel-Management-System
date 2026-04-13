@@ -1011,13 +1011,14 @@ h4 {
     border-radius: 6px;
 }
 
-/* ===== FOOTER ===== */
-footer {
+/* ===== LEGACY ROOMS FOOTER ===== */
+.rooms-page > footer {
     text-align: center;
     padding: 3rem 5%;
     color: var(--text-light);
     border-top: 1px solid #e2e8f0;
     background: white;
+    display: none;
 }
 
 /* ===== NOTIFICATION ===== */

@@ -6,6 +6,7 @@ import org.example.backendpj.Entity.BookingDetail;
 import org.example.backendpj.Entity.Room;
 import org.example.backendpj.Repository.BookingDetailRepository;
 import org.example.backendpj.Repository.BookingRepository;
+import org.example.backendpj.Repository.WalletRepository;
 import org.example.backendpj.Service.CustomerTierService;
 import org.example.backendpj.Service.UserService;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Locale;
 
 @Controller
 public class PageController {
@@ -40,19 +42,22 @@ public class PageController {
     private final CustomerTierService customerTierService;
     private final BookingRepository bookingRepository;
     private final BookingDetailRepository bookingDetailRepository;
+    private final WalletRepository walletRepository;
 
     public PageController(UserRepository userRepository,
                           UserService userService,
                           RoomRepository roomRepository,
                           CustomerTierService customerTierService,
                           BookingRepository bookingRepository,
-                          BookingDetailRepository bookingDetailRepository) {
+                          BookingDetailRepository bookingDetailRepository,
+                          WalletRepository walletRepository) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.roomRepository = roomRepository;
         this.customerTierService = customerTierService;
         this.bookingRepository = bookingRepository;
         this.bookingDetailRepository = bookingDetailRepository;
+        this.walletRepository = walletRepository;
     }
 
     // ================= ADMIN HOME =================
@@ -179,12 +184,34 @@ public class PageController {
                     .toList();
         }
 
+        long bookingCount = history.size();
+        long pendingBookingCount = history.stream()
+                .filter(item -> hasBookingStatus(item, "PENDING"))
+                .count();
+        long cancelledBookingCount = history.stream()
+                .filter(item -> hasBookingStatus(item, "CANCELLED"))
+                .count();
+        long completedBookingCount = history.stream()
+                .filter(item -> hasBookingStatus(item, "COMPLETED"))
+                .count();
+        long refundRecordCount = history.stream()
+                .filter(item -> hasBookingStatus(item, "REFUNDED", "REFUND"))
+                .count();
+
+        var wallet = walletRepository.findByUser(user).orElse(null);
+
         // ================= MODEL =================
         model.addAttribute("avatar", avatar);
         model.addAttribute("avatars", avatars);
         model.addAttribute("user", user);
+        model.addAttribute("wallet", wallet);
 
         model.addAttribute("bookingHistory", history);
+        model.addAttribute("bookingCount", bookingCount);
+        model.addAttribute("pendingBookingCount", pendingBookingCount);
+        model.addAttribute("cancelledBookingCount", cancelledBookingCount);
+        model.addAttribute("completedHistoryCount", completedBookingCount);
+        model.addAttribute("refundRecordCount", refundRecordCount);
         if (user.getCustomer() != null) {
             CustomerTierService.TierUpdateResult tierResult = customerTierService.refreshTier(user.getCustomer());
             model.addAttribute("member", tierResult.memberLevel());
@@ -234,6 +261,16 @@ public class PageController {
         item.put("actualCheckOut", detail.getActualCheckOutDate());
         item.put("status", detail.getStatus() == null ? "" : detail.getStatus());
         return item;
+    }
+
+    private boolean hasBookingStatus(Map<String, Object> item, String... expectedStatuses) {
+        String status = String.valueOf(item.getOrDefault("status", "")).toUpperCase(Locale.ROOT);
+        for (String expectedStatus : expectedStatuses) {
+            if (status.contains(expectedStatus)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Autowired

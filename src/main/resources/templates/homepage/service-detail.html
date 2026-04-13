@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" th:href="@{/css/homepage.css}" />
     <link rel="stylesheet" th:href="@{/css/services.css}" />
+    <link rel="stylesheet" th:href="@{/css/customer-footer.css}" />
 
     <link
       rel="stylesheet"
@@ -147,11 +148,7 @@
       </div>
     </section>
 
-    <footer class="footer">
-      <div class="container">
-        <p th:text="#{footer.copy}"></p>
-      </div>
-    </footer>
+    <div th:replace="~{homepage/customer-footer :: customerFooter}"></div>
 
     <script src="/js/services.js"></script>
   </body>

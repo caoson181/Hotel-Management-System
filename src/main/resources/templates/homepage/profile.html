@@ -1,19 +1,18 @@
-<!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
+﻿<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Profile - Gravity Hotel</title>
   <link rel="stylesheet" th:href="@{/css/homepage.css}" />
   <link rel="stylesheet" th:href="@{/css/contact.css}" />
+  <link rel="stylesheet" th:href="@{/css/profile.css}" />
   <link rel="stylesheet" th:href="@{/css/modals.css}" />
   <link rel="stylesheet" th:href="@{/css/history-modal.css}" />
-
-
+  <link rel="stylesheet" th:href="@{/css/customer-footer.css}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.6.6/css/flag-icons.min.css" />
 </head>
-
 <body class="contact-page">
 <header class="header">
   <div th:replace="~{homepage/navbar :: navbar}"></div>
@@ -23,7 +22,7 @@
   <div class="overlay"></div>
   <div class="container hero-content">
     <h1 class="title-anim">My Profile</h1>
-    <p>Manage your account information and member offers.</p>
+    <p>Manage your account information, wallet, bookings, and preferences.</p>
   </div>
 </section>
 
@@ -31,39 +30,31 @@
   <div class="container">
     <div class="contact-wrapper profile-wrapper">
       <div class="profile-grid-layout">
-        <div class="profile-summary-card" th:classappend="${' tier-' + #strings.toLowerCase(memberLevel)}">
-          <div class="profile-chip" th:text="${memberLevel + ' • ' + customerRank}"></div>
+        <aside class="profile-summary-card" th:classappend="${' tier-' + #strings.toLowerCase(memberLevel)}">
+          <div class="profile-chip" th:text="${memberLevel + ' / ' + customerRank}"></div>
 
           <div th:if="${user != null}">
-            <div id="openAvatarModal" class="profile-avatar-trigger" style="cursor:pointer;">
+            <div id="openAvatarModal" class="profile-avatar-trigger">
               <div class="profile-avatar-large">
-
-                <img th:if="${avatar != null}" th:src="${avatar.url}" />
+                <img th:if="${avatar != null}" th:src="${avatar.url}" alt="Avatar" />
                 <span th:if="${avatar == null}" th:text="${#strings.substring(user.fullName,0,1)}"></span>
-
               </div>
             </div>
 
-            <div class="profile-name" th:text="${user.fullName}">
-            </div>
+            <div class="profile-name" th:text="${user.fullName}"></div>
 
             <div class="avatar-gallery avatar-popup" id="avatarModal">
               <form th:action="@{/profile/avatar/upload}" method="post" enctype="multipart/form-data">
                 <label class="avatar-upload">
-                  ⬆
+                  <i class="fas fa-upload"></i>
                   <input type="file" name="file" hidden onchange="this.form.submit()" />
                 </label>
               </form>
               <form th:each="ava : ${avatars}" th:action="@{/profile/avatar/select}" method="post">
-
                 <input type="hidden" name="avatarId" th:value="${ava.id}" />
-
                 <button type="submit" class="avatar-item" th:classappend="${ava.current} ? 'active'">
-
-                  <img th:src="${ava.url}" />
-
+                  <img th:src="${ava.url}" alt="Avatar option" />
                 </button>
-
               </form>
             </div>
           </div>
@@ -80,146 +71,347 @@
               <p>Member benefits are active for your account.</p>
             </div>
           </div>
+
           <div class="profile-stats">
-            <div class="tier-stat-card level-card"><span th:text="${memberLevel}"></span><small>Level</small></div>
-            <div class="tier-stat-card rank-card"><span th:text="${customerRank}"></span><small>Rank</small></div>
+            <div class="tier-stat-card level-card">
+              <span th:text="${memberLevel}"></span>
+              <small>Level</small>
+            </div>
+            <div class="tier-stat-card rank-card">
+              <span th:text="${customerRank}"></span>
+              <small>Rank</small>
+            </div>
           </div>
+
           <div class="profile-summary-actions">
             <button class="btn-primary" type="button" id="upgradePlanBtn">Upgrade Plan</button>
-            <button type="button" class="btn-secondary btn-history-summary" id="historyBtn">Booking History</button>
           </div>
-        </div>
+        </aside>
 
         <div class="profile-details-card">
+          <button type="button" class="profile-breadcrumb" id="profileBreadcrumb">Account</button>
 
-          <div class="profile-details-header">
-            <div>
-              <h3>Account Details</h3>
-              <p>Manage personal info & security</p>
-            </div>
-
-            <button type="button" class="btn-secondary" id="editBtn">
-              Edit
-            </button>
-
-          </div>
-
-          <form th:action="@{/profile/update}" method="post">
-
-            <div class="profile-table">
-
-              <div class="row">
-                <div>Name</div>
-                <div>
-                  <span class="view-mode" th:text="${user.fullName}"></span>
-
-                  <input class="edit-mode" type="text" name="fullName" th:value="${user.fullName}"
-                         style="display:none;">
+          <section class="profile-panel is-active" data-panel="overview">
+            <div class="profile-overview-list">
+              <button type="button" class="account-nav-card" data-tab-target="profile">
+                <div class="account-nav-card__icon icon-profile"><i class="fas fa-id-badge"></i></div>
+                <div class="account-nav-card__content">
+                  <h3>Profile</h3>
+                  <p>Open your personal details, membership, and account overview.</p>
                 </div>
-              </div>
-
-              <div class="row">
-                <div>Email</div>
-                <div>
-                  <span class="view-mode" th:text="${user.email}"></span>
-
-                  <input class="edit-mode" type="email" name="email" th:value="${user.email}" style="display:none;">
-                </div>
-              </div>
-
-              <div class="row">
-                <div>Phone</div>
-                <div>
-                  <span class="view-mode" th:text="${user.phoneNumber}"></span>
-
-                  <input class="edit-mode" type="text" name="phoneNumber" th:value="${user.phoneNumber}"
-                         style="display:none;">
-                </div>
-              </div>
-
-              <div class="row">
-                <div>Gender</div>
-                <div th:text="${user.gender != null and !#strings.isEmpty(user.gender) ? user.gender : 'Not set'}"></div>
-              </div>
-
-              <div class="row">
-                <div>Username</div>
-                <div th:text="${user.username}"></div>
-              </div>
-
-              <div class="row">
-                <div>Role</div>
-                <div th:text="${user.role}"></div>
-              </div>
-
-              <div class="row">
-                <div>Membership</div>
-                <div th:text="${memberLevel + ' / ' + customerRank}"></div>
-              </div>
-
-            </div>
-
-            <div class="action-row">
-
-              <button type="submit" class="cta-button" id="saveBtn" style="display:none;">
-                Save Changes
+                <div class="account-nav-card__meta">Open</div>
               </button>
 
-              <button type="button" id="ChangePasswordBtn">
-                Change Password
+              <button type="button" class="account-nav-card" data-tab-target="wallet">
+                <div class="account-nav-card__icon icon-wallet"><i class="fas fa-wallet"></i></div>
+                <div class="account-nav-card__content">
+                  <h3>Wallet &amp; Transactions</h3>
+                  <p th:text="${wallet != null ? #numbers.formatDecimal(wallet.balance != null ? wallet.balance.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND available' : '0 VND available'}"></p>
+                </div>
+                <div class="account-nav-card__meta" th:text="${bookingCount + ' txns'}"></div>
               </button>
 
+              <button type="button" class="account-nav-card" data-tab-target="bookings">
+                <div class="account-nav-card__icon icon-booking"><i class="fas fa-receipt"></i></div>
+                <div class="account-nav-card__content">
+                  <h3>Booking &amp; Refunds</h3>
+                  <p th:text="${pendingBookingCount + ' pending · ' + cancelledBookingCount + ' cancelled'}"></p>
+                </div>
+                <div class="account-nav-card__meta" th:text="${bookingCount + ' bookings'}"></div>
+              </button>
             </div>
 
-          </form>
+            <div class="settings-summary-card">
+              <div class="settings-summary-head">
+                <div class="settings-summary-icon"><i class="fas fa-sliders-h"></i></div>
+                <div class="settings-summary-copy">
+                  <h3>Security &amp; Settings</h3>
+                  <p>Email, password, and profile preferences</p>
+                </div>
+              </div>
 
+              <div class="settings-summary-actions">
+                <button type="button" class="settings-link-card" data-tab-target="settings">
+                  <div class="settings-link-card__icon"><i class="fas fa-sliders-h"></i></div>
+                  <span>General Settings</span>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <button type="button" class="settings-link-card" data-tab-target="security">
+                  <div class="settings-link-card__icon settings-link-card__icon--security"><i class="fas fa-shield-alt"></i></div>
+                  <span>Security</span>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="profile-panel" data-panel="profile">
+            <div class="panel-header">
+              <div>
+                <h3>Account Details</h3>
+                <p>Manage personal info &amp; security</p>
+              </div>
+              <button type="button" class="btn-secondary" id="editBtn">Edit</button>
+            </div>
+
+            <form th:action="@{/profile/update}" method="post" id="profileEditForm">
+              <div class="profile-table">
+                <div class="row">
+                  <div>Name</div>
+                  <div>
+                    <span class="view-mode" th:text="${user.fullName}"></span>
+                    <input class="edit-mode" type="text" name="fullName" th:value="${user.fullName}" hidden />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div>Email</div>
+                  <div>
+                    <span class="view-mode" th:text="${user.email}"></span>
+                    <input class="edit-mode" type="email" name="email" th:value="${user.email}" hidden />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div>Phone</div>
+                  <div>
+                    <span class="view-mode" th:text="${user.phoneNumber}"></span>
+                    <input class="edit-mode" type="text" name="phoneNumber" th:value="${user.phoneNumber}" hidden />
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div>Gender</div>
+                  <div th:text="${user.gender != null and !#strings.isEmpty(user.gender) ? user.gender : 'Not set'}"></div>
+                </div>
+
+                <div class="row">
+                  <div>Username</div>
+                  <div th:text="${user.username}"></div>
+                </div>
+
+                <div class="row">
+                  <div>Role</div>
+                  <div th:text="${user.role}"></div>
+                </div>
+
+                <div class="row">
+                  <div>Membership</div>
+                  <div th:text="${memberLevel + ' / ' + customerRank}"></div>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <button type="submit" class="cta-button" id="saveBtn" hidden>Save Changes</button>
+                <button type="button" class="btn-secondary" id="cancelEditBtn" hidden>Cancel</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="profile-panel" data-panel="wallet">
+            <div class="panel-header">
+              <div>
+                <h3>Wallet &amp; Transactions</h3>
+                <p>View your wallet balance, payment codes, and recent activity.</p>
+              </div>
+            </div>
+
+            <div class="wallet-grid">
+              <article class="info-stat-card info-stat-card--wide">
+                <span class="info-stat-card__label">Wallet Balance</span>
+                <strong th:text="${wallet != null ? #numbers.formatDecimal(wallet.balance != null ? wallet.balance.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND' : '0 VND'}"></strong>
+                <p>Tracked only for online payments and refunds in the system.</p>
+              </article>
+
+              <article class="info-stat-card">
+                <span class="info-stat-card__label">VNPay Code</span>
+                <strong th:text="${wallet != null and wallet.vnpayCode != null and !#strings.isEmpty(wallet.vnpayCode) ? wallet.vnpayCode : 'N/A'}"></strong>
+                <span class="info-stat-card__label secondary-label">MoMo Code</span>
+                <strong th:text="${wallet != null and wallet.momoCode != null and !#strings.isEmpty(wallet.momoCode) ? wallet.momoCode : 'N/A'}"></strong>
+              </article>
+
+              <article class="info-stat-card info-stat-card--compact">
+                <span class="info-stat-card__label">Total Transactions</span>
+                <strong th:text="${bookingCount}"></strong>
+              </article>
+
+              <article class="info-stat-card info-stat-card--compact">
+                <span class="info-stat-card__label">Refund Records</span>
+                <strong th:text="${refundRecordCount}"></strong>
+              </article>
+            </div>
+
+            <div class="empty-state-box" th:if="${#lists.isEmpty(bookingHistory)}">No transaction history yet.</div>
+            <div class="compact-history-list" th:if="${!#lists.isEmpty(bookingHistory)}">
+              <article class="compact-history-item" th:each="b, iter : ${bookingHistory}" th:if="${iter.index < 3}">
+                <div>
+                  <h4 th:text="${'Booking #' + b.id}"></h4>
+                  <p th:text="${b.groupCode != null ? b.groupCode : 'No group code'}"></p>
+                </div>
+                <div class="compact-history-summary">
+                  <strong th:text="${#numbers.formatDecimal(b.totalAmount != null ? b.totalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></strong>
+                  <span th:text="${b.status}"></span>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="profile-panel" data-panel="bookings">
+            <div class="panel-header">
+              <div>
+                <h3>Booking History</h3>
+                <p>Review reservations, refunds, and cancellation actions.</p>
+              </div>
+            </div>
+
+            <div class="booking-history-inline" th:if="${!#lists.isEmpty(bookingHistory)}">
+              <div class="history-booking-card" th:each="b : ${bookingHistory}">
+                <div class="history-booking-header">
+                  <div>
+                    <h4 th:text="${'Booking #' + b.id}"></h4>
+                    <p th:text="${'Group: ' + (b.groupCode != null ? b.groupCode : 'N/A')}"></p>
+                  </div>
+                  <div class="history-booking-summary">
+                    <span class="history-status" th:text="${b.status}"></span>
+                    <strong th:text="${#numbers.formatDecimal(b.totalAmount != null ? b.totalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></strong>
+                    <small th:text="${b.checkIn + ' -> ' + b.checkOut}"></small>
+                  </div>
+                </div>
+
+                <div class="history-detail-list">
+                  <div class="history-detail-card" th:each="detail : ${b.details}">
+                    <div class="history-detail-image">
+                      <img
+                        src="https://via.placeholder.com/320x180?text=Room"
+                        alt="Room image"
+                        th:attr="data-rank=${detail.roomRank},data-type=${detail.roomType}" />
+                    </div>
+                    <div class="history-detail-body">
+                      <div class="history-detail-title-row">
+                        <h5 th:text="${detail.roomRank + ' ' + detail.roomType}"></h5>
+                        <span class="history-detail-room" th:text="${'Room ' + detail.roomNumber}"></span>
+                      </div>
+
+                      <div class="history-detail-meta">
+                        <span th:text="${'Price/night: ' + #numbers.formatDecimal(detail.price != null ? detail.price.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
+                        <span th:text="${'Final: ' + #numbers.formatDecimal(detail.finalAmount != null ? detail.finalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
+                      </div>
+
+                      <div class="history-detail-dates">
+                        <div>
+                          <label>Stay</label>
+                          <strong th:text="${detail.checkIn + ' -> ' + detail.checkOut}"></strong>
+                        </div>
+                        <div>
+                          <label>Actual Check-out</label>
+                          <strong th:text="${detail.actualCheckOut != null ? detail.actualCheckOut : '--'}"></strong>
+                        </div>
+                        <div>
+                          <label>Status</label>
+                          <strong th:text="${detail.status != null && !#strings.isEmpty(detail.status) ? detail.status : 'ASSIGNED'}"></strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="empty-state-box" th:if="${#lists.isEmpty(bookingHistory)}">No booking history yet.</div>
+          </section>
+
+          <section class="profile-panel" data-panel="settings">
+            <div class="panel-header">
+              <div>
+                <h3>Security &amp; Settings</h3>
+                <p>Manage account protection and personalize how this profile page looks and behaves.</p>
+              </div>
+            </div>
+
+            <div class="settings-detail-card settings-detail-card--plain">
+              <div class="settings-badge">Settings</div>
+              <h4>Customize your experience</h4>
+              <p>Adjust language and choose between light mode or dark mode.</p>
+
+              <div class="settings-option-box">
+                <h5>Language</h5>
+                <p>Choose the display language for your current session.</p>
+                <div class="settings-pill-group">
+                  <button type="button" class="settings-pill settings-pill--lang" th:classappend="${#locale.language == 'en'} ? ' is-active'" onclick="profileChangeLang('en')">
+                    <span class="fi fi-gb"></span>
+                    <span>English</span>
+                  </button>
+                  <button type="button" class="settings-pill settings-pill--lang" th:classappend="${#locale.language == 'vi'} ? ' is-active'" onclick="profileChangeLang('vi')">
+                    <span class="fi fi-vn"></span>
+                    <span>Tiếng Việt</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="settings-option-box">
+                <h5>Appearance</h5>
+                <p>Switch between a bright interface and a dark profile workspace.</p>
+                <div class="settings-pill-group">
+                  <button type="button" class="settings-pill settings-pill--theme" data-theme-value="light">Light</button>
+                  <button type="button" class="settings-pill settings-pill--theme" data-theme-value="dark">Dark</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="profile-panel" data-panel="security">
+            <div class="panel-header">
+              <div>
+                <h3>Security &amp; Settings</h3>
+                <p>Manage account protection and personalize how this profile page looks and behaves.</p>
+              </div>
+            </div>
+
+            <div class="settings-detail-card settings-detail-card--plain">
+              <div class="settings-badge">Security</div>
+              <h4>Protect your account</h4>
+              <p>Password actions and important account-related preferences.</p>
+
+              <button type="button" class="security-row-card" id="securityPasswordBtn">
+                <div>
+                  <h5>Password &amp; Security</h5>
+                  <p>Change your current password and keep your account protected.</p>
+                </div>
+                <span>Open</span>
+              </button>
+
+              <div class="security-row-card static-card">
+                <div>
+                  <h5>Email Preferences</h5>
+                  <p>Booking confirmations, refund updates, and membership notices are enabled.</p>
+                </div>
+                <span>Enabled</span>
+              </div>
+
+              <div class="security-row-card static-card">
+                <div>
+                  <h5>Contact Preferences</h5>
+                  <p>Your current phone number is used for payment verification and booking support.</p>
+                </div>
+                <span th:text="${user.phoneNumber != null ? user.phoneNumber : 'Not set'}"></span>
+              </div>
+            </div>
+          </section>
         </div>
-
+      </div>
+    </div>
+  </div>
 </section>
 
-<footer class="footer">
-  <div class="container">
-    <p>&copy; 2026 Gravity Hotel. All rights reserved.</p>
-  </div>
-
-</footer>
-
-<style>
-  .profile-avatar-large {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    overflow: hidden;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .profile-avatar-large img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* 🔥 dòng fix chính */
-    border-radius: 50%;
-  }
-</style>
-
-
-<script>
-  const header = document.querySelector('.header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
-    }
-  });
-</script>
-<div id="changePasswordModal" class="modals">
-  <div class="modals-content">
-    <span class="close-btn" id="closeModal">&times;</span>
-
-    <h3>Change Password</h3>
+<div id="changePasswordModal" class="modals profile-password-modal">
+  <div class="modals-content profile-password-content">
+    <button type="button" class="profile-password-close" id="closeModal">&times;</button>
+    <div class="profile-password-head">
+      <span class="profile-password-badge">Security</span>
+      <h3>Change Password</h3>
+      <p>Use a strong password with letters and numbers to keep your account protected.</p>
+    </div>
 
     <div class="password-field">
       <input type="password" id="currentPassword" placeholder="Current Password">
@@ -240,8 +432,7 @@
 
     <div id="confirmHint" class="hint"></div>
 
-
-    <button onclick="submitChangePassword()">Update Password</button>
+    <button class="profile-password-submit" onclick="submitChangePassword()">Update Password</button>
   </div>
 </div>
 
@@ -259,8 +450,8 @@
           </div>
           <div class="history-booking-summary">
             <span class="history-status" th:text="${b.status}"></span>
-            <strong th:text="${#numbers.formatDecimal(b.totalAmount != null ? b.totalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' đ'}"></strong>
-            <small th:text="${b.checkIn + ' → ' + b.checkOut}"></small>
+            <strong th:text="${#numbers.formatDecimal(b.totalAmount != null ? b.totalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></strong>
+            <small th:text="${b.checkIn + ' -> ' + b.checkOut}"></small>
           </div>
         </div>
 
@@ -279,18 +470,18 @@
               </div>
 
               <div class="history-detail-meta">
-                <span th:text="${'Price/night: ' + #numbers.formatDecimal(detail.price != null ? detail.price.doubleValue() : 0,0,'COMMA',0,'POINT') + ' đ'}"></span>
-                <span th:text="${'Final: ' + #numbers.formatDecimal(detail.finalAmount != null ? detail.finalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' đ'}"></span>
+                <span th:text="${'Price/night: ' + #numbers.formatDecimal(detail.price != null ? detail.price.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
+                <span th:text="${'Final: ' + #numbers.formatDecimal(detail.finalAmount != null ? detail.finalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
               </div>
 
               <div class="history-detail-dates">
                 <div>
                   <label>Stay</label>
-                  <strong th:text="${detail.checkIn + ' → ' + detail.checkOut}"></strong>
+                  <strong th:text="${detail.checkIn + ' -> ' + detail.checkOut}"></strong>
                 </div>
                 <div>
                   <label>Actual Check-out</label>
-                  <strong th:text="${detail.actualCheckOut != null ? detail.actualCheckOut : '—'}"></strong>
+                  <strong th:text="${detail.actualCheckOut != null ? detail.actualCheckOut : '--'}"></strong>
                 </div>
                 <div>
                   <label>Status</label>
@@ -319,21 +510,31 @@
       <p class="upgrade-plan-text" id="upgradePlanText">Your spending progress toward the next membership tier.</p>
       <div class="upgrade-amount-row">
         <span>Total spent</span>
-        <strong th:text="${totalSpent != null ? #numbers.formatDecimal(totalSpent.doubleValue(),0,'COMMA',0,'POINT') + ' đ' : '0 đ'}"></strong>
+        <strong th:text="${totalSpent != null ? #numbers.formatDecimal(totalSpent.doubleValue(),0,'COMMA',0,'POINT') + ' VND' : '0 VND'}"></strong>
       </div>
       <div class="upgrade-progress-track">
         <div id="upgradeProgressFill" class="upgrade-progress-fill"></div>
       </div>
       <div class="upgrade-progress-meta">
-        <span id="upgradeProgressCurrent">0 đ</span>
-        <span id="upgradeProgressTarget">50.000.000 đ</span>
+        <span id="upgradeProgressCurrent">0 VND</span>
+        <span id="upgradeProgressTarget">50.000.000 VND</span>
       </div>
     </div>
   </div>
 </div>
 
+<div th:replace="~{homepage/customer-footer :: customerFooter}"></div>
 
+<script>
+  const header = document.querySelector('.header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  });
+</script>
 <script th:src="@{/js/profile.js}"></script>
 </body>
-
 </html>
