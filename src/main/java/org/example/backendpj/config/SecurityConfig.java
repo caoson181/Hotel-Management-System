@@ -2,6 +2,7 @@ package org.example.backendpj.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -61,6 +62,9 @@ public class SecurityConfig {
                                 "/*.html",
                                 "/api/rooms/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/room-comments/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/room-comments/**")
+                        .hasAnyAuthority("ROLE_CUSTOMER", "Customer", "ROLE_Customer")
                         // Customer booking flow
                         .requestMatchers("/api/customer-bookings/checkout")
                         .hasAnyAuthority("ROLE_CUSTOMER", "Customer", "ROLE_Customer")

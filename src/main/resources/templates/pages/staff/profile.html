@@ -6,7 +6,6 @@
     <link rel="stylesheet" th:href="@{/css/global.css}" />
     <link rel="stylesheet" th:href="@{/css/modal.css}" />
     <link rel="stylesheet" th:href="@{/css/navbar.css}" />
-    <link rel="stylesheet" th:href="@{/css/profile.css}" />
     <link rel="stylesheet" th:href="@{/css/profile-staff.css}" />
 </head>
 
@@ -70,7 +69,7 @@
     </div>
 
     <!-- NAVBAR -->
-    <div th:replace="~{components/navbar}"></div>
+    <div th:replace="~{components/navbar :: navbar}"></div>
 
     <div class="profile-container">
         <div class="profile-card">
@@ -151,6 +150,7 @@
     <script th:src="@{/js/account.js}"></script>
     <script th:src="@{/js/dropdown.js}"></script>
     <script th:src="@{/js/role.js}"></script>
+    <div th:replace="~{components/modals :: modals}"></div>
     <script>
         const avatarBtn = document.getElementById("openAvatarModal");
         const avatarModal = document.getElementById("avatarModal");

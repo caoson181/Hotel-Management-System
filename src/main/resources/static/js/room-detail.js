@@ -118,6 +118,13 @@ let availabilityState = {
   available: false,
   availableCount: 0,
 };
+let selectedReviewRating = 0;
+let reviewState = {
+  averageRating: 0,
+  totalReviews: 0,
+  ratingCounts: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+  reviews: [],
+};
 
 const selectedRoomConfig = ROOM_CATALOG[pageRank]?.[pageType] || {};
 const roomInfo = {
@@ -157,6 +164,15 @@ function t(key) {
 
 function formatVND(number) {
   return Number(number || 0).toLocaleString("vi-VN") + " d";
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 function getTodayString() {
@@ -260,7 +276,7 @@ function initRoomData() {
     roomMeta.innerHTML = `
       <span><i class="fas fa-user"></i> ${roomInfo.guests} Guests</span>
       <span><i class="fas fa-ruler-combined"></i> ${roomInfo.size} m2</span>
-      <span><i class="fas fa-star" style="color: #d4af37;"></i> 4.9 (128)</span>
+      <span><i class="fas fa-star" style="color: #d4af37;"></i> ${Number(reviewState.averageRating || 0).toFixed(1)} (${reviewState.totalReviews || 0})</span>
     `;
   }
 
@@ -273,6 +289,291 @@ function initRoomData() {
   if (descCard) {
     descCard.innerHTML = `<p>${t(roomInfo.description)}</p>`;
   }
+}
+
+function renderStarsMarkup(rating) {
+  const normalized = Math.max(0, Math.min(5, Number(rating || 0)));
+  let html = "";
+  for (let index = 1; index <= 5; index += 1) {
+    html += `<i class="${normalized >= index ? "fas" : "far"} fa-star"></i>`;
+  }
+  return html;
+}
+
+function getRatingCountsObject(source) {
+  return {
+    5: Number(source?.[5] ?? source?.["5"] ?? 0),
+    4: Number(source?.[4] ?? source?.["4"] ?? 0),
+    3: Number(source?.[3] ?? source?.["3"] ?? 0),
+    2: Number(source?.[2] ?? source?.["2"] ?? 0),
+    1: Number(source?.[1] ?? source?.["1"] ?? 0),
+  };
+}
+
+function applyReviewSummary(data) {
+  reviewState = {
+    averageRating: Number(data?.averageRating || 0),
+    totalReviews: Number(data?.totalReviews || 0),
+    ratingCounts: getRatingCountsObject(data?.ratingCounts || {}),
+    reviews: Array.isArray(data?.reviews) ? data.reviews : [],
+  };
+
+  const averageRatingValue = document.getElementById("averageRatingValue");
+  const averageRatingStars = document.getElementById("averageRatingStars");
+  const averageRatingNote = document.getElementById("averageRatingNote");
+  const reviewCountTitle = document.getElementById("reviewCountTitle");
+
+  if (averageRatingValue) {
+    averageRatingValue.textContent = reviewState.averageRating.toFixed(1);
+  }
+  if (averageRatingStars) {
+    averageRatingStars.innerHTML = renderStarsMarkup(reviewState.averageRating);
+  }
+  if (averageRatingNote) {
+    averageRatingNote.textContent =
+      reviewState.totalReviews > 0
+        ? `${reviewState.totalReviews} review${reviewState.totalReviews > 1 ? "s" : ""}`
+        : "No ratings yet";
+  }
+  if (reviewCountTitle) {
+    reviewCountTitle.textContent = String(reviewState.totalReviews);
+  }
+
+  for (let rating = 5; rating >= 1; rating -= 1) {
+    const count = reviewState.ratingCounts[rating] || 0;
+    const countEl = document.getElementById(`ratingCount${rating}`);
+    const barEl = document.getElementById(`ratingBar${rating}`);
+    if (countEl) {
+      countEl.textContent = String(count);
+    }
+    if (barEl) {
+      const width = reviewState.totalReviews > 0 ? (count / reviewState.totalReviews) * 100 : 0;
+      barEl.style.width = `${width}%`;
+    }
+  }
+
+  initRoomData();
+  renderReviewsList();
+}
+
+async function loadReviews() {
+  try {
+    const response = await fetch(`/api/room-comments?type=${encodeURIComponent(pageType)}&rank=${encodeURIComponent(pageRank)}`);
+    if (!response.ok) {
+      throw new Error("Could not load reviews.");
+    }
+    const data = await response.json();
+    applyReviewSummary(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function getFilteredReviews() {
+  const ratingFilter = document.getElementById("reviewRatingTrigger")?.dataset.value || "all";
+  const sortType = document.getElementById("reviewSortTrigger")?.dataset.value || "newest";
+  const items = [...reviewState.reviews];
+
+  const filtered = ratingFilter === "all"
+    ? items
+    : items.filter((review) => Number(review.rating) === Number(ratingFilter));
+
+  filtered.sort((left, right) => {
+    const leftTime = new Date(left.createdAt || 0).getTime();
+    const rightTime = new Date(right.createdAt || 0).getTime();
+    return sortType === "oldest" ? leftTime - rightTime : rightTime - leftTime;
+  });
+
+  return filtered;
+}
+
+function createReviewItemMarkup(review) {
+  const safeAuthorName = escapeHtml(review.authorName || "Guest");
+  const safeAuthorInitial = escapeHtml(review.authorInitial || "G");
+  const safeCreatedAtText = escapeHtml(review.createdAtText || "");
+  const safeContent = escapeHtml(review.content || "");
+  const avatar = review.avatarUrl
+    ? `<img class="review-avatar" src="${escapeHtml(review.avatarUrl)}" alt="${safeAuthorName}">`
+    : `<div class="review-avatar-placeholder">${safeAuthorInitial}</div>`;
+
+  return `
+    <article class="review-item">
+      <div class="review-item-header">
+        <div class="review-author">
+          ${avatar}
+          <div class="review-author-meta">
+            <strong>${safeAuthorName}</strong>
+            <span>${safeCreatedAtText}</span>
+          </div>
+        </div>
+        <div class="review-rating" aria-label="${review.rating} stars">
+          ${renderStarsMarkup(review.rating)}
+        </div>
+      </div>
+      <div class="review-content">${safeContent}</div>
+    </article>
+  `;
+}
+
+function renderReviewsList() {
+  const list = document.getElementById("reviewsList");
+  const empty = document.getElementById("reviewsEmptyState");
+  if (!list || !empty) {
+    return;
+  }
+
+  const items = getFilteredReviews();
+  if (!items.length) {
+    list.innerHTML = "";
+    empty.style.display = "block";
+    empty.textContent = reviewState.totalReviews
+      ? "No reviews match the selected filter."
+      : "No reviews yet. Be the first to comment on this room.";
+    return;
+  }
+
+  empty.style.display = "none";
+  list.innerHTML = items.map(createReviewItemMarkup).join("");
+}
+
+function setSelectedReviewRating(value) {
+  selectedReviewRating = Number(value || 0);
+  document.querySelectorAll(".review-star-btn").forEach((button) => {
+    const buttonValue = Number(button.dataset.value || 0);
+    button.classList.toggle("active", buttonValue <= selectedReviewRating);
+    const icon = button.querySelector("i");
+    if (icon) {
+      icon.className = `${buttonValue <= selectedReviewRating ? "fas" : "far"} fa-star`;
+    }
+  });
+}
+
+function setReviewFormMessage(message, mode = "") {
+  const formMessage = document.getElementById("reviewFormMessage");
+  if (!formMessage) {
+    return;
+  }
+  formMessage.textContent = message || "";
+  formMessage.classList.remove("error", "success");
+  if (mode) {
+    formMessage.classList.add(mode);
+  }
+}
+
+async function submitReview() {
+  if (!window.isLoggedIn) {
+    setReviewFormMessage("Please log in with a customer account to send a review.", "error");
+    return;
+  }
+  if (!selectedReviewRating) {
+    setReviewFormMessage("Please choose a star rating before sending.", "error");
+    return;
+  }
+
+  const contentEl = document.getElementById("reviewContent");
+  const submitBtn = document.getElementById("submitReviewBtn");
+  const content = String(contentEl?.value || "").trim();
+
+  if (!content) {
+    setReviewFormMessage("Please write your comment before sending.", "error");
+    return;
+  }
+
+  try {
+    if (submitBtn) {
+      submitBtn.disabled = true;
+    }
+    setReviewFormMessage("Sending review...");
+
+    const response = await fetch("/api/room-comments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        roomType: pageType,
+        roomRank: pageRank,
+        content,
+        rating: selectedReviewRating,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Could not send review.");
+    }
+
+    const data = await response.json();
+    applyReviewSummary(data);
+    if (contentEl) {
+      contentEl.value = "";
+    }
+    setSelectedReviewRating(0);
+    setReviewFormMessage("Review sent successfully.", "success");
+  } catch (error) {
+    console.error(error);
+    setReviewFormMessage(error.message || "Could not send review.", "error");
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+    }
+  }
+}
+
+function initReviewSection() {
+  document.querySelectorAll(".review-star-btn").forEach((button) => {
+    button.addEventListener("click", () => setSelectedReviewRating(button.dataset.value));
+  });
+
+  document.getElementById("submitReviewBtn")?.addEventListener("click", submitReview);
+
+  document.querySelectorAll(".reviews-dropdown-trigger").forEach((trigger) => {
+    trigger.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const dropdown = trigger.closest(".reviews-dropdown");
+      const willOpen = !dropdown?.classList.contains("open");
+      document.querySelectorAll(".reviews-dropdown.open").forEach((item) => {
+        item.classList.remove("open");
+        item.querySelector(".reviews-dropdown-trigger")?.setAttribute("aria-expanded", "false");
+      });
+      if (dropdown && willOpen) {
+        dropdown.classList.add("open");
+        trigger.setAttribute("aria-expanded", "true");
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-dropdown-option]").forEach((option) => {
+    option.addEventListener("click", () => {
+      const targetId = option.dataset.target;
+      const target = document.getElementById(targetId);
+      const dropdown = option.closest(".reviews-dropdown");
+      if (!target || !dropdown) {
+        return;
+      }
+
+      target.dataset.value = option.dataset.value || "";
+      const label = target.querySelector(".reviews-dropdown-label");
+      if (label) {
+        label.textContent = option.textContent || "";
+      }
+
+      dropdown.querySelectorAll(".reviews-dropdown-option").forEach((item) => {
+        item.classList.toggle("active", item === option);
+      });
+
+      dropdown.classList.remove("open");
+      target.setAttribute("aria-expanded", "false");
+      renderReviewsList();
+    });
+  });
+
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".reviews-dropdown.open").forEach((item) => {
+      item.classList.remove("open");
+      item.querySelector(".reviews-dropdown-trigger")?.setAttribute("aria-expanded", "false");
+    });
+  });
 }
 
 function createThumbnails(container) {
@@ -801,12 +1102,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     priceValue.textContent = formatVND(roomInfo.price);
   }
   initRoomData();
+  initReviewSection();
   initGallery();
   initLightbox();
   initBookingCard();
   initEvents();
   initAOS();
   loadCartUI();
+  await loadReviews();
   await loadPriceFromDB(pageType, pageRank);
   await loadSimilarPrices();
   await syncBookingCard();
