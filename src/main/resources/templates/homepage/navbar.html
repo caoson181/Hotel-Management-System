@@ -71,6 +71,31 @@
           ></span>
         </li>
 
+        <li class="notification-menu" sec:authorize="isAuthenticated()">
+          <button
+            class="account-btn notification-btn"
+            id="notificationBtn"
+            type="button"
+            aria-expanded="false"
+            aria-label="Notifications"
+          >
+            <i class="fa fa-bell"></i>
+            <span class="notification-badge hidden" id="notificationBadge">0</span>
+          </button>
+          <div class="notification-dropdown" id="notificationDropdown">
+            <div class="notification-header">
+              <span>Notifications</span>
+              <button type="button" class="notification-clear-btn" id="notificationClearBtn">
+                Clear
+              </button>
+            </div>
+            <div class="notification-list" id="notificationList"></div>
+            <div class="notification-empty" id="notificationEmpty">
+              No notifications yet.
+            </div>
+          </div>
+        </li>
+
         <li sec:authorize="isAnonymous()">
           <a
             th:href="@{/auth/login}"
@@ -117,6 +142,171 @@
 
     const languageBtn = document.getElementById("languageBtn");
     const languageMenu = document.getElementById("languageMenu");
+    const notificationBtn = document.getElementById("notificationBtn");
+    const notificationDropdown = document.getElementById("notificationDropdown");
+    const notificationBadge = document.getElementById("notificationBadge");
+    const notificationList = document.getElementById("notificationList");
+    const notificationEmpty = document.getElementById("notificationEmpty");
+    const notificationClearBtn = document.getElementById("notificationClearBtn");
+
+    const NOTIFICATION_STORAGE_KEY = "gravity.notifications";
+    const NOTIFICATION_AUTO_OPEN_KEY = "gravity.notifications.autoOpen";
+    const MAX_NOTIFICATIONS = 10;
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function readNotifications() {
+      try {
+        const raw = localStorage.getItem(NOTIFICATION_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        console.error("Failed to read notifications", error);
+        return [];
+      }
+    }
+
+    function writeNotifications(notifications) {
+      localStorage.setItem(
+        NOTIFICATION_STORAGE_KEY,
+        JSON.stringify(notifications.slice(0, MAX_NOTIFICATIONS))
+      );
+    }
+
+    function formatNotificationAmount(amount) {
+      return `${Number(amount || 0).toLocaleString("vi-VN")} VND`;
+    }
+
+    function formatNotificationDateTime(value) {
+      if (!value) return "";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    }
+
+    function shortenGroupCode(groupCode) {
+      if (!groupCode) return "N/A";
+      return String(groupCode).slice(0, 8).toUpperCase();
+    }
+
+    function renderNotifications() {
+      if (!notificationList || !notificationEmpty || !notificationBadge) {
+        return;
+      }
+
+      const notifications = readNotifications();
+      const unreadCount = notifications.filter((item) => !item.read).length;
+
+      notificationBadge.textContent = unreadCount > 99 ? "99+" : String(unreadCount);
+      notificationBadge.classList.toggle("hidden", unreadCount === 0);
+
+      if (!notifications.length) {
+        notificationList.innerHTML = "";
+        notificationEmpty.classList.remove("hidden");
+        return;
+      }
+
+      notificationEmpty.classList.add("hidden");
+      notificationList.innerHTML = notifications
+        .map(
+          (item) => `
+            <article class="notification-item ${item.read ? "" : "is-unread"}">
+              <div class="notification-icon">
+                <i class="fa fa-bed"></i>
+              </div>
+              <div class="notification-content">
+                <strong>${escapeHtml(item.title || "Booking created successfully")}</strong>
+                <p>${escapeHtml(item.message || "")}</p>
+                <div class="notification-meta">
+                  <span>${escapeHtml(item.codeLabel || "")}</span>
+                  <time>${escapeHtml(formatNotificationDateTime(item.createdAt))}</time>
+                </div>
+                <div class="notification-amount">${escapeHtml(
+                  formatNotificationAmount(item.amount)
+                )}</div>
+              </div>
+            </article>
+          `
+        )
+        .join("");
+    }
+
+    function markAllNotificationsAsRead() {
+      const notifications = readNotifications();
+      writeNotifications(notifications.map((item) => ({ ...item, read: true })));
+      renderNotifications();
+    }
+
+    function addNotification(notification) {
+      const notifications = readNotifications();
+      notifications.unshift({
+        id: notification.id || `${Date.now()}`,
+        title: notification.title || "Booking created successfully",
+        message: notification.message || "",
+        codeLabel: notification.codeLabel || "",
+        amount: notification.amount || 0,
+        createdAt: notification.createdAt || new Date().toISOString(),
+        read: false,
+      });
+      writeNotifications(notifications);
+      renderNotifications();
+    }
+
+    function openNotificationsDropdown(markAsRead = true) {
+      if (!notificationBtn || !notificationDropdown) {
+        return;
+      }
+
+      notificationDropdown.classList.add("show");
+      notificationBtn.setAttribute("aria-expanded", "true");
+      accountDropdown?.classList.remove("show");
+      accountBtn?.setAttribute("aria-expanded", "false");
+      languageMenu?.classList.remove("show");
+
+      if (markAsRead) {
+        markAllNotificationsAsRead();
+      }
+    }
+
+    window.GravityNotifications = {
+      addBookingSuccessNotification(payload) {
+        if (!payload) return;
+
+        const roomCount = Number(payload.roomCount || 0);
+        const bookingLabel = roomCount === 1 ? "1 room" : `${roomCount} room(s)`;
+
+        addNotification({
+          title: "Booking created successfully",
+          message: `Your booking for ${bookingLabel} from ${payload.checkIn} to ${payload.checkOut} was recorded successfully.`,
+          codeLabel: `Code: ${shortenGroupCode(payload.groupCode)} | ${payload.status || "UNPAID"}`,
+          amount: payload.totalAmount || 0,
+          createdAt: payload.createdAt,
+        });
+      },
+      render: renderNotifications,
+    };
+
+    renderNotifications();
+
+    if (sessionStorage.getItem(NOTIFICATION_AUTO_OPEN_KEY) === "true") {
+      sessionStorage.removeItem(NOTIFICATION_AUTO_OPEN_KEY);
+      window.setTimeout(() => {
+        openNotificationsDropdown(true);
+      }, 350);
+    }
 
     document.addEventListener("click", (e) => {
       // ===== ACCOUNT =====
@@ -130,6 +320,8 @@
 
           // đóng language nếu mở
           languageMenu?.classList.remove("show");
+          notificationDropdown?.classList.remove("show");
+          notificationBtn?.setAttribute("aria-expanded", "false");
         } else if (!accountDropdown.contains(e.target)) {
           accountDropdown.classList.remove("show");
           accountBtn.setAttribute("aria-expanded", "false");
@@ -144,11 +336,42 @@
 
           // đóng account nếu mở
           accountDropdown?.classList.remove("show");
+          notificationDropdown?.classList.remove("show");
+          notificationBtn?.setAttribute("aria-expanded", "false");
         } else if (!languageMenu.contains(e.target)) {
           languageMenu.classList.remove("show");
         }
       }
+      if (notificationBtn && notificationDropdown) {
+        if (notificationBtn.contains(e.target)) {
+          e.stopPropagation();
+          const expanded =
+            notificationBtn.getAttribute("aria-expanded") === "true";
+          if (expanded) {
+            notificationDropdown.classList.remove("show");
+            notificationBtn.setAttribute("aria-expanded", "false");
+          } else {
+            openNotificationsDropdown(true);
+          }
+        } else if (!notificationDropdown.contains(e.target)) {
+          notificationDropdown.classList.remove("show");
+          notificationBtn.setAttribute("aria-expanded", "false");
+        }
+      }
     });
+
+    notificationClearBtn?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      writeNotifications([]);
+      renderNotifications();
+    });
+
+    window.addEventListener("storage", (event) => {
+      if (event.key === NOTIFICATION_STORAGE_KEY) {
+        renderNotifications();
+      }
+    });
+
     function changeLang(lang) {
       const url = new URL(window.location.href);
       url.searchParams.set("lang", lang);

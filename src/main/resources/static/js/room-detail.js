@@ -166,6 +166,48 @@ function formatVND(number) {
   return Number(number || 0).toLocaleString("vi-VN") + " d";
 }
 
+const BOOKING_NOTIFICATION_STORAGE_KEY = "gravity.notifications";
+const BOOKING_NOTIFICATION_LIMIT = 10;
+const BOOKING_NOTIFICATION_AUTO_OPEN_KEY = "gravity.notifications.autoOpen";
+
+function persistBookingNotification(payload) {
+  if (window.GravityNotifications?.addBookingSuccessNotification) {
+    window.GravityNotifications.addBookingSuccessNotification(payload);
+    sessionStorage.setItem(BOOKING_NOTIFICATION_AUTO_OPEN_KEY, "true");
+    return;
+  }
+
+  try {
+    const existing = JSON.parse(
+      localStorage.getItem(BOOKING_NOTIFICATION_STORAGE_KEY) || "[]",
+    );
+    const notifications = Array.isArray(existing) ? existing : [];
+    const roomCount = Number(payload.roomCount || 0);
+
+    notifications.unshift({
+      id: `${Date.now()}`,
+      title: "Booking created successfully",
+      message: `Your booking for ${
+        roomCount === 1 ? "1 room" : `${roomCount} room(s)`
+      } from ${payload.checkIn} to ${payload.checkOut} was recorded successfully.`,
+      codeLabel: `Code: ${String(payload.groupCode || "")
+        .slice(0, 8)
+        .toUpperCase()} | ${payload.status || "UNPAID"}`,
+      amount: payload.totalAmount || 0,
+      createdAt: payload.createdAt || new Date().toISOString(),
+      read: false,
+    });
+
+    localStorage.setItem(
+      BOOKING_NOTIFICATION_STORAGE_KEY,
+      JSON.stringify(notifications.slice(0, BOOKING_NOTIFICATION_LIMIT)),
+    );
+    sessionStorage.setItem(BOOKING_NOTIFICATION_AUTO_OPEN_KEY, "true");
+  } catch (error) {
+    console.error("Failed to persist booking notification", error);
+  }
+}
+
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -975,7 +1017,20 @@ async function checkoutCart(payMode) {
     throw new Error(errorText || "Checkout failed");
   }
 
-  await response.json();
+  const result = await response.json();
+  const checkInDates = cart.map((item) => item.checkin).filter(Boolean).sort();
+  const checkOutDates = cart.map((item) => item.checkout).filter(Boolean).sort();
+
+  persistBookingNotification({
+    groupCode: result.groupCode,
+    status: result.status,
+    totalAmount: result.totalAmount,
+    roomCount: cart.length,
+    checkIn: checkInDates[0] || "",
+    checkOut: checkOutDates[checkOutDates.length - 1] || "",
+    createdAt: new Date().toISOString(),
+  });
+
   localStorage.removeItem("cart");
   loadCartUI();
   showToast("Booking saved successfully. Staff will assign the room(s) later.");

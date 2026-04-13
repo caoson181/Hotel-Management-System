@@ -13,6 +13,9 @@ const cancelBtn = document.getElementById("cancelBtn");
 const confirmPaymentBtn = document.getElementById("confirmPaymentBtn");
 
 let selectedMethod = "VNPAY";
+const BOOKING_NOTIFICATION_STORAGE_KEY = "gravity.notifications";
+const BOOKING_NOTIFICATION_LIMIT = 10;
+const BOOKING_NOTIFICATION_AUTO_OPEN_KEY = "gravity.notifications.autoOpen";
 
 function showPaymentAlert(message, type = "error") {
   paymentAlert.hidden = false;
@@ -28,6 +31,43 @@ function hidePaymentAlert() {
 
 function formatVND(number) {
   return Number(number || 0).toLocaleString("vi-VN") + " đ";
+}
+
+function persistBookingNotification(payload) {
+  if (window.GravityNotifications?.addBookingSuccessNotification) {
+    window.GravityNotifications.addBookingSuccessNotification(payload);
+    return;
+  }
+
+  try {
+    const existing = JSON.parse(
+      localStorage.getItem(BOOKING_NOTIFICATION_STORAGE_KEY) || "[]"
+    );
+    const notifications = Array.isArray(existing) ? existing : [];
+    const roomCount = Number(payload.roomCount || 0);
+
+    notifications.unshift({
+      id: `${Date.now()}`,
+      title: "Booking created successfully",
+      message: `Your booking for ${
+        roomCount === 1 ? "1 room" : `${roomCount} room(s)`
+      } from ${payload.checkIn} to ${payload.checkOut} was recorded successfully.`,
+      codeLabel: `Code: ${String(payload.groupCode || "")
+        .slice(0, 8)
+        .toUpperCase()} | ${payload.status || "UNPAID"}`,
+      amount: payload.totalAmount || 0,
+      createdAt: payload.createdAt || new Date().toISOString(),
+      read: false,
+    });
+
+    localStorage.setItem(
+      BOOKING_NOTIFICATION_STORAGE_KEY,
+      JSON.stringify(notifications.slice(0, BOOKING_NOTIFICATION_LIMIT))
+    );
+    sessionStorage.setItem(BOOKING_NOTIFICATION_AUTO_OPEN_KEY, "true");
+  } catch (error) {
+    console.error("Failed to persist booking notification", error);
+  }
 }
 
 function readCart() {
@@ -152,10 +192,25 @@ async function submitFakePayment() {
       throw new Error(extractErrorMessage(errorText));
     }
 
-    await response.json();
+    const result = await response.json();
+    const checkInDates = cart.map((item) => item.checkin).filter(Boolean).sort();
+    const checkOutDates = cart.map((item) => item.checkout).filter(Boolean).sort();
+
+    persistBookingNotification({
+      groupCode: result.groupCode,
+      status: result.status,
+      totalAmount: result.totalAmount,
+      roomCount: cart.length,
+      checkIn: checkInDates[0] || "",
+      checkOut: checkOutDates[checkOutDates.length - 1] || "",
+      createdAt: new Date().toISOString(),
+    });
+
     localStorage.removeItem("cart");
     showPaymentAlert(`${selectedMethod} payment success. Booking has been saved as paid.`, "success");
-    window.location.href = "/homepage";
+    window.setTimeout(() => {
+      window.location.href = "/homepage";
+    }, 600);
   } catch (error) {
     console.error(error);
     showPaymentAlert(error.message || "Payment failed");
