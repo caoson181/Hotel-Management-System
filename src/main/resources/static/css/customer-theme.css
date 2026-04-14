@@ -59,7 +59,7 @@ body.gravity-news-detail-body .gravity-starfield {
   opacity: 0.62;
   transform-origin: center;
   transform: scale(1);
-  transition: opacity 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+  transition: opacity 0.72s ease-in-out, transform 0.72s ease-in-out, box-shadow 0.72s ease-in-out;
 }
 
 .gravity-star.is-bright {
@@ -69,14 +69,6 @@ body.gravity-news-detail-body .gravity-starfield {
     0 0 10px rgba(255, 255, 255, 1),
     0 0 22px rgba(125, 211, 252, 0.78),
     0 0 34px rgba(252, 211, 77, 0.32);
-}
-
-.gravity-star.is-dim {
-  opacity: 0.22;
-  transform: scale(0.82);
-  box-shadow:
-    0 0 2px rgba(255, 255, 255, 0.22),
-    0 0 5px rgba(125, 211, 252, 0.12);
 }
 
 body.customer-theme-dark .header {
