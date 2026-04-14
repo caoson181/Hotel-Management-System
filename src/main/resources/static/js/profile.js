@@ -301,6 +301,13 @@ const closeHistory = document.getElementById("closeHistory");
 const upgradePlanBtn = document.getElementById("upgradePlanBtn");
 const upgradePlanModal = document.getElementById("upgradePlanModal");
 const closeUpgradePlan = document.getElementById("closeUpgradePlan");
+const cancelBookingModal = document.getElementById("cancelBookingModal");
+const closeCancelBooking = document.getElementById("closeCancelBooking");
+const cancelBookingDismiss = document.getElementById("cancelBookingDismiss");
+const confirmCancelBooking = document.getElementById("confirmCancelBooking");
+const cancelPolicyConfirm = document.getElementById("cancelPolicyConfirm");
+
+let selectedBookingForCancellation = null;
 
 if (historyBtn && historyModal) {
   historyBtn.addEventListener("click", () => {
@@ -322,6 +329,9 @@ window.addEventListener("click", (e) => {
   if (e.target === upgradePlanModal) {
     upgradePlanModal.style.display = "none";
   }
+  if (e.target === cancelBookingModal) {
+    closeCancellationModal();
+  }
 });
 
 if (upgradePlanBtn && upgradePlanModal) {
@@ -339,6 +349,46 @@ if (closeUpgradePlan && upgradePlanModal) {
 
 function formatMoney(value) {
   return Number(value || 0).toLocaleString("vi-VN") + " VND";
+}
+
+function closeCancellationModal() {
+  if (!cancelBookingModal) {
+    return;
+  }
+
+  cancelBookingModal.style.display = "none";
+  selectedBookingForCancellation = null;
+  if (cancelPolicyConfirm) {
+    cancelPolicyConfirm.checked = false;
+  }
+}
+
+function openCancellationModal(button) {
+  if (!cancelBookingModal || !button) {
+    return;
+  }
+
+  selectedBookingForCancellation = {
+    bookingId: button.dataset.bookingId,
+    totalAmount: Number(button.dataset.totalAmount || 0),
+    paymentMode: String(button.dataset.paymentMode || "PAY_LATER").toUpperCase(),
+    refundAmount: Number(button.dataset.refundAmount || 0),
+    cancellationFee: Number(button.dataset.cancellationFee || 0),
+  };
+
+  const isPrepaid = selectedBookingForCancellation.paymentMode === "PAY_NOW";
+  document.getElementById("cancelBookingTotal").textContent = formatMoney(selectedBookingForCancellation.totalAmount);
+  document.getElementById("cancelBookingRefund").textContent = formatMoney(selectedBookingForCancellation.refundAmount);
+  document.getElementById("cancelBookingFee").textContent = formatMoney(selectedBookingForCancellation.cancellationFee);
+  document.getElementById("cancelBookingNote").textContent = isPrepaid
+    ? "Refund only applies to prepaid bookings. The amount above will be credited back to your wallet."
+    : "This booking is pay-later, so no refund will be credited. Cancellation fee is still recorded based on policy.";
+
+  if (cancelPolicyConfirm) {
+    cancelPolicyConfirm.checked = false;
+  }
+
+  cancelBookingModal.style.display = "flex";
 }
 
 function applyTheme(theme) {
@@ -417,6 +467,53 @@ function renderUpgradeProgress() {
   currentEl.textContent = formatMoney(totalSpent);
   targetEl.textContent = formatMoney(nextTarget);
   textEl.textContent = `Spend ${formatMoney(Math.max(0, nextTarget - totalSpent))} more to upgrade to ${nextLabel}.`;
+}
+
+document.querySelectorAll(".booking-cancel-btn").forEach((button) => {
+  button.addEventListener("click", () => openCancellationModal(button));
+});
+
+if (closeCancelBooking) {
+  closeCancelBooking.addEventListener("click", closeCancellationModal);
+}
+
+if (cancelBookingDismiss) {
+  cancelBookingDismiss.addEventListener("click", closeCancellationModal);
+}
+
+if (confirmCancelBooking) {
+  confirmCancelBooking.addEventListener("click", async () => {
+    if (!selectedBookingForCancellation?.bookingId) {
+      return;
+    }
+    if (!cancelPolicyConfirm?.checked) {
+      alert("Please confirm the cancellation policy before continuing.");
+      return;
+    }
+
+    confirmCancelBooking.disabled = true;
+
+    try {
+      const response = await fetch(`/api/customer-bookings/${selectedBookingForCancellation.bookingId}/cancel`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ confirmed: true }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Cancellation failed");
+      }
+
+      window.location.reload();
+    } catch (error) {
+      alert(error.message || "Cancellation failed");
+    } finally {
+      confirmCancelBooking.disabled = false;
+    }
+  });
 }
 
 applyHistoryRoomImages();

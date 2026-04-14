@@ -9,6 +9,10 @@ public class RevenueDTO {
     private String date;
     private Integer totalGuests;
     private Integer roomsBooked;
+    private Double cashIn;
+    private Double refundOut;
+    private Double cancellationFee;
+    private Double netCash;
     private Double revenue;
     private Double profit;
     private Double bookingRevenue;

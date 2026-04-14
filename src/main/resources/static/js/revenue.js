@@ -30,7 +30,7 @@ function renderTable(data) {
   if (!data.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5">Chua có d? li?u doanh thu cho tháng này.</td>
+        <td colspan="9">Chua co du lieu doanh thu cho thang nay.</td>
       </tr>
     `;
     return;
@@ -42,6 +42,10 @@ function renderTable(data) {
         <td>${d.date}</td>
         <td>${d.totalGuests}</td>
         <td>${d.roomsBooked}</td>
+        <td>${formatMoney(d.cashIn)}</td>
+        <td>${formatMoney(d.refundOut)}</td>
+        <td>${formatMoney(d.cancellationFee)}</td>
+        <td>${formatMoney(d.netCash)}</td>
         <td>
           <button type="button" class="revenue-value-btn" data-kind="revenue" data-date="${d.date}">
             ${formatMoney(d.revenue)}
@@ -114,9 +118,29 @@ function openRevenueDetail(item, kind) {
     return;
   }
 
+  const cashRows = `
+    <div class="revenue-detail-row">
+      <span>Cash In</span>
+      <strong>${formatMoney(item.cashIn)}</strong>
+    </div>
+    <div class="revenue-detail-row">
+      <span>Refund Out</span>
+      <strong>${formatMoney(item.refundOut)}</strong>
+    </div>
+    <div class="revenue-detail-row">
+      <span>Cancellation Fee</span>
+      <strong>${formatMoney(item.cancellationFee)}</strong>
+    </div>
+    <div class="revenue-detail-row">
+      <span>Net Cash</span>
+      <strong>${formatMoney(item.netCash)}</strong>
+    </div>
+  `;
+
   if (kind === "revenue") {
     title.textContent = `Revenue Details - ${item.date}`;
     body.innerHTML = `
+      ${cashRows}
       <div class="revenue-detail-row">
         <span>Booking Revenue</span>
         <strong>${formatMoney(item.bookingRevenue)}</strong>
@@ -133,6 +157,7 @@ function openRevenueDetail(item, kind) {
   } else {
     title.textContent = `Profit Details - ${item.date}`;
     body.innerHTML = `
+      ${cashRows}
       <div class="revenue-detail-row">
         <span>Booking Revenue</span>
         <strong>${formatMoney(item.bookingRevenue)}</strong>

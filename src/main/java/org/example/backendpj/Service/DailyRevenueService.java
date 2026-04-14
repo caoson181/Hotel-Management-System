@@ -4,6 +4,7 @@ import org.example.backendpj.Entity.DailyRevenue;
 import org.example.backendpj.Entity.BookingDetail;
 import org.example.backendpj.Repository.BookingDetailRepository;
 import org.example.backendpj.Repository.DailyRevenueRepository;
+import org.example.backendpj.Repository.PaymentRepository;
 import org.example.backendpj.Repository.RentalContractRepository;
 import org.example.backendpj.Repository.StaffRepository;
 import org.example.backendpj.dto.RevenueDTO;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -27,16 +29,19 @@ public class DailyRevenueService {
 
     private final DailyRevenueRepository dailyRevenueRepository;
     private final BookingDetailRepository bookingDetailRepository;
+    private final PaymentRepository paymentRepository;
     private final StaffRepository staffRepository;
     private final RentalContractRepository rentalContractRepository;
 
     public DailyRevenueService(
             DailyRevenueRepository dailyRevenueRepository,
             BookingDetailRepository bookingDetailRepository,
+            PaymentRepository paymentRepository,
             StaffRepository staffRepository,
             RentalContractRepository rentalContractRepository) {
         this.dailyRevenueRepository = dailyRevenueRepository;
         this.bookingDetailRepository = bookingDetailRepository;
+        this.paymentRepository = paymentRepository;
         this.staffRepository = staffRepository;
         this.rentalContractRepository = rentalContractRepository;
     }
@@ -103,13 +108,20 @@ public class DailyRevenueService {
                 .stream()
                 .filter(this::isRevenueEligible)
                 .toList();
+        LocalDateTime start = targetDate.atStartOfDay();
+        LocalDateTime end = targetDate.plusDays(1).atStartOfDay();
         long checkoutCount = checkedOutDetails.size();
-        double bookingRevenue = checkedOutDetails.stream()
+        double checkoutRevenue = checkedOutDetails.stream()
                 .map(this::resolveRecognizedAmount)
                 .mapToDouble(BigDecimal::doubleValue)
                 .sum();
+        double cashIn = toDouble(paymentRepository.sumSuccessfulCashInByPaymentDateBetween(start, end));
+        double refundOut = toDouble(paymentRepository.sumSuccessfulAmountByMethodAndPaymentDateBetween("REFUND", start, end));
+        double cancellationFee = toDouble(paymentRepository.sumSuccessfulAmountByMethodAndPaymentDateBetween("CANCELLATIONFEE", start, end));
+        double bookingRevenue = checkoutRevenue + cancellationFee;
         double rentalRevenue = toDouble(rentalContractRepository.sumActiveMonthlyRevenueByDate(targetDate)) / daysInMonth;
         double salaryCost = defaultZero(staffRepository.sumAllSalary()) / daysInMonth;
+        double netCash = cashIn - refundOut;
         double totalRevenue = bookingRevenue + rentalRevenue;
         double profit = totalRevenue - salaryCost - DEFAULT_OTHER_COST;
 
@@ -119,6 +131,10 @@ public class DailyRevenueService {
         dailyRevenue.setRoomsBooked((int) checkoutCount);
         dailyRevenue.setBookingRevenue(bookingRevenue);
         dailyRevenue.setRentalRevenue(rentalRevenue);
+        dailyRevenue.setCashIn(cashIn);
+        dailyRevenue.setRefundOut(refundOut);
+        dailyRevenue.setCancellationFee(cancellationFee);
+        dailyRevenue.setNetCash(netCash);
         dailyRevenue.setSalaryCost(salaryCost);
         dailyRevenue.setOtherCost(DEFAULT_OTHER_COST);
         dailyRevenue.setProfit(profit);
@@ -140,6 +156,10 @@ public class DailyRevenueService {
                 dailyRevenue.getDate().toString(),
                 defaultZero(dailyRevenue.getTotalGuests()).intValue(),
                 defaultZero(dailyRevenue.getRoomsBooked()).intValue(),
+                defaultZero(dailyRevenue.getCashIn()),
+                defaultZero(dailyRevenue.getRefundOut()),
+                defaultZero(dailyRevenue.getCancellationFee()),
+                defaultZero(dailyRevenue.getNetCash()),
                 revenue,
                 profit,
                 booking,
@@ -154,7 +174,10 @@ public class DailyRevenueService {
 
     private boolean isRevenueEligible(BookingDetail detail) {
         return detail != null
-                && (detail.getStatus() == null || !"NO_SHOW".equalsIgnoreCase(detail.getStatus()));
+                && (detail.getStatus() == null
+                || (!"NO_SHOW".equalsIgnoreCase(detail.getStatus())
+                && !"CANCELLATION".equalsIgnoreCase(detail.getStatus())
+                && !"CANCELLED".equalsIgnoreCase(detail.getStatus())));
     }
 
     private BigDecimal resolveRecognizedAmount(BookingDetail detail) {

@@ -42,6 +42,17 @@ public class WalletService {
         return walletRepository.save(wallet);
     }
 
+    @Transactional
+    public Wallet credit(User user, BigDecimal amount) {
+        Wallet wallet = walletRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("No wallet found for this account"));
+
+        BigDecimal currentBalance = wallet.getBalance() == null ? BigDecimal.ZERO : wallet.getBalance();
+        BigDecimal creditedAmount = amount == null ? BigDecimal.ZERO : amount;
+        wallet.setBalance(currentBalance.add(creditedAmount));
+        return walletRepository.save(wallet);
+    }
+
     private void validateUserInfo(User user, String accountName, String phoneNumber) {
         String expectedName = normalize(user.getFullName());
         String expectedPhone = normalize(user.getPhoneNumber());

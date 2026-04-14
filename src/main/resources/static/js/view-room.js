@@ -944,13 +944,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 <label>Action</label>
                 <div class="detail-value">
                     ${
-                      userRole === "receptionist" || userRole === "manager"
+                      (userRole === "receptionist" || userRole === "manager") && !booking.cancelled && !booking.completed
                         ? `<button id="assignBookingBtn" class="view-details-btn" ${
                             booking.assigned ? "disabled" : ""
                           }>
                         <i class="fas fa-check"></i> Assign
                     </button>`
-                        : '<span class="modal-no-action">View only</span>'
+                        : '<span class="modal-no-action">No actions available</span>'
                     }
                 </div>
             </div>

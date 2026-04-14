@@ -271,12 +271,31 @@
                     <h4 th:text="${'Booking #' + b.id}"></h4>
                     <p th:text="${'Group: ' + (b.groupCode != null ? b.groupCode : 'N/A')}"></p>
                   </div>
-                  <div class="history-booking-summary">
-                    <span class="history-status" th:text="${b.status}"></span>
-                    <strong th:text="${#numbers.formatDecimal(b.totalAmount != null ? b.totalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></strong>
-                    <small th:text="${b.checkIn + ' -> ' + b.checkOut}"></small>
-                  </div>
+                <div class="history-booking-summary">
+                  <span class="history-status" th:text="${b.status}"></span>
+                  <strong th:text="${#numbers.formatDecimal(b.totalAmount != null ? b.totalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></strong>
+                  <small th:text="${b.checkIn + ' -> ' + b.checkOut}"></small>
                 </div>
+              </div>
+
+              <div class="history-booking-actions">
+                <button type="button"
+                        class="btn-secondary booking-cancel-btn"
+                        th:if="${b.canCancel}"
+                        th:attr="data-booking-id=${b.id},
+                                 data-total-amount=${b.totalAmount},
+                                 data-payment-mode=${b.paymentMode},
+                                 data-refund-amount=${b.previewRefundAmount},
+                                 data-cancellation-fee=${b.previewCancellationFee}">
+                  Cancel Booking
+                </button>
+                <div class="history-booking-finance" th:if="${(b.refundAmount != null and b.refundAmount.doubleValue() > 0) or (b.cancellationFee != null and b.cancellationFee.doubleValue() > 0)}">
+                  <span th:if="${b.refundAmount != null and b.refundAmount.doubleValue() > 0}"
+                        th:text="${'Refunded: ' + #numbers.formatDecimal(b.refundAmount.doubleValue(),0,'COMMA',0,'POINT') + ' VND'}"></span>
+                  <span th:if="${b.cancellationFee != null and b.cancellationFee.doubleValue() > 0}"
+                        th:text="${'Cancellation fee: ' + #numbers.formatDecimal(b.cancellationFee.doubleValue(),0,'COMMA',0,'POINT') + ' VND'}"></span>
+                </div>
+              </div>
 
                 <div class="history-detail-list">
                   <div class="history-detail-card" th:each="detail : ${b.details}">
@@ -518,6 +537,50 @@
         <span id="upgradeProgressCurrent">0 VND</span>
         <span id="upgradeProgressTarget">50.000.000 VND</span>
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="cancelBookingModal" class="booking-history-modal">
+  <div class="booking-history-content cancel-booking-content">
+    <span class="close-btn" id="closeCancelBooking">&times;</span>
+    <h3>Booking Cancellation Policy</h3>
+    <div class="cancel-policy-list">
+      <div class="cancel-policy-item">
+        <span>Cancel 3 days before check-in</span>
+        <strong>100% refund</strong>
+      </div>
+      <div class="cancel-policy-item">
+        <span>Cancel 2 days before check-in</span>
+        <strong>50% refund</strong>
+      </div>
+      <div class="cancel-policy-item">
+        <span>Cancel 1 day before check-in</span>
+        <strong>0% refund</strong>
+      </div>
+    </div>
+    <div class="cancel-booking-preview">
+      <div class="cancel-preview-row">
+        <span>Booking total</span>
+        <strong id="cancelBookingTotal">0 VND</strong>
+      </div>
+      <div class="cancel-preview-row">
+        <span>Refund</span>
+        <strong id="cancelBookingRefund">0 VND</strong>
+      </div>
+      <div class="cancel-preview-row">
+        <span>Cancellation fee</span>
+        <strong id="cancelBookingFee">0 VND</strong>
+      </div>
+      <p id="cancelBookingNote" class="cancel-booking-note"></p>
+    </div>
+    <label class="cancel-confirm-box">
+      <input type="checkbox" id="cancelPolicyConfirm" />
+      <span>I have read and agree with the cancellation policy.</span>
+    </label>
+    <div class="action-row">
+      <button type="button" class="btn-secondary" id="cancelBookingDismiss">Close</button>
+      <button type="button" class="cta-button" id="confirmCancelBooking">Confirm Cancel</button>
     </div>
   </div>
 </div>

@@ -68,6 +68,8 @@ public class SecurityConfig {
                         // Customer booking flow
                         .requestMatchers("/api/customer-bookings/checkout")
                         .hasAnyAuthority("ROLE_CUSTOMER", "Customer", "ROLE_Customer")
+                        .requestMatchers(HttpMethod.POST, "/api/customer-bookings/*/cancel")
+                        .hasAnyAuthority("ROLE_CUSTOMER", "Customer", "ROLE_Customer")
                         .requestMatchers("/api/customer-bookings/**")
                         .hasAnyAuthority(
                                 "ROLE_ADMIN", "ROLE_MANAGER", "ROLE_RECEPTIONIST", "ROLE_HOUSEKEEPER",

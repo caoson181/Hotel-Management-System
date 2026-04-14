@@ -54,6 +54,7 @@
 #revenueTable {
     width: 100%;
     border-collapse: collapse;
+    font-size: 14px;
 }
 
 #revenueTable thead {
@@ -65,6 +66,7 @@
 #revenueTable td {
     padding: 10px;
     text-align: center;
+    white-space: nowrap;
 }
 
 #revenueTable tbody tr {

@@ -3,10 +3,13 @@ package org.example.backendpj.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.backendpj.Entity.Booking;
 import org.example.backendpj.Entity.BookingDetail;
+import org.example.backendpj.Entity.CustomerBooking;
 import org.example.backendpj.Entity.Room;
 import org.example.backendpj.Repository.BookingDetailRepository;
 import org.example.backendpj.Repository.BookingRepository;
+import org.example.backendpj.Repository.CustomerBookingRepository;
 import org.example.backendpj.Repository.WalletRepository;
+import org.example.backendpj.Service.BookingLifecycleService;
 import org.example.backendpj.Service.CustomerTierService;
 import org.example.backendpj.Service.UserService;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,7 +46,9 @@ public class PageController {
     private final CustomerTierService customerTierService;
     private final BookingRepository bookingRepository;
     private final BookingDetailRepository bookingDetailRepository;
+    private final CustomerBookingRepository customerBookingRepository;
     private final WalletRepository walletRepository;
+    private final BookingLifecycleService bookingLifecycleService;
 
     public PageController(UserRepository userRepository,
                           UserService userService,
@@ -50,14 +56,18 @@ public class PageController {
                           CustomerTierService customerTierService,
                           BookingRepository bookingRepository,
                           BookingDetailRepository bookingDetailRepository,
-                          WalletRepository walletRepository) {
+                          CustomerBookingRepository customerBookingRepository,
+                          WalletRepository walletRepository,
+                          BookingLifecycleService bookingLifecycleService) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.roomRepository = roomRepository;
         this.customerTierService = customerTierService;
         this.bookingRepository = bookingRepository;
         this.bookingDetailRepository = bookingDetailRepository;
+        this.customerBookingRepository = customerBookingRepository;
         this.walletRepository = walletRepository;
+        this.bookingLifecycleService = bookingLifecycleService;
     }
 
     // ================= ADMIN HOME =================
@@ -189,13 +199,13 @@ public class PageController {
                 .filter(item -> hasBookingStatus(item, "PENDING"))
                 .count();
         long cancelledBookingCount = history.stream()
-                .filter(item -> hasBookingStatus(item, "CANCELLED"))
+                .filter(item -> hasBookingStatus(item, "CANCELLED", "CANCELLATION"))
                 .count();
         long completedBookingCount = history.stream()
                 .filter(item -> hasBookingStatus(item, "COMPLETED"))
                 .count();
         long refundRecordCount = history.stream()
-                .filter(item -> hasBookingStatus(item, "REFUNDED", "REFUND"))
+                .filter(item -> toBigDecimal(item.get("refundAmount")).compareTo(BigDecimal.ZERO) > 0)
                 .count();
 
         var wallet = walletRepository.findByUser(user).orElse(null);
@@ -237,6 +247,20 @@ public class PageController {
                 .map(this::toBookingDetailHistoryItem)
                 .toList();
 
+        if (details.isEmpty() && booking.getGroupCode() != null) {
+            details = customerBookingRepository.findAllByGroupCodeOrderByIdAsc(booking.getGroupCode()).stream()
+                    .map(this::toPendingBookingHistoryItem)
+                    .toList();
+        }
+
+        Map<String, Object> cancellationPreview = bookingLifecycleService.buildCancellationPreview(booking, LocalDate.now());
+        String bookingStatus = booking.getStatus() == null ? "" : booking.getStatus().toUpperCase(Locale.ROOT);
+        boolean canCancel = !bookingStatus.contains("COMPLETED")
+                && !bookingStatus.contains("NO_SHOW")
+                && !bookingStatus.contains("CANCELLATION")
+                && booking.getCheckInDate() != null
+                && !LocalDate.now().isAfter(booking.getCheckInDate());
+
         Map<String, Object> item = new LinkedHashMap<>();
         item.put("id", booking.getId());
         item.put("groupCode", booking.getGroupCode());
@@ -244,6 +268,14 @@ public class PageController {
         item.put("checkIn", booking.getCheckInDate());
         item.put("checkOut", booking.getCheckOutDate());
         item.put("totalAmount", booking.getTotalAmount() == null ? BigDecimal.ZERO : booking.getTotalAmount());
+        item.put("paymentMode", booking.getPaymentMode() == null ? "PAY_LATER" : booking.getPaymentMode());
+        item.put("refundAmount", booking.getRefundAmount() == null ? BigDecimal.ZERO : booking.getRefundAmount());
+        item.put("cancellationFee", booking.getCancellationFee() == null ? BigDecimal.ZERO : booking.getCancellationFee());
+        item.put("canCancel", canCancel);
+        item.put("refundRate", cancellationPreview.get("refundRate"));
+        item.put("previewRefundAmount", cancellationPreview.get("refundAmount"));
+        item.put("previewCancellationFee", cancellationPreview.get("cancellationFee"));
+        item.put("daysBeforeCheckIn", cancellationPreview.get("daysBeforeCheckIn"));
         item.put("details", details);
         return item;
     }
@@ -263,6 +295,20 @@ public class PageController {
         return item;
     }
 
+    private Map<String, Object> toPendingBookingHistoryItem(CustomerBooking detail) {
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("roomNumber", detail.getAssignedRoom() != null ? detail.getAssignedRoom().getRoomNumber() : "Pending assignment");
+        item.put("roomType", detail.getRoomType());
+        item.put("roomRank", detail.getRoomRank());
+        item.put("price", detail.getPrice() == null ? BigDecimal.ZERO : detail.getPrice());
+        item.put("finalAmount", detail.getPrice() == null ? BigDecimal.ZERO : detail.getPrice());
+        item.put("checkIn", detail.getCheckIn());
+        item.put("checkOut", detail.getCheckOut());
+        item.put("actualCheckOut", null);
+        item.put("status", detail.isAssigned() ? "ASSIGNED" : "PENDING");
+        return item;
+    }
+
     private boolean hasBookingStatus(Map<String, Object> item, String... expectedStatuses) {
         String status = String.valueOf(item.getOrDefault("status", "")).toUpperCase(Locale.ROOT);
         for (String expectedStatus : expectedStatuses) {
@@ -271,6 +317,16 @@ public class PageController {
             }
         }
         return false;
+    }
+
+    private BigDecimal toBigDecimal(Object value) {
+        if (value instanceof BigDecimal bigDecimal) {
+            return bigDecimal;
+        }
+        if (value instanceof Number number) {
+            return BigDecimal.valueOf(number.doubleValue());
+        }
+        return BigDecimal.ZERO;
     }
 
     @Autowired

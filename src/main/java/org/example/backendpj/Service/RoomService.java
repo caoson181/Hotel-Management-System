@@ -54,6 +54,9 @@ public class RoomService {
     @Autowired
     private CustomerTierService customerTierService;
 
+    @Autowired
+    private BookingLifecycleService bookingLifecycleService;
+
     public Page<Room> search(String keyword, int page, String sortField, String sortDir) {
         int pageSize = 20;
         sortField = sortField.trim();
@@ -308,9 +311,13 @@ public class RoomService {
         bookingDetailRepository.findActiveDetailsByDate(room, checkoutDate).stream()
                 .findFirst()
                 .ifPresent(detail -> {
+                    BigDecimal previousAmount = detail.getFinalAmount() != null
+                            ? detail.getFinalAmount()
+                            : calculateDetailAmount(detail);
                     detail.setActualCheckOutDate(checkoutDate);
                     detail.setFinalAmount(calculateDetailAmount(detail));
                     bookingDetailRepository.save(detail);
+                    bookingLifecycleService.handleEarlyCheckout(detail, previousAmount, checkoutDate);
                     dailyRevenueService.ensureRevenueForDate(checkoutDate);
                 });
     }
@@ -496,6 +503,9 @@ public class RoomService {
         }
         if (allNoShow) {
             return "NO_SHOW";
+        }
+        if ("CANCELLATION".equals(previousStatus) || "CANCELLED".equals(previousStatus)) {
+            return "CANCELLATION";
         }
         if (hasActiveToday) {
             return "RESERVED";

@@ -28,6 +28,18 @@ public class DailyRevenue {
     @Column(name = "rental_revenue")
     private Double rentalRevenue;
 
+    @Column(name = "cash_in")
+    private Double cashIn;
+
+    @Column(name = "refund_out")
+    private Double refundOut;
+
+    @Column(name = "cancellation_fee")
+    private Double cancellationFee;
+
+    @Column(name = "net_cash")
+    private Double netCash;
+
     @Column(name = "salary_cost")
     private Double salaryCost;
 

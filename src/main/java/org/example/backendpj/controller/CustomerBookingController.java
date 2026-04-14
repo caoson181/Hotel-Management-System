@@ -12,6 +12,7 @@ import org.example.backendpj.Repository.CustomerBookingRepository;
 import org.example.backendpj.Repository.CustomerRepository;
 import org.example.backendpj.Repository.PaymentRepository;
 import org.example.backendpj.Repository.UserRepository;
+import org.example.backendpj.Service.BookingLifecycleService;
 import org.example.backendpj.Service.RoomService;
 import org.example.backendpj.Service.WalletService;
 import org.example.backendpj.dto.CustomerCheckoutRequest;
@@ -44,6 +45,7 @@ public class CustomerBookingController {
     private final PaymentRepository paymentRepository;
     private final RoomService roomService;
     private final WalletService walletService;
+    private final BookingLifecycleService bookingLifecycleService;
 
     public CustomerBookingController(
             CustomerBookingRepository customerBookingRepository,
@@ -53,7 +55,8 @@ public class CustomerBookingController {
             BookingDetailRepository bookingDetailRepository,
             PaymentRepository paymentRepository,
             RoomService roomService,
-            WalletService walletService) {
+            WalletService walletService,
+            BookingLifecycleService bookingLifecycleService) {
         this.customerBookingRepository = customerBookingRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
@@ -62,6 +65,7 @@ public class CustomerBookingController {
         this.paymentRepository = paymentRepository;
         this.roomService = roomService;
         this.walletService = walletService;
+        this.bookingLifecycleService = bookingLifecycleService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -129,8 +133,36 @@ public class CustomerBookingController {
             createdBookings.add(customerBooking);
         }
 
+        LocalDate minCheckIn = createdBookings.stream()
+                .map(CustomerBooking::getCheckIn)
+                .min(LocalDate::compareTo)
+                .orElse(null);
+        LocalDate maxCheckOut = createdBookings.stream()
+                .map(CustomerBooking::getCheckOut)
+                .max(LocalDate::compareTo)
+                .orElse(null);
+
+        Booking booking = bookingRepository.findTopByGroupCode(groupCode).orElse(null);
+        if (booking == null) {
+            booking = new Booking();
+            booking.setCustomer(customer);
+            booking.setGroupCode(groupCode);
+            booking.setRefundAmount(BigDecimal.ZERO);
+            booking.setCancellationFee(BigDecimal.ZERO);
+        }
+        booking.setCheckInDate(minCheckIn);
+        booking.setCheckOutDate(maxCheckOut);
+        booking.setStatus("PENDING");
+        booking.setTotalAmount(total);
+        booking.setPaymentMode(payMode);
+        booking = bookingRepository.save(booking);
+
+        for (CustomerBooking customerBooking : createdBookings) {
+            customerBooking.setBooking(booking);
+        }
+        customerBookingRepository.saveAll(createdBookings);
+
         if ("PAY_NOW".equals(payMode)) {
-            BigDecimal finalTotal = total;
             String paymentMethod = req.getPaymentMethod() == null || req.getPaymentMethod().isBlank()
                     ? "VNPAY"
                     : req.getPaymentMethod().trim().toUpperCase();
@@ -140,41 +172,9 @@ public class CustomerBookingController {
                     req.getAccountName(),
                     req.getPhoneNumber(),
                     req.getPaymentCode(),
-                    finalTotal
+                    total
             );
-            LocalDate minCheckIn = createdBookings.stream()
-                    .map(CustomerBooking::getCheckIn)
-                    .min(LocalDate::compareTo)
-                    .orElse(null);
-            LocalDate maxCheckOut = createdBookings.stream()
-                    .map(CustomerBooking::getCheckOut)
-                    .max(LocalDate::compareTo)
-                    .orElse(null);
-
-            Booking booking = bookingRepository.findTopByGroupCode(groupCode)
-                    .orElseGet(() -> {
-                        Booking newBooking = new Booking();
-                        newBooking.setCustomer(customer);
-                        newBooking.setGroupCode(groupCode);
-                        newBooking.setCheckInDate(minCheckIn);
-                        newBooking.setCheckOutDate(maxCheckOut);
-                        newBooking.setStatus("PENDING");
-                        newBooking.setTotalAmount(finalTotal);
-                        return bookingRepository.save(newBooking);
-                    });
-
-            for (CustomerBooking customerBooking : createdBookings) {
-                customerBooking.setBooking(booking);
-            }
-            customerBookingRepository.saveAll(createdBookings);
-
-            Payment payment = new Payment();
-            payment.setBooking(booking);
-            payment.setAmount(total);
-            payment.setPaymentMethod(paymentMethod);
-            payment.setPaymentDate(now);
-            payment.setStatus("SUCCESS");
-            paymentRepository.save(payment);
+            bookingLifecycleService.recordPayment(booking, total, paymentMethod, now);
         }
 
         return Map.of(
@@ -190,12 +190,20 @@ public class CustomerBookingController {
         List<Map<String, Object>> result = new ArrayList<>();
         for (CustomerBooking customerBooking : all) {
             BookingDetail linkedDetail = resolveBookingDetail(customerBooking);
+            Booking parentBooking = customerBooking.getBooking();
+            boolean cancelled = parentBooking != null
+                    && parentBooking.getStatus() != null
+                    && ("CANCELLATION".equalsIgnoreCase(parentBooking.getStatus())
+                    || "CANCELLED".equalsIgnoreCase(parentBooking.getStatus()));
             boolean completed = linkedDetail != null
                     && (linkedDetail.getActualCheckOutDate() != null
                     || "NO_SHOW".equalsIgnoreCase(linkedDetail.getStatus()));
+            if (cancelled) {
+                completed = true;
+            }
             String completionState = linkedDetail != null && "NO_SHOW".equalsIgnoreCase(linkedDetail.getStatus())
                     ? "NO_SHOW"
-                    : (completed ? "COMPLETED" : null);
+                    : (cancelled ? "CANCELLATION" : (completed ? "COMPLETED" : null));
             String details = customerBooking.getRoomType() + " " + customerBooking.getRoomRank()
                     + " (" + customerBooking.getCheckIn() + " -> " + customerBooking.getCheckOut() + ")";
             Map<String, Object> row = new LinkedHashMap<>();
@@ -206,6 +214,7 @@ public class CustomerBookingController {
             row.put("status", customerBooking.getStatus());
             row.put("assigned", customerBooking.isAssigned());
             row.put("completed", completed);
+            row.put("cancelled", cancelled);
             row.put("completedReason", completionState);
             row.put("displayStatus", buildDisplayStatus(customerBooking, completionState));
             row.put("totalAmount", customerBooking.getPrice() == null ? BigDecimal.ZERO : customerBooking.getPrice());
@@ -240,6 +249,9 @@ public class CustomerBookingController {
         if ("NO_SHOW".equalsIgnoreCase(completionState)) {
             return paymentState + "/NO_SHOW";
         }
+        if ("CANCELLATION".equalsIgnoreCase(completionState)) {
+            return paymentState + "/CANCELLATION";
+        }
         if ("COMPLETED".equalsIgnoreCase(completionState)) {
             return paymentState + "/COMPLETED";
         }
@@ -249,5 +261,13 @@ public class CustomerBookingController {
     @PostMapping("/groups/{groupCode}/assign")
     public Map<String, Object> assignGroup(@PathVariable String groupCode) {
         return roomService.assignGroupBookings(groupCode);
+    }
+
+    @PostMapping("/{bookingId}/cancel")
+    public Map<String, Object> cancelBooking(@PathVariable Integer bookingId,
+                                             @RequestBody(required = false) Map<String, Object> payload,
+                                             Authentication authentication) {
+        boolean confirmed = payload != null && Boolean.TRUE.equals(payload.get("confirmed"));
+        return bookingLifecycleService.cancelBookingForCustomer(bookingId, getCurrentUser(authentication), confirmed);
     }
 }
