@@ -564,24 +564,38 @@
 
 .cancel-policy-list {
   display: grid;
-  gap: 12px;
-  margin: 18px 0;
+  gap: 10px;
+  margin: 16px 0;
 }
 
 .cancel-policy-item,
 .cancel-preview-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 16px;
-  padding: 14px 16px;
+  padding: 12px 16px;
   border: 1px solid #e8eef5;
   border-radius: 16px;
   background: #f8fbff;
+  color: #22324c;
+}
+
+.cancel-policy-item span,
+.cancel-preview-row span {
+  color: #4a607c;
+  font-weight: 600;
+}
+
+.cancel-policy-item strong,
+.cancel-preview-row strong {
+  color: #1b2b44;
+  font-weight: 800;
 }
 
 .cancel-booking-preview {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .cancel-booking-note {
@@ -897,6 +911,24 @@ body.profile-theme-dark .profile-password-content .password-field input {
   background: #111827;
   border-color: #475569;
   color: #f8fbff;
+}
+
+body.profile-theme-dark .cancel-policy-item,
+body.profile-theme-dark .cancel-preview-row {
+  background: rgba(15, 23, 42, 0.88);
+  border-color: rgba(148, 163, 184, 0.18);
+  color: #e5edf7;
+}
+
+body.profile-theme-dark .cancel-policy-item span,
+body.profile-theme-dark .cancel-preview-row span,
+body.profile-theme-dark .cancel-booking-note {
+  color: #cbd5e1;
+}
+
+body.profile-theme-dark .cancel-policy-item strong,
+body.profile-theme-dark .cancel-preview-row strong {
+  color: #f8fafc;
 }
 
 @media (max-width: 1100px) {
