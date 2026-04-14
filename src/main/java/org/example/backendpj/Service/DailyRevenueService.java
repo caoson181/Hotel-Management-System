@@ -176,8 +176,7 @@ public class DailyRevenueService {
         return detail != null
                 && (detail.getStatus() == null
                 || (!"NO_SHOW".equalsIgnoreCase(detail.getStatus())
-                && !"CANCELLATION".equalsIgnoreCase(detail.getStatus())
-                && !"CANCELLED".equalsIgnoreCase(detail.getStatus())));
+                && !"CANCELLATION".equalsIgnoreCase(detail.getStatus())));
     }
 
     private BigDecimal resolveRecognizedAmount(BookingDetail detail) {

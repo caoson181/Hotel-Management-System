@@ -191,10 +191,13 @@ public class CustomerBookingController {
         for (CustomerBooking customerBooking : all) {
             BookingDetail linkedDetail = resolveBookingDetail(customerBooking);
             Booking parentBooking = customerBooking.getBooking();
-            boolean cancelled = parentBooking != null
+            boolean cancelled = (parentBooking != null
                     && parentBooking.getStatus() != null
-                    && ("CANCELLATION".equalsIgnoreCase(parentBooking.getStatus())
-                    || "CANCELLED".equalsIgnoreCase(parentBooking.getStatus()));
+                    && "CANCELLATION".equalsIgnoreCase(parentBooking.getStatus()))
+                    || hasCustomerBookingCancellation(customerBooking)
+                    || (linkedDetail != null
+                    && linkedDetail.getStatus() != null
+                    && "CANCELLATION".equalsIgnoreCase(linkedDetail.getStatus()));
             boolean completed = linkedDetail != null
                     && (linkedDetail.getActualCheckOutDate() != null
                     || "NO_SHOW".equalsIgnoreCase(linkedDetail.getStatus()));
@@ -245,7 +248,7 @@ public class CustomerBookingController {
     }
 
     private String buildDisplayStatus(CustomerBooking customerBooking, String completionState) {
-        String paymentState = customerBooking.getStatus() == null ? "UNPAID" : customerBooking.getStatus();
+        String paymentState = extractPaymentState(customerBooking.getStatus());
         if ("NO_SHOW".equalsIgnoreCase(completionState)) {
             return paymentState + "/NO_SHOW";
         }
@@ -256,6 +259,21 @@ public class CustomerBookingController {
             return paymentState + "/COMPLETED";
         }
         return paymentState + "/" + (customerBooking.isAssigned() ? "ASSIGNED" : "UNASSIGNED");
+    }
+
+    private boolean hasCustomerBookingCancellation(CustomerBooking customerBooking) {
+        String status = customerBooking == null || customerBooking.getStatus() == null
+                ? ""
+                : customerBooking.getStatus().trim().toUpperCase();
+        return status.contains("CANCELLATION");
+    }
+
+    private String extractPaymentState(String status) {
+        String normalized = status == null ? "" : status.trim().toUpperCase();
+        if (normalized.startsWith("PAID")) {
+            return "PAID";
+        }
+        return "UNPAID";
     }
 
     @PostMapping("/groups/{groupCode}/assign")
@@ -269,5 +287,21 @@ public class CustomerBookingController {
                                              Authentication authentication) {
         boolean confirmed = payload != null && Boolean.TRUE.equals(payload.get("confirmed"));
         return bookingLifecycleService.cancelBookingForCustomer(bookingId, getCurrentUser(authentication), confirmed);
+    }
+
+    @PostMapping("/details/{detailId}/cancel")
+    public Map<String, Object> cancelBookingDetail(@PathVariable Integer detailId,
+                                                   @RequestBody(required = false) Map<String, Object> payload,
+                                                   Authentication authentication) {
+        boolean confirmed = payload != null && Boolean.TRUE.equals(payload.get("confirmed"));
+        return bookingLifecycleService.cancelBookingDetailForCustomer(detailId, getCurrentUser(authentication), confirmed);
+    }
+
+    @PostMapping("/pending/{customerBookingId}/cancel")
+    public Map<String, Object> cancelPendingCustomerBooking(@PathVariable Integer customerBookingId,
+                                                            @RequestBody(required = false) Map<String, Object> payload,
+                                                            Authentication authentication) {
+        boolean confirmed = payload != null && Boolean.TRUE.equals(payload.get("confirmed"));
+        return bookingLifecycleService.cancelCustomerBookingForCustomer(customerBookingId, getCurrentUser(authentication), confirmed);
     }
 }

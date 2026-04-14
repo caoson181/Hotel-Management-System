@@ -69,10 +69,36 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
 }
 
 .logo a {
     text-decoration: none;
+}
+
+.logo h1 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+}
+
+.brand-link-customer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    transform: translateY(-2px);
+}
+
+.brand-logo-customer {
+    width: 72px;
+    height: 72px;
+    display: block;
+    object-fit: contain;
+    flex: 0 0 72px;
+    filter: drop-shadow(0 10px 18px rgba(7, 16, 28, 0.28));
 }
 
 .nav-links {
@@ -86,6 +112,8 @@ body {
 .nav-links li {
     margin-left: 0;
     flex: 0 0 auto;
+    display: flex;
+    align-items: center;
 }
 
 .nav-links li:nth-child(-n + 5) {
@@ -117,6 +145,25 @@ body {
     font-size: 1.15em;
     transition: all 0.3s ease;
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+}
+
+@media (max-width: 768px) {
+    .brand-link-customer {
+        gap: 0.6rem;
+    }
+
+    .brand-logo-customer {
+        width: 54px;
+        height: 54px;
+        flex-basis: 54px;
+    }
+
+    .logo h1 a {
+        font-size: 1.45rem;
+    }
 }
 
 .account-menu {

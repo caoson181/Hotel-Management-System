@@ -33,7 +33,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
             WHERE bd.room = :room
               AND bd.checkInDate < :checkOut
               AND COALESCE(bd.actualCheckOutDate, bd.checkOutDate) > :checkIn
-              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION', 'CANCELLED'))
+              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION'))
             """)
     List<BookingDetail> findOverlappingDetails(
             @Param("room") Room room,
@@ -45,7 +45,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
             WHERE bd.room = :room
               AND bd.checkInDate <= :targetDate
               AND COALESCE(bd.actualCheckOutDate, bd.checkOutDate) > :targetDate
-              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION', 'CANCELLED'))
+              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION'))
             """)
     List<BookingDetail> findActiveDetailsByDate(
             @Param("room") Room room,
@@ -75,7 +75,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
             SELECT COALESCE(SUM(bd.price), 0)
             FROM BookingDetail bd
             WHERE bd.actualCheckOutDate = :targetDate
-              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION', 'CANCELLED'))
+              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION'))
             """)
     BigDecimal sumPriceByActualCheckOutDate(@Param("targetDate") LocalDate targetDate);
 
@@ -83,7 +83,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
             SELECT COALESCE(SUM(COALESCE(bd.finalAmount, bd.price)), 0)
             FROM BookingDetail bd
             WHERE bd.actualCheckOutDate = :targetDate
-              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION', 'CANCELLED'))
+              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION'))
             """)
     BigDecimal sumFinalAmountByActualCheckOutDate(@Param("targetDate") LocalDate targetDate);
 
@@ -92,7 +92,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
             FROM BookingDetail bd
             WHERE bd.booking.customer = :customer
               AND bd.actualCheckOutDate IS NOT NULL
-              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION', 'CANCELLED'))
+              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION'))
             """)
     BigDecimal sumCheckedOutFinalAmountByCustomer(@Param("customer") Customer customer);
 
@@ -101,7 +101,7 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
             FROM BookingDetail bd
             WHERE bd.booking.customer = :customer
               AND bd.actualCheckOutDate IS NOT NULL
-              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION', 'CANCELLED'))
+              AND (bd.status IS NULL OR UPPER(bd.status) NOT IN ('NO_SHOW', 'CANCELLATION'))
             """)
     long countCheckedOutDetailsByCustomer(@Param("customer") Customer customer);
 }

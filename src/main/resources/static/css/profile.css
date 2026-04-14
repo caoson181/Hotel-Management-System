@@ -231,6 +231,8 @@
 .profile-details-card {
   overflow: hidden;
   border-radius: 34px;
+  position: relative;
+  z-index: 2;
 }
 
 .profile-breadcrumb {
@@ -257,6 +259,8 @@
 
 .profile-panel.is-active {
   display: block;
+  position: relative;
+  z-index: 2;
 }
 
 .profile-overview-list,
@@ -498,10 +502,15 @@
   max-height: 980px;
   overflow-y: auto;
   padding-right: 8px;
+  position: relative;
+  z-index: 3;
 }
 
 .history-booking-card {
   padding: 18px;
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
 }
 
 .history-booking-header {
@@ -595,6 +604,9 @@
 
 .history-detail-card {
   overflow: hidden;
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
 }
 
 .history-detail-image img {
@@ -627,6 +639,19 @@
 
 .history-detail-dates {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.history-detail-actions {
+  margin-top: 16px;
+}
+
+.booking-history-inline button,
+.booking-history-inline a,
+.booking-history-inline input,
+.booking-history-inline label {
+  position: relative;
+  z-index: 4;
+  pointer-events: auto;
 }
 
 .settings-detail-card {

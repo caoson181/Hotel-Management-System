@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -139,6 +140,9 @@ public class RoomService {
         if (!customer.getCustomerId().equals(customerBooking.getCustomer().getCustomerId())) {
             throw new RuntimeException("Customer ID does not match Customer Booking ID");
         }
+        if (isCancelledCustomerBooking(customerBooking)) {
+            throw new RuntimeException("Customer booking has been cancelled");
+        }
         if (customerBooking.isAssigned()) {
             throw new RuntimeException("Customer booking is already assigned");
         }
@@ -174,6 +178,7 @@ public class RoomService {
         Booking booking = findOrCreateBookingForGroup(groupCode, customer);
 
         List<CustomerBooking> unassignedItems = items.stream()
+                .filter(cb -> !"CANCELLATION".equalsIgnoreCase(cb.getStatus()))
                 .filter(cb -> !cb.isAssigned())
                 .sorted(Comparator.comparing(CustomerBooking::getId))
                 .toList();
@@ -417,9 +422,23 @@ public class RoomService {
         List<BookingDetail> details = bookingDetailRepository.findAllByBooking(booking);
         BigDecimal total = BigDecimal.ZERO;
         for (BookingDetail detail : details) {
+            if (isCancelledDetail(detail)) {
+                continue;
+            }
             BigDecimal lineAmount = detail.getFinalAmount() != null ? detail.getFinalAmount() : calculateDetailAmount(detail);
             if (lineAmount != null) {
                 total = total.add(lineAmount);
+            }
+        }
+        if (booking != null && booking.getGroupCode() != null && !booking.getGroupCode().isBlank()) {
+            for (CustomerBooking customerBooking : customerBookingRepository.findAllByGroupCodeOrderByIdAsc(booking.getGroupCode())) {
+                if (customerBooking.getBooking() == null
+                        || !booking.getId().equals(customerBooking.getBooking().getId())
+                        || customerBooking.isAssigned()
+                        || isCancelledCustomerBooking(customerBooking)) {
+                    continue;
+                }
+                total = total.add(customerBooking.getPrice() == null ? BigDecimal.ZERO : customerBooking.getPrice());
             }
         }
         return total;
@@ -445,6 +464,17 @@ public class RoomService {
 
     private void syncBookingSummary(Booking booking) {
         List<BookingDetail> details = bookingDetailRepository.findAllByBooking(booking);
+        List<BookingDetail> activeDetails = details.stream()
+                .filter(detail -> !isCancelledDetail(detail))
+                .toList();
+        List<CustomerBooking> activePendingBookings = booking.getGroupCode() == null || booking.getGroupCode().isBlank()
+                ? List.of()
+                : customerBookingRepository.findAllByGroupCodeOrderByIdAsc(booking.getGroupCode()).stream()
+                .filter(customerBooking -> customerBooking.getBooking() != null
+                        && booking.getId().equals(customerBooking.getBooking().getId()))
+                .filter(customerBooking -> !customerBooking.isAssigned())
+                .filter(customerBooking -> !isCancelledCustomerBooking(customerBooking))
+                .toList();
         if (details.isEmpty()) {
             booking.setCheckInDate(null);
             booking.setCheckOutDate(null);
@@ -453,13 +483,34 @@ public class RoomService {
             return;
         }
 
-        LocalDate minCheckIn = details.stream()
-                .map(BookingDetail::getCheckInDate)
+        if (activeDetails.isEmpty() && activePendingBookings.isEmpty()) {
+            booking.setCheckInDate(details.stream()
+                    .map(BookingDetail::getCheckInDate)
+                    .filter(date -> date != null)
+                    .min(LocalDate::compareTo)
+                    .orElse(null));
+            booking.setCheckOutDate(details.stream()
+                    .map(this::getEffectiveCheckOutDate)
+                    .filter(date -> date != null)
+                    .max(LocalDate::compareTo)
+                    .orElse(null));
+            booking.setTotalAmount(BigDecimal.ZERO);
+            booking.setStatus("CANCELLATION");
+            if (booking.getCancelledAt() == null) {
+                booking.setCancelledAt(LocalDateTime.now());
+            }
+            return;
+        }
+
+        LocalDate minCheckIn = java.util.stream.Stream.concat(
+                        activeDetails.stream().map(BookingDetail::getCheckInDate),
+                        activePendingBookings.stream().map(CustomerBooking::getCheckIn))
                 .filter(date -> date != null)
                 .min(LocalDate::compareTo)
                 .orElse(null);
-        LocalDate maxCheckOut = details.stream()
-                .map(this::getEffectiveCheckOutDate)
+        LocalDate maxCheckOut = java.util.stream.Stream.concat(
+                        activeDetails.stream().map(this::getEffectiveCheckOutDate),
+                        activePendingBookings.stream().map(CustomerBooking::getCheckOut))
                 .filter(date -> date != null)
                 .max(LocalDate::compareTo)
                 .orElse(null);
@@ -467,7 +518,11 @@ public class RoomService {
         booking.setCheckInDate(minCheckIn);
         booking.setCheckOutDate(maxCheckOut);
         booking.setTotalAmount(calculateBookingTotal(booking));
-        booking.setStatus(calculateBookingStatus(booking, details, minCheckIn, maxCheckOut));
+        String nextStatus = calculateBookingStatus(booking, activeDetails, minCheckIn, maxCheckOut);
+        booking.setStatus(nextStatus);
+        if ("CANCELLATION".equalsIgnoreCase(nextStatus) && booking.getCancelledAt() == null) {
+            booking.setCancelledAt(LocalDateTime.now());
+        }
     }
 
     private String calculateBookingStatus(Booking booking,
@@ -478,8 +533,8 @@ public class RoomService {
         boolean hasActiveToday = false;
         boolean hasOccupiedToday = false;
         boolean hasOperationalProgress = hasOperationalProgress(details);
-        boolean allNoShow = details.stream()
-                .allMatch(detail -> "NO_SHOW".equalsIgnoreCase(detail.getStatus()));
+        boolean allNoShow = !details.isEmpty()
+                && details.stream().allMatch(detail -> "NO_SHOW".equalsIgnoreCase(detail.getStatus()));
         String previousStatus = booking.getStatus() == null ? "" : booking.getStatus().trim().toUpperCase();
 
         for (BookingDetail detail : details) {
@@ -504,7 +559,7 @@ public class RoomService {
         if (allNoShow) {
             return "NO_SHOW";
         }
-        if ("CANCELLATION".equals(previousStatus) || "CANCELLED".equals(previousStatus)) {
+        if ("CANCELLATION".equals(previousStatus)) {
             return "CANCELLATION";
         }
         if (hasActiveToday) {
@@ -527,7 +582,7 @@ public class RoomService {
 
     private boolean hasOperationalProgress(List<BookingDetail> details) {
         for (BookingDetail detail : details) {
-            if ("NO_SHOW".equalsIgnoreCase(detail.getStatus())) {
+            if ("NO_SHOW".equalsIgnoreCase(detail.getStatus()) || isCancelledDetail(detail)) {
                 continue;
             }
             String roomStatus = detail.getRoom() != null ? detail.getRoom().getStatus() : null;
@@ -543,6 +598,18 @@ public class RoomService {
 
     private LocalDate getEffectiveCheckOutDate(BookingDetail detail) {
         return detail.getActualCheckOutDate() != null ? detail.getActualCheckOutDate() : detail.getCheckOutDate();
+    }
+
+    private boolean isCancelledDetail(BookingDetail detail) {
+        String status = detail == null || detail.getStatus() == null ? "" : detail.getStatus().trim().toUpperCase();
+        return "CANCELLATION".equals(status);
+    }
+
+    private boolean isCancelledCustomerBooking(CustomerBooking customerBooking) {
+        String status = customerBooking == null || customerBooking.getStatus() == null
+                ? ""
+                : customerBooking.getStatus().trim().toUpperCase();
+        return status.contains("CANCELLATION");
     }
 
     private record PendingSelection(CustomerBooking customerBooking, Room room) {

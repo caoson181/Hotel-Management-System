@@ -369,7 +369,8 @@ function openCancellationModal(button) {
   }
 
   selectedBookingForCancellation = {
-    bookingId: button.dataset.bookingId,
+    targetType: String(button.dataset.targetType || "booking").toLowerCase(),
+    targetId: button.dataset.targetId,
     totalAmount: Number(button.dataset.totalAmount || 0),
     paymentMode: String(button.dataset.paymentMode || "PAY_LATER").toUpperCase(),
     refundAmount: Number(button.dataset.refundAmount || 0),
@@ -377,12 +378,22 @@ function openCancellationModal(button) {
   };
 
   const isPrepaid = selectedBookingForCancellation.paymentMode === "PAY_NOW";
+  const isDetailCancellation = selectedBookingForCancellation.targetType === "detail";
+  const modalTitle = document.getElementById("cancelBookingTitle");
+  const amountLabel = document.getElementById("cancelBookingAmountLabel");
+
+  if (modalTitle) {
+    modalTitle.textContent = isDetailCancellation ? "Room Cancellation Policy" : "Booking Cancellation Policy";
+  }
+  if (amountLabel) {
+    amountLabel.textContent = isDetailCancellation ? "Room total" : "Booking total";
+  }
   document.getElementById("cancelBookingTotal").textContent = formatMoney(selectedBookingForCancellation.totalAmount);
   document.getElementById("cancelBookingRefund").textContent = formatMoney(selectedBookingForCancellation.refundAmount);
   document.getElementById("cancelBookingFee").textContent = formatMoney(selectedBookingForCancellation.cancellationFee);
   document.getElementById("cancelBookingNote").textContent = isPrepaid
-    ? "Refund only applies to prepaid bookings. The amount above will be credited back to your wallet."
-    : "This booking is pay-later, so no refund will be credited. Cancellation fee is still recorded based on policy.";
+    ? `Refund only applies to prepaid ${isDetailCancellation ? "rooms" : "bookings"}. The amount above will be credited back to your wallet.`
+    : `This ${isDetailCancellation ? "room" : "booking"} is pay-later, so no refund will be credited. Cancellation fee is still recorded based on policy.`;
 
   if (cancelPolicyConfirm) {
     cancelPolicyConfirm.checked = false;
@@ -473,6 +484,14 @@ document.querySelectorAll(".booking-cancel-btn").forEach((button) => {
   button.addEventListener("click", () => openCancellationModal(button));
 });
 
+document.addEventListener("click", (event) => {
+  const button = event.target.closest(".booking-cancel-btn");
+  if (!button) {
+    return;
+  }
+  openCancellationModal(button);
+});
+
 if (closeCancelBooking) {
   closeCancelBooking.addEventListener("click", closeCancellationModal);
 }
@@ -483,7 +502,7 @@ if (cancelBookingDismiss) {
 
 if (confirmCancelBooking) {
   confirmCancelBooking.addEventListener("click", async () => {
-    if (!selectedBookingForCancellation?.bookingId) {
+    if (!selectedBookingForCancellation?.targetId) {
       return;
     }
     if (!cancelPolicyConfirm?.checked) {
@@ -494,7 +513,13 @@ if (confirmCancelBooking) {
     confirmCancelBooking.disabled = true;
 
     try {
-      const response = await fetch(`/api/customer-bookings/${selectedBookingForCancellation.bookingId}/cancel`, {
+      const apiPath = selectedBookingForCancellation.targetType === "detail"
+        ? `/api/customer-bookings/details/${selectedBookingForCancellation.targetId}/cancel`
+        : selectedBookingForCancellation.targetType === "pending"
+          ? `/api/customer-bookings/pending/${selectedBookingForCancellation.targetId}/cancel`
+        : `/api/customer-bookings/${selectedBookingForCancellation.targetId}/cancel`;
+
+      const response = await fetch(apiPath, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

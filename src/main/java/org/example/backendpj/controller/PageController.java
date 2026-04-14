@@ -199,7 +199,7 @@ public class PageController {
                 .filter(item -> hasBookingStatus(item, "PENDING"))
                 .count();
         long cancelledBookingCount = history.stream()
-                .filter(item -> hasBookingStatus(item, "CANCELLED", "CANCELLATION"))
+                .filter(item -> hasBookingStatus(item, "CANCELLATION"))
                 .count();
         long completedBookingCount = history.stream()
                 .filter(item -> hasBookingStatus(item, "COMPLETED"))
@@ -243,23 +243,20 @@ public class PageController {
     }
 
     private Map<String, Object> toBookingHistoryItem(Booking booking) {
-        List<Map<String, Object>> details = bookingDetailRepository.findAllByBooking(booking).stream()
-                .map(this::toBookingDetailHistoryItem)
-                .toList();
-
-        if (details.isEmpty() && booking.getGroupCode() != null) {
+        List<Map<String, Object>> details;
+        if (booking.getGroupCode() != null && !booking.getGroupCode().isBlank()) {
             details = customerBookingRepository.findAllByGroupCodeOrderByIdAsc(booking.getGroupCode()).stream()
-                    .map(this::toPendingBookingHistoryItem)
+                    .map(customerBooking -> toBookingHistoryDetailItem(booking, customerBooking))
+                    .toList();
+        } else {
+            details = bookingDetailRepository.findAllByBooking(booking).stream()
+                    .map(this::toBookingDetailHistoryItem)
                     .toList();
         }
 
         Map<String, Object> cancellationPreview = bookingLifecycleService.buildCancellationPreview(booking, LocalDate.now());
         String bookingStatus = booking.getStatus() == null ? "" : booking.getStatus().toUpperCase(Locale.ROOT);
-        boolean canCancel = !bookingStatus.contains("COMPLETED")
-                && !bookingStatus.contains("NO_SHOW")
-                && !bookingStatus.contains("CANCELLATION")
-                && booking.getCheckInDate() != null
-                && !LocalDate.now().isAfter(booking.getCheckInDate());
+        boolean canCancel = canCancelBooking(booking, bookingStatus);
 
         Map<String, Object> item = new LinkedHashMap<>();
         item.put("id", booking.getId());
@@ -280,9 +277,34 @@ public class PageController {
         return item;
     }
 
+    private Map<String, Object> toBookingHistoryDetailItem(Booking booking, CustomerBooking customerBooking) {
+        if (customerBooking == null) {
+            return Map.of();
+        }
+
+        Room assignedRoom = customerBooking.getAssignedRoom();
+        if (assignedRoom != null) {
+            BookingDetail linkedDetail = bookingDetailRepository.findTopByBookingAndRoomAndCheckInDateAndCheckOutDateOrderByIdDesc(
+                            booking,
+                            assignedRoom,
+                            customerBooking.getCheckIn(),
+                            customerBooking.getCheckOut())
+                    .orElse(null);
+            if (linkedDetail != null) {
+                return toBookingDetailHistoryItem(linkedDetail);
+            }
+        }
+
+        return toPendingBookingHistoryItem(customerBooking);
+    }
+
     private Map<String, Object> toBookingDetailHistoryItem(BookingDetail detail) {
         Room room = detail.getRoom();
+        Map<String, Object> cancellationPreview = bookingLifecycleService.buildDetailCancellationPreview(detail, LocalDate.now());
+        String detailStatus = detail.getStatus() == null ? "" : detail.getStatus().toUpperCase(Locale.ROOT);
+        boolean canCancel = canCancelDetail(detail, detailStatus);
         Map<String, Object> item = new LinkedHashMap<>();
+        item.put("id", detail.getId());
         item.put("roomNumber", room != null ? room.getRoomNumber() : "N/A");
         item.put("roomType", room != null ? room.getRoomType() : "");
         item.put("roomRank", room != null ? room.getRoomRank() : "");
@@ -292,11 +314,19 @@ public class PageController {
         item.put("checkOut", detail.getCheckOutDate());
         item.put("actualCheckOut", detail.getActualCheckOutDate());
         item.put("status", detail.getStatus() == null ? "" : detail.getStatus());
+        item.put("canCancel", canCancel);
+        item.put("cancelTargetType", "detail");
+        item.put("previewRefundAmount", cancellationPreview.get("refundAmount"));
+        item.put("previewCancellationFee", cancellationPreview.get("cancellationFee"));
         return item;
     }
 
     private Map<String, Object> toPendingBookingHistoryItem(CustomerBooking detail) {
+        Map<String, Object> cancellationPreview = bookingLifecycleService
+                .buildPendingCustomerBookingCancellationPreview(detail, LocalDate.now());
+        boolean canCancel = canCancelPendingCustomerBooking(detail);
         Map<String, Object> item = new LinkedHashMap<>();
+        item.put("id", detail.getId());
         item.put("roomNumber", detail.getAssignedRoom() != null ? detail.getAssignedRoom().getRoomNumber() : "Pending assignment");
         item.put("roomType", detail.getRoomType());
         item.put("roomRank", detail.getRoomRank());
@@ -305,7 +335,13 @@ public class PageController {
         item.put("checkIn", detail.getCheckIn());
         item.put("checkOut", detail.getCheckOut());
         item.put("actualCheckOut", null);
-        item.put("status", detail.isAssigned() ? "ASSIGNED" : "PENDING");
+        item.put("status", detail.getStatus() != null && detail.getStatus().toUpperCase(Locale.ROOT).contains("CANCELLATION")
+                ? "CANCELLATION"
+                : (detail.isAssigned() ? "ASSIGNED" : "PENDING"));
+        item.put("canCancel", canCancel);
+        item.put("cancelTargetType", "pending");
+        item.put("previewRefundAmount", cancellationPreview.getOrDefault("refundAmount", BigDecimal.ZERO));
+        item.put("previewCancellationFee", cancellationPreview.getOrDefault("cancellationFee", BigDecimal.ZERO));
         return item;
     }
 
@@ -317,6 +353,48 @@ public class PageController {
             }
         }
         return false;
+    }
+
+    private boolean canCancelBooking(Booking booking, String bookingStatus) {
+        if (bookingStatus.contains("COMPLETED")
+                || bookingStatus.contains("NO_SHOW")
+                || bookingStatus.contains("CANCELLATION")
+                || booking.getCheckInDate() == null
+                || LocalDate.now().isAfter(booking.getCheckInDate())) {
+            return false;
+        }
+
+        for (BookingDetail detail : bookingDetailRepository.findAllByBooking(booking)) {
+            if (!canCancelDetail(detail, detail.getStatus() == null ? "" : detail.getStatus().toUpperCase(Locale.ROOT))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean canCancelDetail(BookingDetail detail, String detailStatus) {
+        if (detailStatus.contains("NO_SHOW")
+                || detailStatus.contains("CANCELLATION")
+                || detail.getActualCheckOutDate() != null
+                || detail.getCheckInDate() == null
+                || LocalDate.now().isAfter(detail.getCheckInDate())) {
+            return false;
+        }
+
+        String roomStatus = detail.getRoom() != null && detail.getRoom().getStatus() != null
+                ? detail.getRoom().getStatus().trim().toUpperCase(Locale.ROOT)
+                : "";
+        return !roomStatus.equals("OCCUPIED")
+                && !roomStatus.equals("CHECKED-OUT")
+                && !roomStatus.equals("HOUSEKEEPING");
+    }
+
+    private boolean canCancelPendingCustomerBooking(CustomerBooking detail) {
+        return !detail.isAssigned()
+                && detail.getCheckIn() != null
+                && !LocalDate.now().isAfter(detail.getCheckIn())
+                && (detail.getStatus() == null || !detail.getStatus().toUpperCase(Locale.ROOT).contains("CANCELLATION"));
     }
 
     private BigDecimal toBigDecimal(Object value) {

@@ -7,9 +7,9 @@
   <link rel="stylesheet" th:href="@{/css/homepage.css}" />
   <link rel="stylesheet" th:href="@{/css/customer-theme.css}" />
   <link rel="stylesheet" th:href="@{/css/contact.css}" />
-  <link rel="stylesheet" th:href="@{/css/profile.css}" />
+  <link rel="stylesheet" th:href="@{/css/profile.css(v='20260414-2')}" />
   <link rel="stylesheet" th:href="@{/css/modals.css}" />
-  <link rel="stylesheet" th:href="@{/css/history-modal.css}" />
+  <link rel="stylesheet" th:href="@{/css/history-modal.css(v='20260414-2')}" />
   <link rel="stylesheet" th:href="@{/css/customer-footer.css}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.6.6/css/flag-icons.min.css" />
@@ -282,7 +282,8 @@
                 <button type="button"
                         class="btn-secondary booking-cancel-btn"
                         th:if="${b.canCancel}"
-                        th:attr="data-booking-id=${b.id},
+                        th:attr="data-target-type='booking',
+                                 data-target-id=${b.id},
                                  data-total-amount=${b.totalAmount},
                                  data-payment-mode=${b.paymentMode},
                                  data-refund-amount=${b.previewRefundAmount},
@@ -329,6 +330,19 @@
                           <label>Status</label>
                           <strong th:text="${detail.status != null && !#strings.isEmpty(detail.status) ? detail.status : 'ASSIGNED'}"></strong>
                         </div>
+                      </div>
+
+                      <div class="history-detail-actions" th:if="${detail.canCancel}">
+                        <button type="button"
+                                class="btn-secondary booking-cancel-btn"
+                                th:attr="data-target-type=${detail.cancelTargetType},
+                                         data-target-id=${detail.id},
+                                         data-total-amount=${detail.finalAmount != null ? detail.finalAmount : detail.price},
+                                         data-payment-mode=${b.paymentMode},
+                                         data-refund-amount=${detail.previewRefundAmount},
+                                         data-cancellation-fee=${detail.previewCancellationFee}">
+                          Cancel This Room
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -544,7 +558,7 @@
 <div id="cancelBookingModal" class="booking-history-modal">
   <div class="booking-history-content cancel-booking-content">
     <span class="close-btn" id="closeCancelBooking">&times;</span>
-    <h3>Booking Cancellation Policy</h3>
+    <h3 id="cancelBookingTitle">Booking Cancellation Policy</h3>
     <div class="cancel-policy-list">
       <div class="cancel-policy-item">
         <span>Cancel 3 days before check-in</span>
@@ -561,7 +575,7 @@
     </div>
     <div class="cancel-booking-preview">
       <div class="cancel-preview-row">
-        <span>Booking total</span>
+        <span id="cancelBookingAmountLabel">Booking total</span>
         <strong id="cancelBookingTotal">0 VND</strong>
       </div>
       <div class="cancel-preview-row">
@@ -597,6 +611,6 @@
     }
   });
 </script>
-<script th:src="@{/js/profile.js}"></script>
+<script th:src="@{/js/profile.js(v='20260414-2')}"></script>
 </body>
 </html>

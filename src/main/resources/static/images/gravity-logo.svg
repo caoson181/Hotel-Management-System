@@ -1,0 +1,25 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ring" x1="48" y1="36" x2="208" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8E7A1"/>
+      <stop offset="0.45" stop-color="#D4A94D"/>
+      <stop offset="1" stop-color="#A06A1E"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="87" y1="77" x2="169" y2="173" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8EE3F5"/>
+      <stop offset="1" stop-color="#53C3C0"/>
+    </linearGradient>
+    <linearGradient id="innerGlow" x1="79" y1="58" x2="177" y2="198" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#213A57"/>
+      <stop offset="1" stop-color="#0A1623"/>
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="100" fill="url(#innerGlow)"/>
+  <circle cx="128" cy="128" r="92" stroke="url(#ring)" stroke-width="10"/>
+  <path d="M128 56L137.78 70.07L154.43 67.95L148.04 83.48L161.29 93.79L144.64 97.17L141.87 113.73L128 104.98L114.13 113.73L111.36 97.17L94.71 93.79L107.96 83.48L101.57 67.95L118.22 70.07L128 56Z" fill="url(#ring)"/>
+  <path d="M93 171V106.5C93 101.253 97.2533 97 102.5 97H153.5C158.747 97 163 101.253 163 106.5V171" stroke="url(#accent)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M111 171V131H145V171" stroke="url(#accent)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M104 115H152" stroke="url(#accent)" stroke-width="10" stroke-linecap="round"/>
+  <path d="M83 171H173" stroke="url(#ring)" stroke-width="10" stroke-linecap="round"/>
+  <path d="M79 186C89.5 171.333 105.833 164 128 164C150.167 164 166.5 171.333 177 186" stroke="url(#ring)" stroke-width="8" stroke-linecap="round"/>
+</svg>
