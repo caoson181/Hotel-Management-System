@@ -3,10 +3,13 @@
 
 <head>
     <title>Staff Profile</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" th:href="@{/css/global.css}" />
     <link rel="stylesheet" th:href="@{/css/modal.css}" />
     <link rel="stylesheet" th:href="@{/css/navbar.css}" />
-    <link rel="stylesheet" th:href="@{/css/profile-staff.css}" />
+    <link rel="stylesheet" th:href="@{/css/profile-staff-v2.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 
 <body>
@@ -73,6 +76,17 @@
 
     <div class="profile-container">
         <div class="profile-card">
+            <div class="profile-topbar">
+                <div class="profile-topbar-copy">
+                    <span class="profile-eyebrow">Staff Workspace</span>
+                    <h1>Profile Overview</h1>
+                    <p>Keep your staff information updated for smoother internal operations.</p>
+                </div>
+                <button id="openEditModal" class="btn primary profile-topbar-btn">
+                    <i class="fas fa-pen"></i>
+                    <span>Edit Profile</span>
+                </button>
+            </div>
 
             <!-- AVATAR -->
             <div class="profile-header">
@@ -105,7 +119,26 @@
                 <div>
                     <h2 th:text="${user.fullName}">Full Name</h2>
                     <p class="role" th:text="${user.role}">Role</p>
+                    <div class="profile-header-meta">
+                        <span class="profile-badge"><i class="fas fa-user-shield"></i> Staff account</span>
+                        <span class="profile-meta-item"><i class="fas fa-envelope"></i><span th:text="${user.email}"></span></span>
+                    </div>
                 </div>
+            </div>
+
+            <div class="profile-highlights">
+                <article class="highlight-card">
+                    <span class="highlight-label">Username</span>
+                    <strong th:text="${user.username}"></strong>
+                </article>
+                <article class="highlight-card">
+                    <span class="highlight-label">Phone</span>
+                    <strong th:text="${user.phoneNumber != null ? user.phoneNumber : 'Not set'}"></strong>
+                </article>
+                <article class="highlight-card">
+                    <span class="highlight-label">Date of Birth</span>
+                    <strong th:text="${user.dateOfBirth != null ? #temporals.format(user.dateOfBirth, 'dd/MM/yyyy') : 'Not set'}"></strong>
+                </article>
             </div>
 
             <!-- INFO GRID -->
@@ -140,8 +173,14 @@
 
             <!-- ACTION -->
             <div class="profile-actions">
-                <a th:href="@{/index}" class="btn secondary">Back</a>
-                <button id="openEditModal" class="btn primary">Edit Profile</button>
+                <a th:href="@{/index}" class="btn secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back</span>
+                </a>
+                <button id="openEditModalBottom" class="btn primary">
+                    <i class="fas fa-pen"></i>
+                    <span>Edit Profile</span>
+                </button>
             </div>
 
         </div>
@@ -152,6 +191,31 @@
     <script th:src="@{/js/role.js}"></script>
     <div th:replace="~{components/modals :: modals}"></div>
     <script>
+        const editModal = document.getElementById("editProfileModal");
+        const openEditModalBtn = document.getElementById("openEditModal");
+        const openEditModalBottomBtn = document.getElementById("openEditModalBottom");
+        const closeEditModalBtn = document.getElementById("closeEditModal");
+        const cancelEditBtn = document.getElementById("cancelEdit");
+        const editModalOverlay = document.querySelector("#editProfileModal .modal-overlay");
+
+        function openStaffEditModal() {
+            if (editModal) {
+                editModal.classList.add("active");
+            }
+        }
+
+        function closeStaffEditModal() {
+            if (editModal) {
+                editModal.classList.remove("active");
+            }
+        }
+
+        openEditModalBtn?.addEventListener("click", openStaffEditModal);
+        openEditModalBottomBtn?.addEventListener("click", openStaffEditModal);
+        closeEditModalBtn?.addEventListener("click", closeStaffEditModal);
+        cancelEditBtn?.addEventListener("click", closeStaffEditModal);
+        editModalOverlay?.addEventListener("click", closeStaffEditModal);
+
         const avatarBtn = document.getElementById("openAvatarModal");
         const avatarModal = document.getElementById("avatarModal");
 
@@ -162,6 +226,13 @@
 
         document.addEventListener("click", () => {
             avatarModal.classList.remove("active");
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                closeStaffEditModal();
+                avatarModal.classList.remove("active");
+            }
         });
     </script>
 </body>
