@@ -42,6 +42,10 @@ let currentTypeFilter = "all";
 let currentRankFilter = "all";
 let currentCheckInFilter = "";
 let currentCheckOutFilter = "";
+let selectedRoomId = null;
+let selectedRoomNumber = "";
+let selectedRoomTimeline = null;
+let currentCalendarMonth = null;
 const itemsPerPage = 10;
 
 // DOM Elements
@@ -54,6 +58,7 @@ let tableBody,
   pagination,
   roleIndicator;
 let typeFilter, rankFilter, bookingsTableBody, dateCheckInInput, dateCheckOutInput;
+let roomTimelineContainer, roomTimelineBody, roomTimelineSubtitle, timelineCloseBtn;
 
 // Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
@@ -80,6 +85,10 @@ document.addEventListener("DOMContentLoaded", function () {
   bookingsTableBody = document.getElementById("bookingsTableBody");
   dateCheckInInput = document.getElementById("dateCheckIn");
   dateCheckOutInput = document.getElementById("dateCheckOut");
+  roomTimelineContainer = document.getElementById("roomTimelineContainer");
+  roomTimelineBody = document.getElementById("roomTimelineBody");
+  roomTimelineSubtitle = document.getElementById("roomTimelineSubtitle");
+  timelineCloseBtn = document.getElementById("timelineCloseBtn");
 
   const today = new Date().toISOString().split("T")[0];
   if (dateCheckInInput) {
@@ -93,6 +102,12 @@ document.addEventListener("DOMContentLoaded", function () {
   if (roleIndicator) {
     roleIndicator.textContent =
       userRole.charAt(0).toUpperCase() + userRole.slice(1);
+  }
+
+  if (timelineCloseBtn) {
+    timelineCloseBtn.addEventListener("click", () => {
+      clearSelectedTimeline();
+    });
   }
 
   // Initial render
@@ -213,12 +228,14 @@ function loadRooms() {
       }));
       currentPage = 0;
       renderTable();
+      syncSelectedRoomState();
     })
     .catch((error) => {
       console.error("Error loading rooms:", error);
       rooms = [];
       currentPage = 0;
       renderTable();
+      syncSelectedRoomState();
     });
 }
 
@@ -293,7 +310,13 @@ function renderTable() {
       .map(
         (room) => `
             <tr>
-                <td><strong>${escapeHtml(room.roomNumber)}</strong></td>
+                <td class="room-number-cell">
+                    <button type="button"
+                        class="room-number-btn ${selectedRoomId === room.id ? "active" : ""}"
+                        onclick="toggleRoomTimeline(${room.id}, '${escapeJs(room.roomNumber)}')">
+                        <strong>${escapeHtml(room.roomNumber)}</strong>
+                    </button>
+                </td>
                 <td>${escapeHtml(room.roomType)}</td>
                 <td>
                     <span class="status-badge status-${escapeHtml(
@@ -804,6 +827,428 @@ function showNotification(message, type = "info") {
   alert(message);
 }
 
+function toggleRoomTimeline(roomId, roomNumber) {
+  if (selectedRoomId === roomId) {
+    clearSelectedTimeline();
+    renderTable();
+    return;
+  }
+
+  selectedRoomId = roomId;
+  selectedRoomNumber = roomNumber || "";
+  renderTable();
+  renderTimelineLoading(roomNumber);
+
+  fetch(`/api/rooms/${roomId}/timeline`)
+    .then(async (response) => {
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(extractErrorMessage(errorText) || "Failed to load room timeline");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (selectedRoomId !== roomId) {
+        return;
+      }
+      renderRoomTimeline(data);
+    })
+    .catch((error) => {
+      console.error("Error loading room timeline:", error);
+      if (selectedRoomId !== roomId) {
+        return;
+      }
+      renderTimelineError(roomNumber, error.message || "Failed to load room timeline");
+    });
+}
+
+function clearSelectedTimeline() {
+  selectedRoomId = null;
+  selectedRoomNumber = "";
+  selectedRoomTimeline = null;
+  currentCalendarMonth = null;
+  if (roomTimelineContainer) {
+    roomTimelineContainer.classList.remove("active");
+  }
+  if (roomTimelineSubtitle) {
+    roomTimelineSubtitle.textContent = "Click a room number in the table to view timeline.";
+  }
+  if (roomTimelineBody) {
+    roomTimelineBody.innerHTML = `
+      <div class="room-timeline-empty">
+        <i class="fas fa-bed"></i>
+        <span>No room selected.</span>
+      </div>
+    `;
+  }
+}
+
+function syncSelectedRoomState() {
+  if (!selectedRoomId) {
+    return;
+  }
+
+  const selectedRoom = (rooms || []).find((room) => room.id === selectedRoomId);
+  if (!selectedRoom) {
+    clearSelectedTimeline();
+  }
+}
+
+function renderTimelineLoading(roomNumber) {
+  if (roomTimelineContainer) {
+    roomTimelineContainer.classList.add("active");
+  }
+  if (roomTimelineSubtitle) {
+    roomTimelineSubtitle.textContent = `Loading timeline for room ${roomNumber || selectedRoomNumber}...`;
+  }
+  if (roomTimelineBody) {
+    roomTimelineBody.innerHTML = `
+      <div class="room-timeline-empty">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Loading timeline...</span>
+      </div>
+    `;
+  }
+}
+
+function renderTimelineError(roomNumber, message) {
+  if (roomTimelineContainer) {
+    roomTimelineContainer.classList.add("active");
+  }
+  if (roomTimelineSubtitle) {
+    roomTimelineSubtitle.textContent = `Timeline for room ${roomNumber || selectedRoomNumber}`;
+  }
+  if (roomTimelineBody) {
+    roomTimelineBody.innerHTML = `
+      <div class="room-timeline-empty room-timeline-error">
+        <i class="fas fa-circle-exclamation"></i>
+        <span>${escapeHtml(message)}</span>
+      </div>
+    `;
+  }
+}
+
+function renderRoomTimeline(payload) {
+  if (!roomTimelineContainer || !roomTimelineBody || !roomTimelineSubtitle) {
+    return;
+  }
+
+  roomTimelineContainer.classList.add("active");
+  roomTimelineSubtitle.textContent = `${escapeText(payload.roomNumber)} - ${escapeText(payload.roomType)} - ${escapeText(payload.roomRank)}`;
+
+  const events = Array.isArray(payload.events) ? payload.events : [];
+  if (events.length === 0) {
+    selectedRoomTimeline = null;
+    currentCalendarMonth = null;
+    roomTimelineBody.innerHTML = `
+      <div class="room-timeline-empty">
+        <i class="fas fa-calendar-xmark"></i>
+        <span>No booking history for room ${escapeHtml(payload.roomNumber || "")}.</span>
+      </div>
+    `;
+    return;
+  }
+
+  selectedRoomTimeline = payload;
+  currentCalendarMonth = resolveInitialCalendarMonth(events);
+  renderRoomCalendar();
+}
+
+function renderRoomCalendar() {
+  if (!roomTimelineBody || !selectedRoomTimeline || !currentCalendarMonth) {
+    return;
+  }
+
+  const monthStart = new Date(currentCalendarMonth.getFullYear(), currentCalendarMonth.getMonth(), 1);
+  const monthDays = buildCalendarDays(monthStart, selectedRoomTimeline.events || []);
+  const eventsHtml = (selectedRoomTimeline.events || [])
+    .map(
+      (event) => `
+        <div class="calendar-booking-item">
+          <div class="calendar-booking-item-top">
+            <strong>Booking #${escapeHtml(event.bookingId ?? "N/A")}</strong>
+            <span class="status-badge status-${escapeHtml(normalizeTimelineStatus(event.bookingStatus || event.status))}">
+              ${escapeHtml(formatTimelineStatus(event.bookingStatus || event.status))}
+            </span>
+          </div>
+          <div class="calendar-booking-item-meta">
+            Customer ${escapeHtml(event.customerId ?? "N/A")} | ${escapeHtml(formatDateRange(event.checkIn, event.checkOut))}
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+
+  roomTimelineBody.innerHTML = `
+    <div class="calendar-shell">
+      <div class="calendar-toolbar">
+        <button type="button" class="calendar-nav-btn" onclick="changeRoomCalendarMonth(-1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="calendar-toolbar-title">
+          <strong>${escapeHtml(formatMonthYear(monthStart))}</strong>
+          <span>${escapeHtml(buildCalendarSummary(monthDays))}</span>
+        </div>
+        <button type="button" class="calendar-nav-btn" onclick="changeRoomCalendarMonth(1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="calendar-legend">
+        <span><i class="fas fa-square legend-booked"></i> Booked day</span>
+        <span><i class="fas fa-square legend-checkin"></i> Check-in</span>
+        <span><i class="fas fa-square legend-checkout"></i> Check-out</span>
+        <span><i class="fas fa-square legend-today"></i> Today</span>
+      </div>
+
+      <div class="calendar-weekdays">
+        <span>Mon</span>
+        <span>Tue</span>
+        <span>Wed</span>
+        <span>Thu</span>
+        <span>Fri</span>
+        <span>Sat</span>
+        <span>Sun</span>
+      </div>
+
+      <div class="calendar-grid">
+        ${monthDays.map((day) => renderCalendarDay(day)).join("")}
+      </div>
+    </div>
+
+    <div class="calendar-booking-list">
+      <div class="calendar-booking-list-header">
+        <h4>Booked Stays</h4>
+        <span>${escapeHtml(String((selectedRoomTimeline.events || []).length))} bookings</span>
+      </div>
+      ${eventsHtml}
+    </div>
+  `;
+}
+
+function buildCalendarDays(monthStart, events) {
+  const todayKey = formatDateKey(new Date());
+  const year = monthStart.getFullYear();
+  const month = monthStart.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const leadingDays = (firstDay.getDay() + 6) % 7;
+  const gridStart = new Date(year, month, 1 - leadingDays);
+  const totalCells = 42;
+  const days = [];
+
+  for (let i = 0; i < totalCells; i += 1) {
+    const date = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i);
+    const dateKey = formatDateKey(date);
+    const matchedEvents = events.filter((event) => isDateBookedByEvent(date, event));
+    const isCheckIn = events.some((event) => formatDateKey(parseLocalDate(event.checkIn)) === dateKey);
+    const isCheckOut = events.some((event) => {
+      const checkoutDate = getEventCheckoutDate(event);
+      return checkoutDate && formatDateKey(checkoutDate) === dateKey;
+    });
+
+    days.push({
+      date,
+      dateKey,
+      inMonth: date.getMonth() === month,
+      isToday: dateKey === todayKey,
+      isBooked: matchedEvents.length > 0,
+      isCheckIn,
+      isCheckOut,
+      bookingCount: matchedEvents.length,
+      events: matchedEvents,
+    });
+  }
+
+  return days;
+}
+
+function renderCalendarDay(day) {
+  const classes = ["calendar-day"];
+  if (!day.inMonth) classes.push("is-outside");
+  if (day.isBooked) classes.push("is-booked");
+  if (day.isToday) classes.push("is-today");
+  if (day.isCheckIn) classes.push("is-checkin");
+  if (day.isCheckOut) classes.push("is-checkout");
+
+  const note = day.bookingCount > 0
+    ? `${day.bookingCount} booking${day.bookingCount > 1 ? "s" : ""}`
+    : "&nbsp;";
+
+  return `
+    <div class="${classes.join(" ")}" title="${escapeHtml(buildCalendarDayTitle(day))}">
+      <span class="calendar-day-number">${day.date.getDate()}</span>
+      <span class="calendar-day-note">${note}</span>
+    </div>
+  `;
+}
+
+function buildCalendarDayTitle(day) {
+  if (!day.events.length) {
+    return `${formatSingleDate(day.date)}: Available`;
+  }
+
+  return `${formatSingleDate(day.date)}: ${day.events
+    .map((event) => `Booking #${event.bookingId} (${formatSingleDate(event.checkIn)} -> ${formatSingleDate(event.checkOut)})`)
+    .join(", ")}`;
+}
+
+function buildCalendarSummary(days) {
+  const bookedDays = days.filter((day) => day.inMonth && day.isBooked).length;
+  return `${bookedDays} booked day${bookedDays === 1 ? "" : "s"} in this month`;
+}
+
+function resolveInitialCalendarMonth(events) {
+  const today = new Date();
+  const activeEvent = events.find((event) => {
+    const start = parseLocalDate(event.checkIn);
+    const end = getEventCheckoutDate(event);
+    return start && end && start <= today && today < end;
+  });
+
+  if (activeEvent) {
+    const activeStart = parseLocalDate(activeEvent.checkIn);
+    return new Date(activeStart.getFullYear(), activeStart.getMonth(), 1);
+  }
+
+  const firstEvent = [...events]
+    .map((event) => parseLocalDate(event.checkIn))
+    .filter(Boolean)
+    .sort((a, b) => b - a)[0];
+
+  if (firstEvent) {
+    return new Date(firstEvent.getFullYear(), firstEvent.getMonth(), 1);
+  }
+
+  return new Date(today.getFullYear(), today.getMonth(), 1);
+}
+
+function changeRoomCalendarMonth(offset) {
+  if (!currentCalendarMonth) {
+    return;
+  }
+
+  currentCalendarMonth = new Date(
+    currentCalendarMonth.getFullYear(),
+    currentCalendarMonth.getMonth() + offset,
+    1,
+  );
+  renderRoomCalendar();
+}
+
+function isDateBookedByEvent(date, event) {
+  const start = parseLocalDate(event.checkIn);
+  const end = getEventCheckoutDate(event);
+  if (!start || !end) {
+    return false;
+  }
+
+  return date >= start && date < end;
+}
+
+function getEventCheckoutDate(event) {
+  return parseLocalDate(event.actualCheckOut || event.checkOut);
+}
+
+function parseLocalDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  }
+
+  const text = String(value);
+  const parts = text.split("-");
+  if (parts.length !== 3) {
+    const parsed = new Date(text);
+    if (Number.isNaN(parsed.getTime())) {
+      return null;
+    }
+    return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+  }
+
+  return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+}
+
+function formatDateKey(value) {
+  const date = value instanceof Date ? value : parseLocalDate(value);
+  if (!date) {
+    return "";
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatMonthYear(date) {
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function normalizeTimelineStatus(status) {
+  const value = String(status || "").trim().toLowerCase();
+  if (value.includes("checked")) return "checked-out";
+  if (value.includes("occup")) return "occupied";
+  if (value.includes("reserv") || value.includes("assign")) return "reserved";
+  if (value.includes("house")) return "housekeeping";
+  if (value.includes("cancel")) return "checked-out";
+  return "available";
+}
+
+function formatTimelineStatus(status) {
+  const value = String(status || "").trim();
+  if (!value) return "N/A";
+  return value
+    .toLowerCase()
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatDateRange(checkIn, checkOut) {
+  return `${formatSingleDate(checkIn)} -> ${formatSingleDate(checkOut)}`;
+}
+
+function formatSingleDate(value) {
+  if (!value) {
+    return "N/A";
+  }
+
+  const date = value instanceof Date ? value : parseLocalDate(value);
+  if (!date || Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleDateString("vi-VN");
+}
+
+function formatCurrency(value) {
+  if (value === null || value === undefined || value === "") {
+    return "N/A";
+  }
+  const amount = Number(value);
+  if (Number.isNaN(amount)) {
+    return String(value);
+  }
+  return `${amount.toLocaleString("vi-VN")} VND`;
+}
+
+function escapeText(value) {
+  return value == null ? "" : String(value);
+}
+
+function escapeJs(str) {
+  if (str === null || str === undefined) return "";
+  return String(str).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
+
 function extractErrorMessage(rawText) {
   if (!rawText) {
     return "";
@@ -841,6 +1286,8 @@ function markNoShow(roomId) {
 window.changeRoomStatus = changeRoomStatus;
 window.assignRoomToCustomer = assignRoomToCustomer;
 window.markNoShow = markNoShow;
+window.toggleRoomTimeline = toggleRoomTimeline;
+window.changeRoomCalendarMonth = changeRoomCalendarMonth;
 
 // Booking Details Modal Handler
 document.addEventListener("DOMContentLoaded", function () {

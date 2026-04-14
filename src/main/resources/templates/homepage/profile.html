@@ -31,6 +31,8 @@
       <div class="profile-grid-layout">
         <aside class="profile-summary-card" th:classappend="${' tier-' + #strings.toLowerCase(memberLevel)}">
           <div class="profile-chip" th:text="${memberLevel + ' / ' + customerRank}"></div>
+          <div class="profile-membership-meta"
+               th:attr="data-member-level=${memberLevel},data-customer-rank=${customerRank}"></div>
 
           <div th:if="${user != null}">
             <div id="openAvatarModal" class="profile-avatar-trigger">
@@ -117,6 +119,24 @@
                   <p th:text="${pendingBookingCount + ' pending · ' + cancelledBookingCount + ' cancelled'}"></p>
                 </div>
                 <div class="account-nav-card__meta" th:text="${bookingCount + ' bookings'}"></div>
+              </button>
+
+              <button type="button" class="account-nav-card" data-tab-target="membership">
+                <div class="account-nav-card__icon icon-membership"><i class="fas fa-crown"></i></div>
+                <div class="account-nav-card__content">
+                  <h3>Membership Center</h3>
+                  <p>View your level, rank, progress, and current service privileges.</p>
+                </div>
+                <div class="account-nav-card__meta">Open</div>
+              </button>
+
+              <button type="button" class="account-nav-card" data-tab-target="coupons">
+                <div class="account-nav-card__icon icon-privileges"><i class="fas fa-ticket-alt"></i></div>
+                <div class="account-nav-card__content">
+                  <h3>My Coupons</h3>
+                  <p>Browse frontend coupon perks currently unlocked by your rank.</p>
+                </div>
+                <div class="account-nav-card__meta">Open</div>
               </button>
             </div>
 
@@ -254,6 +274,110 @@
                 </div>
               </article>
             </div>
+          </section>
+
+          <section class="profile-panel" data-panel="membership">
+            <div class="panel-header">
+              <div>
+                <h3>Membership Center</h3>
+                <p>Frontend preview of your membership level, rank progress, and service privileges.</p>
+              </div>
+            </div>
+
+            <section class="profile-membership-center" id="profileMembershipCenter">
+              <div class="membership-hero-card">
+                <div>
+                  <span class="profile-privileges-label">Frontend Preview</span>
+                  <h3 id="membershipHeroTitle">Membership Overview</h3>
+                  <p id="membershipHeroText">Preview your current level, rank, and upcoming benefits.</p>
+                </div>
+                <div class="membership-hero-badge" id="membershipHeroBadge">Bronze / Normal</div>
+              </div>
+
+              <div class="membership-center-grid">
+                <article class="membership-progress-card">
+                  <div class="privilege-title-row">
+                    <span class="privilege-kicker">Upgrade Progress</span>
+                    <strong id="membershipProgressTitle">Progress to next tier</strong>
+                  </div>
+                  <p class="membership-progress-copy" id="membershipProgressCopy"></p>
+                  <div class="membership-progress-track">
+                    <div class="membership-progress-fill" id="membershipProgressFill"></div>
+                  </div>
+                  <div class="membership-progress-meta">
+                    <span id="membershipProgressCurrent">0 VND</span>
+                    <span id="membershipProgressTarget">0 VND</span>
+                  </div>
+                </article>
+
+                <article class="membership-summary-card">
+                  <div class="privilege-title-row">
+                    <span class="privilege-kicker">Current Status</span>
+                    <strong>Membership Snapshot</strong>
+                  </div>
+                  <div class="membership-summary-grid">
+                    <div class="membership-stat-box">
+                      <label>Level</label>
+                      <strong id="membershipLevelValue">Bronze</strong>
+                    </div>
+                    <div class="membership-stat-box">
+                      <label>Rank</label>
+                      <strong id="membershipRankValue">Normal</strong>
+                    </div>
+                    <div class="membership-stat-box">
+                      <label>Total Spent</label>
+                      <strong id="membershipSpentValue">0 VND</strong>
+                    </div>
+                    <div class="membership-stat-box">
+                      <label>Unlocked Coupons</label>
+                      <strong id="membershipCouponCount">0</strong>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              <div class="profile-privileges-card profile-privileges-card--panel">
+                <div class="profile-privileges-head">
+                  <div>
+                    <span class="profile-privileges-label">Level Services</span>
+                    <h3 id="levelPrivilegeTitle">Service policies by level</h3>
+                  </div>
+                  <i class="fas fa-concierge-bell"></i>
+                </div>
+
+                <div class="service-policy-list" id="levelServicePolicyList"></div>
+              </div>
+
+              <div class="membership-next-card">
+                <div>
+                  <span class="privilege-kicker">Next Unlock</span>
+                  <strong id="membershipNextTitle">Next membership milestone</strong>
+                  <p id="membershipNextCopy"></p>
+                </div>
+                <div class="membership-next-pills" id="membershipNextPills"></div>
+              </div>
+            </section>
+          </section>
+
+          <section class="profile-panel" data-panel="coupons">
+            <div class="panel-header">
+              <div>
+                <h3>My Coupons</h3>
+                <p>Frontend preview of coupon perks unlocked based on your current rank.</p>
+              </div>
+            </div>
+
+            <section class="profile-privileges-card profile-privileges-card--panel" id="profileCouponsPanel">
+              <div class="profile-privileges-head">
+                <div>
+                  <span class="profile-privileges-label">Rank Coupons</span>
+                  <h3 id="rankPrivilegeTitle">Coupons by rank</h3>
+                </div>
+                <i class="fas fa-ticket-alt"></i>
+              </div>
+
+              <div class="coupon-list" id="rankCouponList"></div>
+            </section>
           </section>
 
           <section class="profile-panel" data-panel="bookings">

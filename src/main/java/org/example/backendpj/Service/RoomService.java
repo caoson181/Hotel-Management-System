@@ -272,6 +272,44 @@ public class RoomService {
         return roomRepository.findFirstByRoomTypeIgnoreCaseAndRoomRankIgnoreCaseOrderByIdAsc(type, rank);
     }
 
+    public Map<String, Object> getRoomTimeline(Integer roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        List<Map<String, Object>> events = bookingDetailRepository.findTimelineByRoom(room).stream()
+                .map(detail -> {
+                    Booking booking = detail.getBooking();
+                    Customer customer = booking != null ? booking.getCustomer() : null;
+
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("bookingDetailId", detail.getId());
+                    item.put("bookingId", booking != null ? booking.getId() : null);
+                    item.put("customerId", customer != null ? customer.getCustomerId() : null);
+                    item.put("roomNumber", room.getRoomNumber());
+                    item.put("roomType", room.getRoomType());
+                    item.put("roomRank", room.getRoomRank());
+                    item.put("checkIn", detail.getCheckInDate());
+                    item.put("checkOut", detail.getCheckOutDate());
+                    item.put("actualCheckOut", detail.getActualCheckOutDate());
+                    item.put("status", detail.getStatus());
+                    item.put("bookingStatus", booking != null ? booking.getStatus() : null);
+                    item.put("price", detail.getPrice());
+                    item.put("finalAmount", detail.getFinalAmount());
+                    item.put("groupCode", booking != null ? booking.getGroupCode() : null);
+                    return item;
+                })
+                .toList();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("roomId", room.getId());
+        response.put("roomNumber", room.getRoomNumber());
+        response.put("roomType", room.getRoomType());
+        response.put("roomRank", room.getRoomRank());
+        response.put("status", room.getStatus());
+        response.put("events", events);
+        return response;
+    }
+
     private void createAssignment(Booking booking, CustomerBooking customerBooking, Room room) {
         BookingDetail detail = new BookingDetail();
         detail.setBooking(booking);

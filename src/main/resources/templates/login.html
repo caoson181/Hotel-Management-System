@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/login-anim.css">
     <!-- Preload slideshow images to prevent first-load flash -->
@@ -54,11 +54,17 @@
 <body>
 <!-- background slideshow container -->
 <div class="bg-slideshow"></div>
+<div class="bg-overlay"></div>
 <a th:href="@{/}" class="login-brand-mark" aria-label="Back to Gravity Hotel home">
     <img src="/images/gravity-logo-chatgpt-cutout.png" alt="Gravity Hotel logo">
     <span>Gravity Hotel</span>
 </a>
 <form id="loginForm" method="post" action="/login">
+    <div class="login-card-head">
+        <span class="eyebrow">Private Access</span>
+        <h1>Welcome Back</h1>
+        <p>Sign in to continue managing reservations, rooms, and the guest experience.</p>
+    </div>
     <div class="svgContainer">
         <div>
             <svg class="mySVG" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 200">
@@ -186,7 +192,7 @@
     <div id="errorMessage"></div>
     <div class="form-footer">
         <a th:href="@{/auth/forgot-password}">Forgot Password</a>
-        <a th:href="@{/auth/signup}">Sign up</a>
+        <a th:href="@{/auth/signup}">Create account</a>
         <a th:href="@{/}">Back to Home</a>
     </div>
     <div th:if="${errorMessage}" style="color:red;">

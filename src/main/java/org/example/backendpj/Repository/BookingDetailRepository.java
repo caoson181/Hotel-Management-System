@@ -22,6 +22,15 @@ public interface BookingDetailRepository extends JpaRepository<BookingDetail, In
 
     List<BookingDetail> findAllByRoom(Room room);
 
+    @Query("""
+            SELECT bd FROM BookingDetail bd
+            JOIN FETCH bd.booking b
+            JOIN FETCH b.customer c
+            WHERE bd.room = :room
+            ORDER BY bd.checkInDate DESC, bd.id DESC
+            """)
+    List<BookingDetail> findTimelineByRoom(@Param("room") Room room);
+
     Optional<BookingDetail> findTopByBookingAndRoomAndCheckInDateAndCheckOutDateOrderByIdDesc(
             Booking booking,
             Room room,

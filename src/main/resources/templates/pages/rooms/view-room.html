@@ -140,6 +140,24 @@
             <!-- Pagination -->
             <div class="pagination" id="pagination"></div>
         </div>
+
+        <div class="room-timeline-container" id="roomTimelineContainer">
+            <div class="room-timeline-header">
+                <div>
+                    <h3><i class="fas fa-calendar-days"></i> Room Booking Calendar</h3>
+                    <p id="roomTimelineSubtitle">Click a room number in the table to view booked days on the calendar.</p>
+                </div>
+                <button type="button" class="timeline-close-btn" id="timelineCloseBtn" aria-label="Close timeline">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="room-timeline-body" id="roomTimelineBody">
+                <div class="room-timeline-empty">
+                    <i class="fas fa-bed"></i>
+                    <span>No room selected.</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="right-section">

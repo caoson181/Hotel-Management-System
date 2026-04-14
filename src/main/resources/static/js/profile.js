@@ -7,11 +7,80 @@ const panels = Array.from(document.querySelectorAll(".profile-panel"));
 const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
 const themeButtons = Array.from(document.querySelectorAll("[data-theme-value]"));
 const PROFILE_THEME_STORAGE_KEY = "customerTheme";
+const membershipMeta = document.querySelector(".profile-membership-meta");
+const rankCouponList = document.getElementById("rankCouponList");
+const levelServicePolicyList = document.getElementById("levelServicePolicyList");
+const rankPrivilegeTitle = document.getElementById("rankPrivilegeTitle");
+const levelPrivilegeTitle = document.getElementById("levelPrivilegeTitle");
+const membershipHeroTitle = document.getElementById("membershipHeroTitle");
+const membershipHeroText = document.getElementById("membershipHeroText");
+const membershipHeroBadge = document.getElementById("membershipHeroBadge");
+const membershipProgressTitle = document.getElementById("membershipProgressTitle");
+const membershipProgressCopy = document.getElementById("membershipProgressCopy");
+const membershipProgressFill = document.getElementById("membershipProgressFill");
+const membershipProgressCurrent = document.getElementById("membershipProgressCurrent");
+const membershipProgressTarget = document.getElementById("membershipProgressTarget");
+const membershipLevelValue = document.getElementById("membershipLevelValue");
+const membershipRankValue = document.getElementById("membershipRankValue");
+const membershipSpentValue = document.getElementById("membershipSpentValue");
+const membershipCouponCount = document.getElementById("membershipCouponCount");
+const membershipNextTitle = document.getElementById("membershipNextTitle");
+const membershipNextCopy = document.getElementById("membershipNextCopy");
+const membershipNextPills = document.getElementById("membershipNextPills");
+
+const RANK_COUPON_CATALOG = {
+  normal: [
+    { value: "5%", name: "Welcome Saver", code: "NORMAL05", meta: "5% off room rate on weekday bookings." },
+    { value: "10%", name: "Cafe Voucher", code: "CAFE10", meta: "10% off drinks and pastries at the hotel cafe." },
+  ],
+  vip: [
+    { value: "10%", name: "Signature Stay", code: "VIP10", meta: "10% off premium room bookings and suite upgrades." },
+    { value: "15%", name: "Spa Credit", code: "SPA15", meta: "15% off spa and wellness treatments during your stay." },
+    { value: "20%", name: "Dining Select", code: "DINE20", meta: "20% off one in-house dining bill per booking." },
+  ],
+  vvip: [
+    { value: "15%", name: "Elite Escape", code: "VVIP15", meta: "15% off direct bookings across all room categories." },
+    { value: "25%", name: "Private Lounge", code: "LOUNGE25", meta: "25% off executive lounge and afternoon tea packages." },
+    { value: "30%", name: "Celebration Gift", code: "GIFT30", meta: "30% off selected occasion setup and in-room gifts." },
+  ],
+};
+
+const LEVEL_SERVICE_POLICY_CATALOG = {
+  bronze: {
+    title: "Bronze service policies",
+    description: "Entry member benefits for a smoother booking and check-in experience.",
+    benefits: ["Priority booking support", "Early promotion alerts", "Basic birthday offer"],
+  },
+  silver: {
+    title: "Silver service policies",
+    description: "More flexible services for returning guests with better convenience during the stay.",
+    benefits: ["Late check-out priority", "Flexible room preference note", "Faster support response"],
+  },
+  gold: {
+    title: "Gold service policies",
+    description: "Premium service handling with more personalized support and stay flexibility.",
+    benefits: ["Priority room assignment", "Complimentary welcome amenity", "Service recovery priority"],
+  },
+  platinum: {
+    title: "Platinum service policies",
+    description: "Top-tier service treatment with the highest priority across guest support touchpoints.",
+    benefits: ["Highest support priority", "Preferred upgrade consideration", "Dedicated premium check-in handling"],
+  },
+};
+
+const MEMBERSHIP_TIER_FLOW = {
+  bronze: { baseline: 0, target: 50000000, nextLevel: "Silver", nextRank: "VIP" },
+  silver: { baseline: 50000000, target: 100000000, nextLevel: "Gold", nextRank: "VIP" },
+  gold: { baseline: 100000000, target: 200000000, nextLevel: "Platinum", nextRank: "VVIP" },
+  platinum: { baseline: 200000000, target: 200000000, nextLevel: null, nextRank: null },
+};
 
 const panelTitles = {
   overview: "Account",
   profile: "Account > Profile",
   wallet: "Account > Wallet & Transactions",
+  membership: "Account > Membership Center",
+  coupons: "Account > My Coupons",
   bookings: "Account > Booking & Refunds",
   settings: "Account > General Settings",
   security: "Account > Security",
@@ -55,6 +124,174 @@ function applyHistoryRoomImages() {
       img.alt = `${rank} ${type}`;
     }
   });
+}
+
+function renderMembershipPrivileges() {
+  if (!membershipMeta || !rankCouponList || !levelServicePolicyList) {
+    return;
+  }
+
+  const customerRank = String(membershipMeta.dataset.customerRank || "Normal").toLowerCase();
+  const memberLevel = String(membershipMeta.dataset.memberLevel || "Bronze").toLowerCase();
+  const totalSpent = Number(document.querySelector(".upgrade-plan-summary")?.dataset.totalSpent || 0);
+
+  const coupons = RANK_COUPON_CATALOG[customerRank] || RANK_COUPON_CATALOG.normal;
+  const servicePolicy = LEVEL_SERVICE_POLICY_CATALOG[memberLevel] || LEVEL_SERVICE_POLICY_CATALOG.bronze;
+  const tierFlow = MEMBERSHIP_TIER_FLOW[memberLevel] || MEMBERSHIP_TIER_FLOW.bronze;
+
+  if (rankPrivilegeTitle) {
+    rankPrivilegeTitle.textContent = `${capitalize(customerRank)} rank coupons`;
+  }
+
+  if (levelPrivilegeTitle) {
+    levelPrivilegeTitle.textContent = servicePolicy.title;
+  }
+
+  rankCouponList.innerHTML = coupons
+    .map(
+      (coupon) => `
+        <article class="coupon-card">
+          <div class="coupon-card__top">
+            <div>
+              <div class="coupon-card__value">${escapeHtml(coupon.value)}</div>
+              <div class="coupon-card__name">${escapeHtml(coupon.name)}</div>
+            </div>
+            <span class="coupon-card__code">${escapeHtml(coupon.code)}</span>
+          </div>
+          <div class="coupon-card__meta">${escapeHtml(coupon.meta)}</div>
+        </article>
+      `,
+    )
+    .join("");
+
+  levelServicePolicyList.innerHTML = `
+    <article class="service-policy-card">
+      <div class="service-policy-card__top">
+        <div>
+          <div class="service-policy-card__badge">${escapeHtml(capitalize(memberLevel))}</div>
+          <div class="service-policy-card__name">${escapeHtml(servicePolicy.title)}</div>
+        </div>
+      </div>
+      <div class="service-policy-card__desc">${escapeHtml(servicePolicy.description)}</div>
+      <div class="service-policy-card__benefits">
+        ${servicePolicy.benefits
+          .map((benefit) => `<span class="service-policy-pill"><i class="fas fa-check"></i>${escapeHtml(benefit)}</span>`)
+          .join("")}
+      </div>
+    </article>
+  `;
+
+  renderMembershipCenter({
+    customerRank,
+    memberLevel,
+    totalSpent,
+    coupons,
+    servicePolicy,
+    tierFlow,
+  });
+}
+
+function renderMembershipCenter({ customerRank, memberLevel, totalSpent, coupons, servicePolicy, tierFlow }) {
+  if (membershipHeroBadge) {
+    membershipHeroBadge.textContent = `${capitalize(memberLevel)} / ${customerRank.toUpperCase()}`;
+  }
+
+  if (membershipHeroTitle) {
+    membershipHeroTitle.textContent = `${capitalize(memberLevel)} member journey`;
+  }
+
+  if (membershipHeroText) {
+    membershipHeroText.textContent = `You are currently in ${capitalize(memberLevel)} level with ${customerRank.toUpperCase()} rank perks unlocked for your account.`;
+  }
+
+  if (membershipLevelValue) {
+    membershipLevelValue.textContent = capitalize(memberLevel);
+  }
+
+  if (membershipRankValue) {
+    membershipRankValue.textContent = customerRank.toUpperCase();
+  }
+
+  if (membershipSpentValue) {
+    membershipSpentValue.textContent = formatMoney(totalSpent);
+  }
+
+  if (membershipCouponCount) {
+    membershipCouponCount.textContent = String(coupons.length);
+  }
+
+  if (membershipProgressTitle) {
+    membershipProgressTitle.textContent = tierFlow.nextLevel
+      ? `Progress to ${tierFlow.nextLevel} / ${tierFlow.nextRank}`
+      : "Top tier reached";
+  }
+
+  const progress = tierFlow.target === tierFlow.baseline
+    ? 100
+    : Math.max(0, Math.min(100, ((totalSpent - tierFlow.baseline) / (tierFlow.target - tierFlow.baseline)) * 100));
+
+  if (membershipProgressFill) {
+    membershipProgressFill.style.width = `${progress}%`;
+  }
+
+  if (membershipProgressCurrent) {
+    membershipProgressCurrent.textContent = formatMoney(totalSpent);
+  }
+
+  if (membershipProgressTarget) {
+    membershipProgressTarget.textContent = tierFlow.nextLevel ? formatMoney(tierFlow.target) : "Top tier";
+  }
+
+  if (membershipProgressCopy) {
+    membershipProgressCopy.textContent = tierFlow.nextLevel
+      ? `Spend ${formatMoney(Math.max(0, tierFlow.target - totalSpent))} more to unlock ${tierFlow.nextLevel} level and ${tierFlow.nextRank} rank benefits.`
+      : "You already unlocked the highest membership tier in this frontend preview.";
+  }
+
+  if (membershipNextTitle) {
+    membershipNextTitle.textContent = tierFlow.nextLevel
+      ? `Next milestone: ${tierFlow.nextLevel} / ${tierFlow.nextRank}`
+      : "All milestone benefits unlocked";
+  }
+
+  if (membershipNextCopy) {
+    membershipNextCopy.textContent = tierFlow.nextLevel
+      ? `At the next milestone, your account can unlock stronger coupons and upgraded service handling policies.`
+      : "No higher milestone remains. You are already at the top of the preview ladder.";
+  }
+
+  if (membershipNextPills) {
+    const nextBenefits = tierFlow.nextLevel
+      ? [
+          `${tierFlow.nextRank} coupons`,
+          `More flexible service policies`,
+          `Higher booking priority`,
+        ]
+      : [...servicePolicy.benefits];
+
+    membershipNextPills.innerHTML = nextBenefits
+      .map((benefit) => `<span class="membership-next-pill"><i class="fas fa-star"></i>${escapeHtml(benefit)}</span>`)
+      .join("");
+  }
+}
+
+function capitalize(value) {
+  const text = String(value || "");
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
+}
+
+function escapeHtml(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[char]);
 }
 
 function activatePanel(panelName) {
@@ -542,6 +779,7 @@ if (confirmCancelBooking) {
 }
 
 applyHistoryRoomImages();
+renderMembershipPrivileges();
 resetEditMode();
 applyTheme(window.CustomerTheme?.get?.() || localStorage.getItem(PROFILE_THEME_STORAGE_KEY));
 

@@ -95,4 +95,9 @@ public class RoomApiController {
         LocalDate parsedCheckOut = (checkOut == null || checkOut.isBlank()) ? null : LocalDate.parse(checkOut);
         return ResponseEntity.ok(roomService.getRoomsWithAvailability(parsedCheckIn, parsedCheckOut, type, rank));
     }
+
+    @GetMapping("/{id}/timeline")
+    public ResponseEntity<Map<String, Object>> getRoomTimeline(@PathVariable Integer id) {
+        return ResponseEntity.ok(roomService.getRoomTimeline(id));
+    }
 }

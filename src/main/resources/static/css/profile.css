@@ -205,6 +205,330 @@
   display: grid;
 }
 
+.profile-membership-meta {
+  display: none;
+}
+
+.profile-privileges-card {
+  border: 1px solid #e7edf5;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fdfefe 0%, #f6faff 100%);
+  padding: 18px;
+  display: grid;
+  gap: 16px;
+}
+
+.profile-privileges-card--panel {
+  margin-top: 0;
+}
+
+.profile-membership-center {
+  display: grid;
+  gap: 18px;
+}
+
+.membership-hero-card,
+.membership-progress-card,
+.membership-summary-card,
+.membership-next-card {
+  border: 1px solid #e7edf5;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  padding: 20px;
+}
+
+.membership-hero-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, #edf5ff 0%, #fff8eb 100%);
+}
+
+.membership-hero-card h3 {
+  margin: 6px 0 8px;
+  color: #203148;
+  font-size: 24px;
+}
+
+.membership-hero-card p,
+.membership-progress-copy,
+.membership-next-card p {
+  margin: 0;
+  color: #65758c;
+  line-height: 1.6;
+}
+
+.membership-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 160px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff2cd, #ffd986);
+  color: #8a5b05;
+  font-weight: 800;
+  text-align: center;
+}
+
+.membership-center-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 18px;
+}
+
+.membership-progress-track {
+  height: 14px;
+  border-radius: 999px;
+  background: #e8eef6;
+  overflow: hidden;
+  margin: 16px 0 10px;
+}
+
+.membership-progress-fill {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffb15d 0%, #ff7b72 50%, #66dbd2 100%);
+}
+
+.membership-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #43607f;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.membership-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.membership-stat-box {
+  border: 1px solid #e7edf5;
+  border-radius: 18px;
+  padding: 14px;
+  background: #fff;
+}
+
+.membership-stat-box label {
+  margin: 0 0 6px;
+  color: #7a8aa0;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.membership-stat-box strong {
+  color: #203148;
+  font-size: 18px;
+}
+
+.membership-next-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.membership-next-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.membership-next-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #e2eaf4;
+  color: #32506f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.profile-privileges-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profile-privileges-head h3 {
+  margin: 4px 0 0;
+  color: #203148;
+  font-size: 18px;
+}
+
+.profile-privileges-head i {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff2c8, #ffd88c);
+  color: #b87800;
+}
+
+.profile-privileges-label {
+  color: #73839a;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.privilege-block {
+  display: grid;
+  gap: 12px;
+}
+
+.privilege-title-row {
+  display: grid;
+  gap: 2px;
+}
+
+.privilege-kicker {
+  color: #7990ad;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.privilege-title-row strong {
+  color: #22344c;
+  font-size: 15px;
+}
+
+.coupon-list,
+.service-policy-list {
+  display: grid;
+  gap: 10px;
+}
+
+.coupon-card,
+.service-policy-card {
+  border: 1px solid #e7edf5;
+  border-radius: 18px;
+  padding: 14px;
+  background: #fff;
+}
+
+.coupon-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fffaf0 0%, #fef3cf 100%);
+}
+
+.coupon-card::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.coupon-card__top,
+.service-policy-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.coupon-card__value {
+  color: #a25d00;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.coupon-card__name,
+.service-policy-card__name {
+  margin-top: 4px;
+  color: #24354d;
+  font-weight: 800;
+}
+
+.coupon-card__code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 74px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(162, 93, 0, 0.12);
+  color: #8b5202;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.coupon-card__meta,
+.service-policy-card__desc {
+  margin-top: 8px;
+  color: #607188;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.service-policy-card {
+  background: linear-gradient(180deg, #fcfdff 0%, #f6f9ff 100%);
+}
+
+.service-policy-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #edf3ff;
+  color: #44648e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.service-policy-card__desc {
+  margin-bottom: 10px;
+}
+
+.service-policy-card__benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.service-policy-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #e2eaf4;
+  color: #32506f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .btn-primary,
 .cta-button,
 #ChangePasswordBtn,
@@ -310,6 +634,8 @@
 .icon-profile { background: #eef0ff; color: #5a54d6; }
 .icon-wallet { background: #eafbf3; color: #14a064; }
 .icon-booking { background: #edf5ff; color: #2466d1; }
+.icon-privileges { background: #fff5e8; color: #c47a12; }
+.icon-membership { background: #fff5de; color: #c48816; }
 .settings-link-card__icon { background: #fff6eb; color: #cf7e1b; }
 
 .account-nav-card__content,
@@ -856,6 +1182,11 @@ body.profile-theme-dark .profile-wrapper,
 body.profile-theme-dark .profile-summary-card,
 body.profile-theme-dark .profile-details-card,
 body.profile-theme-dark .member-benefit-box,
+body.profile-theme-dark .profile-privileges-card,
+body.profile-theme-dark .membership-hero-card,
+body.profile-theme-dark .membership-progress-card,
+body.profile-theme-dark .membership-summary-card,
+body.profile-theme-dark .membership-next-card,
 body.profile-theme-dark .account-nav-card,
 body.profile-theme-dark .settings-summary-card,
 body.profile-theme-dark .settings-link-card,
@@ -872,6 +1203,8 @@ body.profile-theme-dark .profile-password-content {
 }
 
 body.profile-theme-dark .profile-name,
+body.profile-theme-dark .profile-privileges-head h3,
+body.profile-theme-dark .membership-hero-card h3,
 body.profile-theme-dark .account-nav-card__content h3,
 body.profile-theme-dark .panel-header h3,
 body.profile-theme-dark .settings-summary-head h3,
@@ -886,6 +1219,13 @@ body.profile-theme-dark .profile-password-head h3 {
 }
 
 body.profile-theme-dark .member-benefit-box p,
+body.profile-theme-dark .profile-privileges-label,
+body.profile-theme-dark .privilege-kicker,
+body.profile-theme-dark .coupon-card__meta,
+body.profile-theme-dark .service-policy-card__desc,
+body.profile-theme-dark .membership-hero-card p,
+body.profile-theme-dark .membership-progress-copy,
+body.profile-theme-dark .membership-next-card p,
 body.profile-theme-dark .panel-header p,
 body.profile-theme-dark .account-nav-card__content p,
 body.profile-theme-dark .settings-summary-head p,
@@ -904,6 +1244,46 @@ body.profile-theme-dark .secondary-label {
 
 body.profile-theme-dark .profile-table .row {
   border-bottom-color: #334155;
+}
+
+body.profile-theme-dark .coupon-card,
+body.profile-theme-dark .service-policy-card,
+body.profile-theme-dark .service-policy-pill,
+body.profile-theme-dark .membership-stat-box,
+body.profile-theme-dark .membership-next-pill {
+  background: #111827;
+  border-color: #334155;
+}
+
+body.profile-theme-dark .privilege-title-row strong,
+body.profile-theme-dark .coupon-card__name,
+body.profile-theme-dark .service-policy-card__name,
+body.profile-theme-dark .membership-stat-box strong,
+body.profile-theme-dark .membership-hero-badge {
+  color: #f8fbff;
+}
+
+body.profile-theme-dark .coupon-card__code,
+body.profile-theme-dark .service-policy-card__badge {
+  background: rgba(148, 163, 184, 0.14);
+  color: #dbe6f3;
+}
+
+body.profile-theme-dark .coupon-card__value {
+  color: #ffd777;
+}
+
+body.profile-theme-dark .membership-progress-track {
+  background: #334155;
+}
+
+body.profile-theme-dark .membership-progress-meta,
+body.profile-theme-dark .membership-stat-box label {
+  color: #aebed1;
+}
+
+body.profile-theme-dark .membership-hero-badge {
+  background: linear-gradient(135deg, #8a6722, #b7903c);
 }
 
 body.profile-theme-dark .profile-table input,
@@ -941,6 +1321,7 @@ body.profile-theme-dark .cancel-preview-row strong {
   }
 
   .wallet-grid,
+  .membership-center-grid,
   .settings-summary-actions,
   .history-detail-meta,
   .history-detail-dates {
@@ -970,6 +1351,8 @@ body.profile-theme-dark .cancel-preview-row strong {
   }
 
   .panel-header,
+  .membership-hero-card,
+  .membership-next-card,
   .compact-history-item,
   .history-booking-header,
   .action-row {
@@ -978,6 +1361,10 @@ body.profile-theme-dark .cancel-preview-row strong {
   }
 
   .profile-table .row {
+    grid-template-columns: 1fr;
+  }
+
+  .membership-summary-grid {
     grid-template-columns: 1fr;
   }
 }
