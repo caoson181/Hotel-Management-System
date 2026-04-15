@@ -60,26 +60,45 @@ body {
   top: 22px;
   left: 24px;
   z-index: 5;
-  display: inline-flex;
+}
+
+.login-brand-mark h1 {
+  margin: 0;
+  display: flex;
   align-items: center;
-  gap: 12px;
+  line-height: 1;
+}
+
+.login-brand-mark a {
   text-decoration: none;
 }
 
-.login-brand-mark img {
-  width: 78px;
-  height: 78px;
-  display: block;
-  object-fit: contain;
-  flex: 0 0 78px;
+.login-brand-mark .brand-link-customer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  transform: translateY(-2px);
 }
 
-.login-brand-mark span {
-  color: #f5e7bf;
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.46);
+.login-brand-mark h1 a {
+  color: #fff;
+  font-size: 1.8rem;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.login-brand-mark .brand-logo-customer {
+  width: 72px;
+  height: 72px;
+  display: block;
+  object-fit: contain;
+  flex: 0 0 72px;
+  filter: drop-shadow(0 10px 18px rgba(7, 16, 28, 0.28));
 }
 
 form {
@@ -447,17 +466,20 @@ button:active {
   .login-brand-mark {
     top: 14px;
     left: 14px;
-    gap: 10px;
   }
 
-  .login-brand-mark img {
-    width: 58px;
-    height: 58px;
-    flex-basis: 58px;
+  .login-brand-mark .brand-link-customer {
+    gap: 0.6rem;
   }
 
-  .login-brand-mark span {
-    font-size: 0.98rem;
+  .login-brand-mark .brand-logo-customer {
+    width: 54px;
+    height: 54px;
+    flex-basis: 54px;
+  }
+
+  .login-brand-mark h1 a {
+    font-size: 1.45rem;
   }
 
   form {

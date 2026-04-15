@@ -1066,7 +1066,7 @@ tr:hover td {
     width: 90%;
     max-width: 500px;
     max-height: 85vh;
-    overflow-y: auto;
+    overflow: hidden;
     z-index: 10002;
     animation: modalSlideUp 0.3s ease;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
@@ -1131,6 +1131,14 @@ tr:hover td {
 
 .booking-modal-body {
     padding: 25px;
+    max-height: calc(85vh - 78px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.booking-modal-body::-webkit-scrollbar {
+    display: none;
 }
 
 /* Thay thế phần booking-detail-item hiện tại bằng phần này */

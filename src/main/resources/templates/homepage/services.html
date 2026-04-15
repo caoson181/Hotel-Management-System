@@ -57,9 +57,14 @@
             <div class="service-image service-image-link">
               <a th:href="@{/services/{slug}(slug=${item.slug})}">
                 <img th:src="${item.coverImage}" th:alt="${item.title}" />
-                <div class="service-image-overlay">
+                <div
+                  class="service-image-overlay"
+                  th:classappend="${itemStat.index % 2 == 1} ? ' is-reverse' : ''"
+                >
+                  <i
+                    th:class="${itemStat.index % 2 == 1} ? 'fas fa-arrow-left' : 'fas fa-arrow-right'"
+                  ></i>
                   <span>View Details</span>
-                  <i class="fas fa-arrow-right"></i>
                 </div>
               </a>
             </div>

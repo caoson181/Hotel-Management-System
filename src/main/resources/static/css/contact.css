@@ -157,6 +157,27 @@
   margin: 0;
 }
 
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #5b21b6;
+  text-decoration: none;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.social-links a::after {
+  display: none !important;
+}
+
 /* ==========================================================================
    4. CONTACT FORM
    ========================================================================== */
@@ -202,6 +223,18 @@
 .contact-form .cta-button:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(255, 126, 95, 0.3);
+}
+
+.contact-success-message {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ecfdf3, #d9fbe8);
+  border: 1px solid #9ee6b8;
+  color: #157347;
+  font-size: 0.98rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 /* ==========================================================================

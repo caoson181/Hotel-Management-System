@@ -218,16 +218,6 @@ function viewRoom(id) {
                     <div class="detail-value">${room.description || "-"}</div>
                 </div>
 
-                <div class="detail-item">
-                    <div class="detail-label">Image:</div>
-                    <div class="detail-value">
-                        ${
-                room.picture
-                    ? `<img src="${room.picture}" style="width:80px;height:60px;border-radius:6px;">`
-                    : "-"
-            }
-                    </div>
-                </div>
             `;
 
             document.getElementById("detailModalBody").innerHTML = html;
@@ -263,7 +253,6 @@ function editRoom(id) {
             document.getElementById("price").value = room.price;
             document.getElementById("room_rank").value = room.roomRank;
             document.getElementById("description").value = room.description || "";
-            document.getElementById("picture").value = room.picture || "";
 
             openModal("formModal");
         });
@@ -281,8 +270,7 @@ function saveRoom(e) {
         basePrice: parseFloat(document.getElementById("base_price").value),
         price: parseFloat(document.getElementById("price").value),
         roomRank: document.getElementById("room_rank").value,
-        description: document.getElementById("description").value,
-        picture: document.getElementById("picture").value
+        description: document.getElementById("description").value
     };
 
     const url = id ? `/rooms/api/${id}` : `/rooms/api`;

@@ -263,7 +263,8 @@ body {
     cursor: not-allowed;
 }
 
-.modal {
+#equipmentModal.modal,
+#issueModal.modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -275,7 +276,8 @@ body {
     justify-content: center;
 }
 
-.modal-overlay {
+#equipmentModal .modal-overlay,
+#issueModal .modal-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -284,7 +286,8 @@ body {
     background: rgba(0, 0, 0, 0.5);
 }
 
-.modal-container {
+#equipmentModal .modal-container,
+#issueModal .modal-container {
     position: relative;
     background: white;
     border-radius: 20px;
@@ -295,7 +298,8 @@ body {
     z-index: 10001;
 }
 
-.modal-header {
+#equipmentModal .modal-header,
+#issueModal .modal-header {
     padding: 20px 25px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -306,16 +310,18 @@ body {
     top: 0;
 }
 
-.modal-header.issue-header {
+#issueModal .modal-header.issue-header {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
 }
 
-.modal-header h3 {
+#equipmentModal .modal-header h3,
+#issueModal .modal-header h3 {
     margin: 0;
     font-size: 18px;
 }
 
-.modal-close {
+#equipmentModal .modal-close,
+#issueModal .modal-close {
     background: none;
     border: none;
     color: white;
@@ -323,11 +329,13 @@ body {
     cursor: pointer;
 }
 
-.modal-body {
+#equipmentModal .modal-body,
+#issueModal .modal-body {
     padding: 25px;
 }
 
-.modal-footer {
+#equipmentModal .modal-footer,
+#issueModal .modal-footer {
     padding: 15px 25px;
     border-top: 1px solid #e2e8f0;
     display: flex;

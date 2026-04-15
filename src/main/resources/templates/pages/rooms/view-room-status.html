@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>View Room Status - Hotel Admin</title>
     <link rel="stylesheet" th:href="@{/css/global.css}" />
@@ -9,221 +9,238 @@
     <link rel="stylesheet" th:href="@{/css/profile.css}" />
     <link rel="stylesheet" th:href="@{/css/view-room-status.css}" />
     <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-<body>
-<div
-        id="navbar-container"
-        th:replace="~{components/navbar :: navbar}"
-></div>
+  <body>
+    <div
+      id="navbar-container"
+      th:replace="~{components/navbar :: navbar}"
+    ></div>
 
-
-<!-- Room Management Content -->
-<div class="room-management-container">
-    <!-- Controls -->
-    <div class="controls">
+    <!-- Room Management Content -->
+    <div class="room-management-container">
+      <!-- Controls -->
+      <div class="controls">
         <div class="search-section">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search by room number, type...">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by room number, type..."
+            />
+          </div>
+          <div class="filter-sort">
+            <select class="sort-select" id="sortSelect">
+              <option value="roomNumber">Room Number</option>
+              <option value="roomType">Room Type</option>
+              <option value="basePrice">Base Price</option>
+              <option value="price">Current Price</option>
+              <option value="roomRank">Room Rank</option>
+            </select>
+            <div class="sort-order">
+              <button class="active" id="sortAsc" title="Ascending">
+                <i class="fas fa-arrow-up"></i>
+              </button>
+              <button id="sortDesc" title="Descending">
+                <i class="fas fa-arrow-down"></i>
+              </button>
             </div>
-            <div class="filter-sort">
-                <select class="sort-select" id="sortSelect">
-                    <option value="roomNumber">Room Number</option>
-                    <option value="roomType">Room Type</option>
-                    <option value="basePrice">Base Price</option>
-                    <option value="price">Current Price</option>
-                    <option value="roomRank">Room Rank</option>
-                </select>
-                <div class="sort-order">
-                    <button class="active" id="sortAsc" title="Ascending"><i class="fas fa-arrow-up"></i></button>
-                    <button id="sortDesc" title="Descending"><i class="fas fa-arrow-down"></i></button>
-                </div>
-            </div>
+          </div>
         </div>
 
         <!-- Status Filter Circles - 5 trạng thái -->
         <div class="status-filter">
-            <div class="status-circle active" data-status="all">
-                <div class="circle">All</div>
-                <span class="circle-label">All Rooms</span>
+          <div class="status-circle active" data-status="all">
+            <div class="circle">All</div>
+            <span class="circle-label">All Rooms</span>
+          </div>
+          <div class="status-circle" data-status="available">
+            <div class="circle">
+              <i class="fas fa-check"></i>
             </div>
-            <div class="status-circle" data-status="available">
-                <div class="circle">
-                    <i class="fas fa-check"></i>
-                </div>
-                <span class="circle-label">Available</span>
+            <span class="circle-label">Available</span>
+          </div>
+          <div class="status-circle" data-status="reserved">
+            <div class="circle">
+              <i class="fas fa-clock"></i>
             </div>
-            <div class="status-circle" data-status="reserved">
-                <div class="circle">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <span class="circle-label">Reserved</span>
+            <span class="circle-label">Reserved</span>
+          </div>
+          <div class="status-circle" data-status="occupied">
+            <div class="circle">
+              <i class="fas fa-user"></i>
             </div>
-            <div class="status-circle" data-status="occupied">
-                <div class="circle">
-                    <i class="fas fa-user"></i>
-                </div>
-                <span class="circle-label">Occupied</span>
+            <span class="circle-label">Occupied</span>
+          </div>
+          <div class="status-circle" data-status="checked-out">
+            <div class="circle">
+              <i class="fas fa-sign-out-alt"></i>
             </div>
-            <div class="status-circle" data-status="checked-out">
-                <div class="circle">
-                    <i class="fas fa-sign-out-alt"></i>
-                </div>
-                <span class="circle-label">Checked Out</span>
+            <span class="circle-label">Checked Out</span>
+          </div>
+          <div class="status-circle" data-status="housekeeping">
+            <div class="circle">
+              <i class="fas fa-broom"></i>
             </div>
-            <div class="status-circle" data-status="housekeeping">
-                <div class="circle">
-                    <i class="fas fa-broom"></i>
-                </div>
-                <span class="circle-label">Housekeeping</span>
-            </div>
-            <button class="new-btn" onclick="openAddModal()">
-                <i class="fas fa-plus"></i>
-                Add New Room
-            </button>
+            <span class="circle-label">Housekeeping</span>
+          </div>
+          <button class="new-btn" onclick="openAddModal()">
+            <i class="fas fa-plus"></i>
+            Add New Room
+          </button>
         </div>
-    </div>
+      </div>
 
-    <!-- Table -->
-    <div class="table-container">
+      <!-- Table -->
+      <div class="table-container">
         <table id="roomTable">
-            <thead>
+          <thead>
             <tr>
-                <th>Room Number</th>
-                <th>Room Type</th>
-                <th>Status</th>
-                <th>Base Price</th>
-                <th>Current Price</th>
-                <th>Room Rank</th>
-                <th>Actions</th>
+              <th>Room Number</th>
+              <th>Room Type</th>
+              <th>Status</th>
+              <th>Base Price</th>
+              <th>Current Price</th>
+              <th>Room Rank</th>
+              <th>Actions</th>
             </tr>
-            </thead>
-            <tbody id="tableBody">
-            </tbody>
+          </thead>
+          <tbody id="tableBody"></tbody>
         </table>
 
         <!-- Pagination -->
         <div class="pagination" id="pagination"></div>
+      </div>
     </div>
-</div>
 
-<!-- MODALS from components -->
-<div th:replace="~{components/modals :: modals}"></div>
+    <!-- MODALS from components -->
+    <div th:replace="~{components/modals :: modals}"></div>
 
-<!-- Room Status Modals -->
-<!-- Detail Modal -->
-<div class="modal" id="detailModal" style="display: none;">
-    <div class="modal-content room-modal-content">
+    <!-- Room Status Modals -->
+    <!-- Detail Modal -->
+    <div class="modal" id="detailModal" style="display: none">
+      <div class="modal-content room-modal-content">
         <div class="modal-header room-modal-header">
-            <h2>
-                <i class="fas fa-info-circle"></i>
-                Room Details
-            </h2>
-            <button class="close-btn" onclick="closeModal('detailModal')">
-                <i class="fas fa-times"></i>
-            </button>
+          <h2>
+            <i class="fas fa-info-circle"></i>
+            Room Details
+          </h2>
+          <button class="close-btn" onclick="closeModal('detailModal')">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
         <div class="modal-body" id="detailModalBody">
-            <!-- Details will be inserted here -->
+          <!-- Details will be inserted here -->
         </div>
+      </div>
     </div>
-</div>
 
-<!-- Add/Edit Modal -->
-<div class="modal" id="formModal" style="display: none;">
-    <div class="modal-content room-modal-content">
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="formModal" style="display: none">
+      <div class="modal-content room-modal-content">
         <div class="modal-header room-modal-header">
-            <h2>
-                <i class="fas fa-edit"></i>
-                <span id="modalTitle">Add New Room</span>
-            </h2>
-            <button class="close-btn" onclick="closeModal('formModal')">
-                <i class="fas fa-times"></i>
-            </button>
+          <h2>
+            <i class="fas fa-edit"></i>
+            <span id="modalTitle">Add New Room</span>
+          </h2>
+          <button class="close-btn" onclick="closeModal('formModal')">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
         <div class="modal-body">
-            <form id="roomForm">
-                <input type="hidden" id="roomId" value="">
+          <form id="roomForm">
+            <input type="hidden" id="roomId" value="" />
 
-                <div class="form-group">
-                    <label for="room_number">Room Number *</label>
-                    <input type="text" id="room_number" required>
-                </div>
+            <div class="form-group">
+              <label for="room_number">Room Number *</label>
+              <input type="text" id="room_number" required />
+            </div>
 
-                <div class="form-group">
-                    <label for="room_type">Room Type *</label>
-                    <select id="room_type" required>
-                        <option value="">Select room type</option>
-                        <option value="Single">Single</option>
-                        <option value="Double">Double</option>
-                        <option value="Twin">Twin</option>
-                        <option value="Triple">Triple</option>
-                        <option value="Family">Family</option>
-                    </select>
-                </div>
+            <div class="form-group">
+              <label for="room_type">Room Type *</label>
+              <select id="room_type" required>
+                <option value="">Select room type</option>
+                <option value="Single">Single</option>
+                <option value="Double">Double</option>
+                <option value="Twin">Twin</option>
+                <option value="Triple">Triple</option>
+                <option value="Family">Family</option>
+              </select>
+            </div>
 
-                <div class="form-group">
-                    <label for="status">Status *</label>
-                    <select id="status" required>
-                        <option value="">Select status</option>
-                        <option value="Available">Available</option>
-                        <option value="Reserved">Reserved</option>
-                        <option value="Occupied">Occupied</option>
-                        <option value="Checked-out">Checked Out</option>
-                        <option value="Housekeeping">Housekeeping</option>
-                    </select>
-                </div>
+            <div class="form-group">
+              <label for="status">Status *</label>
+              <select id="status" required>
+                <option value="">Select status</option>
+                <option value="Available">Available</option>
+                <option value="Reserved">Reserved</option>
+                <option value="Occupied">Occupied</option>
+                <option value="Checked-out">Checked Out</option>
+                <option value="Housekeeping">Housekeeping</option>
+              </select>
+            </div>
 
-                <div class="form-group">
-                    <label for="base_price">Base Price *</label>
-                    <input type="number" id="base_price" required min="0">
-                </div>
+            <div class="form-group">
+              <label for="base_price">Base Price *</label>
+              <input type="number" id="base_price" required min="0" />
+            </div>
 
-                <div class="form-group">
-                    <label for="price">Current Price *</label>
-                    <input type="number" id="price" required min="0">
-                </div>
+            <div class="form-group">
+              <label for="price">Current Price *</label>
+              <input type="number" id="price" required min="0" />
+            </div>
 
-                <div class="form-group">
-                    <label for="room_rank">Room Rank *</label>
-                    <select id="room_rank" required>
-                        <option value="">Select rank</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Superior">Superior</option>
-                        <option value="Deluxe">Deluxe</option>
-                        <option value="Executive">Executive</option>
-                        <option value="Suite">Suite</option>
-                    </select>
-                </div>
+            <div class="form-group">
+              <label for="room_rank">Room Rank *</label>
+              <select id="room_rank" required>
+                <option value="">Select rank</option>
+                <option value="Standard">Standard</option>
+                <option value="Superior">Superior</option>
+                <option value="Deluxe">Deluxe</option>
+                <option value="Executive">Executive</option>
+                <option value="Suite">Suite</option>
+              </select>
+            </div>
 
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" rows="4" placeholder="Enter room description..."></textarea>
-                </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                rows="4"
+                placeholder="Enter room description..."
+              ></textarea>
+            </div>
 
-                <div class="form-group">
-                    <label for="picture">Image URL</label>
-                    <input type="url" id="picture" placeholder="https://example.com/image.jpg">
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal('formModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Save</button>
-                </div>
-            </form>
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn-secondary"
+                onclick="closeModal('formModal')"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn-primary">Save</button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- Scripts -->
-<script th:src="@{/js/main.js}"></script>
-<script th:src="@{/js/account.js}"></script>
-<script th:src="@{/js/dropdown.js}"></script>
-<script th:src="@{/js/role.js}"></script>
-<script th:src="@{/js/view-room-status.js}"></script>
-</body>
+    <!-- Scripts -->
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/account.js}"></script>
+    <script th:src="@{/js/dropdown.js}"></script>
+    <script th:src="@{/js/role.js}"></script>
+    <script th:src="@{/js/view-room-status.js}"></script>
+  </body>
 </html>

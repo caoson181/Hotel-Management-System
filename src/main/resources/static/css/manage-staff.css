@@ -204,7 +204,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* ===================== MODAL ===================== */
-.modal-content {
+#createModal .modal-content,
+#editModal .modal-content {
     width: 460px;
     margin: 6% auto;
     padding: 25px;
@@ -214,7 +215,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     overflow-y: auto;
 }
 
-.modal-content h4 {
+#createModal .modal-content h4,
+#editModal .modal-content h4 {
     margin: 18px 0 10px;
     border-left: 3px solid #3498db;
     padding-left: 8px;

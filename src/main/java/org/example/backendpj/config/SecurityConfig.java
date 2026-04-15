@@ -41,7 +41,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
-                                "/index",
                                 "/about",
                                 "/gravity-news",
                                 "/rooms",
@@ -91,7 +90,7 @@ public class SecurityConfig {
                         .hasAnyRole("ADMIN", "MANAGER")
 
                         // Staff dashboard
-                        .requestMatchers("/index/**")
+                        .requestMatchers("/index", "/index/**")
                         .hasAnyRole("ADMIN", "MANAGER", "RECEPTIONIST", "HOUSEKEEPER")
                         // Only Admin & Manager can access
                         .requestMatchers("/rooms/view-room-status/**")

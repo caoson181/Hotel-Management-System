@@ -137,7 +137,7 @@ button:hover {
 }
 
 /* ===================== MODAL ===================== */
-.modal {
+#staffModal.modal {
     display: none;
     position: fixed;
     top: 0;
@@ -151,7 +151,7 @@ button:hover {
 }
 
 /* ===================== MODAL CONTENT ===================== */
-.modal-content {
+#staffModal .modal-content {
     width: 500px;
     background: white;
     border-radius: 16px;
@@ -160,7 +160,7 @@ button:hover {
 }
 
 /* ===================== MODAL HEADER ===================== */
-.modal-header {
+#staffModal .modal-header {
     background: linear-gradient(135deg, #6366f1, #7c3aed);
     color: white;
     padding: 18px;
@@ -191,7 +191,7 @@ button:hover {
 }
 
 /* ===================== MODAL BODY ===================== */
-.modal-body {
+#staffModal .modal-body {
     padding: 20px;
 }
 

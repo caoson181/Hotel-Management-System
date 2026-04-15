@@ -1,6 +1,9 @@
 document.querySelectorAll(".view-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     const modal = document.getElementById("staffModal");
+    const statusEl = document.getElementById("m-status");
+
+    statusEl.classList.remove("active", "disabled");
 
     modal.classList.add("show");
 
@@ -13,14 +16,11 @@ document.querySelectorAll(".view-btn").forEach((btn) => {
     document.getElementById("m-salary").innerText = btn.dataset.salary || "N/A";
     document.getElementById("m-hiredate").innerText =
       btn.dataset.hiredate || "N/A";
-
-    const statusEl = document.getElementById("m-status");
-
     if (btn.dataset.status === "true") {
-      statusEl.innerHTML = "✔ Active";
+      statusEl.textContent = "Active";
       statusEl.classList.add("active");
     } else {
-      statusEl.innerHTML = "✖ Disabled";
+      statusEl.textContent = "Disabled";
       statusEl.classList.add("disabled");
     }
   });

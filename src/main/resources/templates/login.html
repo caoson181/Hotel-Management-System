@@ -55,10 +55,14 @@
 <!-- background slideshow container -->
 <div class="bg-slideshow"></div>
 <div class="bg-overlay"></div>
-<a th:href="@{/}" class="login-brand-mark" aria-label="Back to Gravity Hotel home">
-    <img src="/images/gravity-logo-chatgpt-cutout.png" alt="Gravity Hotel logo">
-    <span>Gravity Hotel</span>
-</a>
+<div class="login-brand-mark logo">
+    <h1>
+        <a th:href="@{/}" class="brand-link-customer" aria-label="Back to Gravity Hotel home">
+            <img src="/images/gravity-logo-chatgpt-cutout.png" alt="Gravity Hotel logo" class="brand-logo-customer">
+            <span>Gravity Hotel</span>
+        </a>
+    </h1>
+</div>
 <form id="loginForm" method="post" action="/login">
     <div class="login-card-head">
         <span class="eyebrow">Private Access</span>

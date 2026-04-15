@@ -2,15 +2,15 @@ package org.example.backendpj.controller;
 
 import org.example.backendpj.Entity.Room;
 import org.example.backendpj.Repository.RoomRepository;
-
 import org.example.backendpj.Service.RoomService;
+import org.example.backendpj.dto.RoomStatusRequest;
+import org.example.backendpj.dto.RoomStatusResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class RoomController {
     // ===============================
     @GetMapping("/api")
     @ResponseBody
-    public List<Room> getAllRooms(
+    public List<RoomStatusResponse> getAllRooms(
 
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String search,
@@ -66,7 +66,9 @@ public class RoomController {
                     .toList();
         }
 
-        return rooms;
+        return rooms.stream()
+                .map(this::toRoomStatusResponse)
+                .toList();
     }
 
     // ===============================
@@ -74,9 +76,9 @@ public class RoomController {
     // ===============================
     @GetMapping("/api/{id}")
     @ResponseBody
-    public Room getRoomById(@PathVariable Integer id) {
+    public RoomStatusResponse getRoomById(@PathVariable Integer id) {
         Optional<Room> room = roomRepository.findById(id);
-        return room.orElse(null);
+        return room.map(this::toRoomStatusResponse).orElse(null);
     }
 
     // ===============================
@@ -84,7 +86,10 @@ public class RoomController {
     // ===============================
     @PostMapping("/api")
     @ResponseBody
-    public ResponseEntity<?> addRoom(@RequestBody Room room) {
+    public ResponseEntity<?> addRoom(@RequestBody RoomStatusRequest request) {
+
+        Room room = new Room();
+        applyRoomStatusRequest(room, request);
 
         Optional<Room> existingRoom = roomRepository.findByRoomNumber(room.getRoomNumber());
 
@@ -96,7 +101,7 @@ public class RoomController {
 
         Room savedRoom = roomRepository.save(room);
 
-        return ResponseEntity.ok(savedRoom);
+        return ResponseEntity.ok(toRoomStatusResponse(savedRoom));
     }
 
     // ===============================
@@ -104,22 +109,16 @@ public class RoomController {
     // ===============================
     @PutMapping("/api/{id}")
     @ResponseBody
-    public Room updateRoom(
+    public RoomStatusResponse updateRoom(
             @PathVariable Integer id,
-            @RequestBody Room updatedRoom) {
+            @RequestBody RoomStatusRequest request) {
 
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        room.setRoomNumber(updatedRoom.getRoomNumber());
-        room.setRoomType(updatedRoom.getRoomType());
-        room.setStatus(updatedRoom.getStatus());
-        room.setPrice(updatedRoom.getPrice());
-        room.setBasePrice(updatedRoom.getBasePrice());
-        room.setRoomRank(updatedRoom.getRoomRank());
-        room.setDescription(updatedRoom.getDescription());
+        applyRoomStatusRequest(room, request);
 
-        return roomRepository.save(room);
+        return toRoomStatusResponse(roomRepository.save(room));
     }
 
     // ===============================
@@ -162,4 +161,27 @@ public class RoomController {
             @RequestParam String type,
             @RequestParam String rank)
     {return roomRepository.findByRoomTypeAndRoomRank(type, rank);}
+
+    private void applyRoomStatusRequest(Room room, RoomStatusRequest request) {
+        room.setRoomNumber(request.getRoomNumber());
+        room.setRoomType(request.getRoomType());
+        room.setStatus(request.getStatus());
+        room.setPrice(request.getPrice());
+        room.setBasePrice(request.getBasePrice());
+        room.setRoomRank(request.getRoomRank());
+        room.setDescription(request.getDescription());
+    }
+
+    private RoomStatusResponse toRoomStatusResponse(Room room) {
+        RoomStatusResponse response = new RoomStatusResponse();
+        response.setId(room.getId());
+        response.setRoomNumber(room.getRoomNumber());
+        response.setRoomType(room.getRoomType());
+        response.setStatus(room.getStatus());
+        response.setBasePrice(room.getBasePrice());
+        response.setPrice(room.getPrice());
+        response.setRoomRank(room.getRoomRank());
+        response.setDescription(room.getDescription());
+        return response;
+    }
 }

@@ -113,6 +113,12 @@
                 th:text="#{contact.form5}"
               ></button>
             </form>
+            <div
+              class="contact-success-message"
+              th:if="${param.success}"
+            >
+              Your message has been sent successfully.
+            </div>
           </div>
         </div>
       </div>
