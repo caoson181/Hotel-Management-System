@@ -157,6 +157,7 @@
                  data-phone=${user.phoneNumber},
                  data-gender=${user.gender},
                  data-role=${user.role},
+                 data-dob=${user.dateOfBirth},
                  data-hiredate=${user.staff != null ? user.staff.hireDate : ''},
                  data-salary=${user.staff != null ? user.staff.salary : ''}"
                   onclick="openEditModal(this)"
@@ -343,10 +344,10 @@
             <div>
               <label>💼 Role</label>
               <select name="role" id="editRole">
-                <option>Manager</option>
-                <option>Admin</option>
-                <option>Receptionist</option>
-                <option>Housekeeper</option>
+                <option value="Manager">Manager</option>
+                <option value="Admin">Admin</option>
+                <option value="Receptionist">Receptionist</option>
+                <option value="Housekeeper">Housekeeper</option>
               </select>
             </div>
 

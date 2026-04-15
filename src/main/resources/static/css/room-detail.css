@@ -489,6 +489,8 @@ h1, h2, h3, h4 {
 /* ===== REVIEWS ===== */
 .reviews-section {
     margin-bottom: 2rem;
+    position: relative;
+    z-index: 30;
 }
 
 .reviews-heading {
@@ -709,6 +711,8 @@ h1, h2, h3, h4 {
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1rem;
+    position: relative;
+    z-index: 35;
 }
 
 .reviews-list-header h3 {
@@ -755,6 +759,7 @@ h1, h2, h3, h4 {
 
 .reviews-dropdown {
     position: relative;
+    z-index: 40;
 }
 
 .reviews-dropdown-trigger {
@@ -808,7 +813,7 @@ h1, h2, h3, h4 {
     transform: translateY(10px) scale(0.98);
     transform-origin: top left;
     transition: all 0.24s ease;
-    z-index: 30;
+    z-index: 120;
     backdrop-filter: blur(10px);
 }
 
@@ -949,6 +954,8 @@ h1, h2, h3, h4 {
 /* ===== SIMILAR ROOMS ===== */
 .similar-row {
     margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 .similar-row h2 {

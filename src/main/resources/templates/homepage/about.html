@@ -32,17 +32,21 @@
       <div class="container">
         <!-- Top Section: Text Left, Image Right -->
         <div class="about-top">
-          <div class="about-text">
+          <div class="about-hero-copy">
             <h2 th:text="#{about.title}"></h2>
+          </div>
+          <div class="about-top-content">
+            <div class="about-text">
             <p th:text="#{about.desc1}"></p>
             <p th:text="#{about.desc2}"></p>
             <p th:text="#{about.desc3}"></p>
-          </div>
-          <div class="about-image">
-            <img
-              th:src="@{/images/slide4.jpg}"
-              alt="Zero Gravity Hotel Exterior"
-            />
+            </div>
+            <div class="about-image">
+              <img
+                th:src="@{/images/slide4.jpg}"
+                alt="Zero Gravity Hotel Exterior"
+              />
+            </div>
           </div>
         </div>
 

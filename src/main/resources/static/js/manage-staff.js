@@ -7,6 +7,17 @@ function closeCreateModal() {
   document.getElementById("createModal").style.display = "none";
 }
 
+function normalizeRoleValue(role) {
+  const normalized = String(role || "").trim().toLowerCase().replace(/^role_/, "");
+  const roleMap = {
+    admin: "Admin",
+    manager: "Manager",
+    receptionist: "Receptionist",
+    housekeeper: "Housekeeper",
+  };
+  return roleMap[normalized] || "";
+}
+
 function openEditModal(btn) {
   document.getElementById("editId").value = btn.dataset.id;
   document.getElementById("editName").value = btn.dataset.name;
@@ -14,7 +25,11 @@ function openEditModal(btn) {
   document.getElementById("editEmail").value = btn.dataset.email;
   document.getElementById("editPhone").value = btn.dataset.phone;
   document.getElementById("editGender").value = btn.dataset.gender;
-  document.getElementById("editRole").value = btn.dataset.role;
+  document.getElementById("editDob").value = btn.dataset.dob || "";
+
+  const roleSelect = document.getElementById("editRole");
+  const normalizedRole = normalizeRoleValue(btn.dataset.role);
+  roleSelect.value = normalizedRole;
 
   // 👉 THÊM 2 DÒNG NÀY
   document.getElementById("editHireDate").value = btn.dataset.hiredate;

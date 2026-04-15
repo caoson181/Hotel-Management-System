@@ -78,30 +78,50 @@ public class SecurityConfig {
                                 "ROLE_ADMIN", "ROLE_MANAGER", "ROLE_RECEPTIONIST", "ROLE_HOUSEKEEPER",
                                 "Admin", "Manager", "Receptionist", "Housekeeper"
                         )
-                        // Staff VIEW (all staff roles)
-                        .requestMatchers("/staff/view/**")
-                        .hasAnyRole("ADMIN", "MANAGER", "RECEPTIONIST", "HOUSEKEEPER")
-
-                        // Staff MANAGE (only Admin & Manager)
-                        .requestMatchers("/staff/manage/**",
-                                "/staff/add",
-                                "/staff/edit/**",
-                                "/staff/delete/**")
-                        .hasAnyRole("ADMIN", "MANAGER")
-
                         // Staff dashboard
                         .requestMatchers("/index", "/index/**")
                         .hasAnyRole("ADMIN", "MANAGER", "RECEPTIONIST", "HOUSEKEEPER")
-                        // Only Admin & Manager can access
-                        .requestMatchers("/rooms/view-room-status/**")
+
+                        // Staff manage pages/actions (Admin & Manager only)
+                        .requestMatchers(
+                                "/staff/manage",
+                                "/staff/manage/**",
+                                "/staff/manage-staff",
+                                "/staff/create",
+                                "/staff/update",
+                                "/staff/edit/**",
+                                "/staff/delete/**",
+                                "/staff/toggle/**",
+                                "/users/manage",
+                                "/users/manage/**",
+                                "/users/manage-users",
+                                "/user/toggle/**"
+                        )
                         .hasAnyRole("ADMIN", "MANAGER")
-                        .requestMatchers("/users/manage/**")
+
+                        // Restricted staff/admin pages & APIs
+                        .requestMatchers(
+                                "/rooms/view-room-status",
+                                "/rooms/view-room-status/**",
+                                "/revenue/**",
+                                "/api/revenue/**",
+                                "/reports/**"
+                        )
                         .hasAnyRole("ADMIN", "MANAGER")
-                        // Admin only
-                        .requestMatchers("/revenue/**")
-                        .hasAnyRole("ADMIN","MANAGER")
-                        .requestMatchers("/reports/**")
-                        .hasAnyRole("ADMIN","MANAGER")
+
+                        // Staff internal pages & APIs (all staff roles)
+                        .requestMatchers(
+                                "/staff/**",
+                                "/rooms/view-room",
+                                "/rooms/view-room/**",
+                                "/rooms/check-equipment",
+                                "/rooms/check-equipment/**",
+                                "/rooms/check-in-out",
+                                "/rooms/check-in-out/**",
+                                "/rooms/api/**",
+                                "/api/equipment/**"
+                        )
+                        .hasAnyRole("ADMIN", "MANAGER", "RECEPTIONIST", "HOUSEKEEPER")
 
 
                         // Everything else
