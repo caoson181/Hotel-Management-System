@@ -48,8 +48,8 @@
         <div class="tier-upgrade-icon">
           <i class="fas fa-crown"></i>
         </div>
-        <p class="tier-upgrade-label">Membership Upgrade</p>
-        <h2>Congratulations!</h2>
+        <p class="tier-upgrade-label" th:text="#{tier.upgrade.label}">Membership Upgrade</p>
+        <h2 th:text="#{tier.upgrade.title}">Congratulations!</h2>
         <p id="tierUpgradeMessage" class="tier-upgrade-message"></p>
       </div>
       <div id="tierConfetti" class="tier-confetti"></div>
@@ -205,6 +205,36 @@
 
     <!-- Scripts -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script th:inline="javascript">
+      window.homepageMessages = {
+        bookShelfServices: [
+          {
+            title: /*[[#{service.title1}]]*/ "Luxury Spa & Wellness",
+            desc: /*[[#{service.info1}]]*/ "Relax with professional spa treatments and wellness services.",
+            image: "/images/slide1.jpg",
+            link: "/services#spa",
+          },
+          {
+            title: /*[[#{service.title2}]]*/ "Swimming Pool",
+            desc: /*[[#{service.info2}]]*/ "Enjoy a relaxing swim in our clean and modern pool.",
+            image: "/images/slide2.jpg",
+            link: "/services#pool",
+          },
+          {
+            title: /*[[#{service.title3}]]*/ "Fitness Center",
+            desc: /*[[#{service.info3}]]*/ "Stay active with our fully equipped gym facilities.",
+            image: "/images/slide6.jpg",
+            link: "/services#gym",
+          },
+          {
+            title: /*[[#{service.title4}]]*/ "Fine Dining Restaurant",
+            desc: /*[[#{service.info4}]]*/ "Enjoy delicious local and international dishes prepared by expert chefs.",
+            image: "/images/slide4.jpg",
+            link: "/services#restaurant",
+          },
+        ],
+      };
+    </script>
     <script src="/js/homepage.js"></script>
     <!-- Room card JavaScript -->
     <script src="/js/room-card.js"></script>
@@ -212,6 +242,13 @@
     <script>
       // Navbar scroll effect
       const header = document.querySelector(".header");
+      const tierUpgradeI18n = {
+        message: /*[[#{tier.upgrade.message}]]*/ "You have been upgraded to {0} / {1}. Enjoy your new member privileges.",
+      };
+
+      function replacePlaceholders(template, ...values) {
+        return String(template ?? "").replace(/\{(\d+)\}/g, (_, index) => values[Number(index)] ?? "");
+      }
 
       window.addEventListener("scroll", () => {
         if (window.scrollY > 50) {
@@ -250,7 +287,11 @@
 
         const memberLevel = payload.memberLevel || "Silver";
         const customerRank = payload.customerRank || "VIP";
-        message.textContent = `You have been upgraded to ${memberLevel} / ${customerRank}. Enjoy your new member privileges.`;
+        message.textContent = replacePlaceholders(
+          tierUpgradeI18n.message,
+          memberLevel,
+          customerRank
+        );
         overlay.classList.remove("hidden");
 
         for (let i = 0; i < 36; i += 1) {

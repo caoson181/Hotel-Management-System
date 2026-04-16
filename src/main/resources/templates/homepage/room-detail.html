@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="UTF-8" />
@@ -48,7 +48,7 @@
 
     <!-- Main Content -->
     <main class="room-detail">
-      <!-- Hero Section với ảnh lớn -->
+      <!-- Hero Section vá»›i áº£nh lá»›n -->
       <div class="room-hero">
         <div class="main-image-container">
           <img
@@ -85,7 +85,7 @@
             <span
               ><i class="fas fa-ruler-combined"></i>
               <span>32</span>
-              m²</span
+              mÂ²</span
             >
             <span
               ><i class="fas fa-star" style="color: #d4af37"></i> 4.9
@@ -178,8 +178,8 @@
               />
             </div>
             <div class="availability-box" id="availabilityBox">
-              <strong id="availabilityTitle">Select dates to check availability</strong>
-              <p id="availabilityText">Availability will be calculated for the exact date range you choose.</p>
+              <strong id="availabilityTitle" th:text="#{room.availability.selectTitle}">Select dates to check availability</strong>
+              <p id="availabilityText" th:text="#{room.availability.selectText}">Availability will be calculated for the exact date range you choose.</p>
             </div>
             <div class="guest-selector">
               <label
@@ -198,15 +198,13 @@
               <span th:text="#{room.total}">Total</span><br />
               <span id="totalPrice">$398</span>
             </div>
-            <button id="addRoomBtn" class="add-btn">
-              ➕ Add Room
-            </button>
+            <button id="addRoomBtn" class="add-btn" th:text="#{room.add}">Add Room</button>
 
 
             <div class="secure-text">
               <i class="fas fa-lock"></i>
               <span th:text="#{room.secure.booking}"
-                >Secure booking • Free cancellation</span
+                >Secure booking â€¢ Free cancellation</span
               >
             </div>
 
@@ -245,17 +243,17 @@
           <div class="reviews-heading">
             <h2>
               <i class="fas fa-star"></i>
-              <span>Ratings &amp; Reviews</span>
+              <span th:text="#{review.sectionTitle}">Ratings &amp; Reviews</span>
             </h2>
-            <p>Share your stay experience for this room.</p>
+            <p th:text="#{review.sectionText}">Share your stay experience for this room.</p>
           </div>
 
           <div class="reviews-top-grid">
             <div class="reviews-summary-card">
-              <div class="summary-label">AVERAGE RATING</div>
+              <div class="summary-label" th:text="#{review.average}">AVERAGE RATING</div>
               <div class="summary-score" id="averageRatingValue">0.0</div>
-              <div class="summary-stars" id="averageRatingStars" aria-label="Average rating"></div>
-              <p class="summary-note" id="averageRatingNote">No ratings yet</p>
+              <div class="summary-stars" id="averageRatingStars" th:attr="aria-label=#{review.averageAria}" aria-label="Average rating"></div>
+              <p class="summary-note" id="averageRatingNote" th:text="#{review.noRatings}">No ratings yet</p>
 
               <div class="rating-breakdown">
                 <div class="rating-breakdown-row" data-rating="5">
@@ -287,23 +285,23 @@
             </div>
 
             <div class="review-form-card">
-              <h3>Write a review</h3>
-              <p>Your review will help other guests choose the right room.</p>
+              <h3 th:text="#{review.writeTitle}">Write a review</h3>
+              <p th:text="#{review.writeText}">Your review will help other guests choose the right room.</p>
 
               <div class="review-star-picker" id="reviewStarPicker">
-                <button type="button" class="review-star-btn" data-value="1" aria-label="1 star">
+                <button type="button" class="review-star-btn" data-value="1" th:attr="aria-label=#{review.star1}" aria-label="1 star">
                   <i class="far fa-star"></i>
                 </button>
-                <button type="button" class="review-star-btn" data-value="2" aria-label="2 stars">
+                <button type="button" class="review-star-btn" data-value="2" th:attr="aria-label=#{review.star2}" aria-label="2 stars">
                   <i class="far fa-star"></i>
                 </button>
-                <button type="button" class="review-star-btn" data-value="3" aria-label="3 stars">
+                <button type="button" class="review-star-btn" data-value="3" th:attr="aria-label=#{review.star3}" aria-label="3 stars">
                   <i class="far fa-star"></i>
                 </button>
-                <button type="button" class="review-star-btn" data-value="4" aria-label="4 stars">
+                <button type="button" class="review-star-btn" data-value="4" th:attr="aria-label=#{review.star4}" aria-label="4 stars">
                   <i class="far fa-star"></i>
                 </button>
-                <button type="button" class="review-star-btn" data-value="5" aria-label="5 stars">
+                <button type="button" class="review-star-btn" data-value="5" th:attr="aria-label=#{review.star5}" aria-label="5 stars">
                   <i class="far fa-star"></i>
                 </button>
               </div>
@@ -311,12 +309,13 @@
               <textarea
                 id="reviewContent"
                 class="review-textarea"
+                th:attr="placeholder=#{review.placeholder}"
                 placeholder="Write your comment here..."
               ></textarea>
 
               <div class="review-form-actions">
                 <div class="review-form-message" id="reviewFormMessage"></div>
-                <button id="submitReviewBtn" class="review-submit-btn" type="button">
+                <button id="submitReviewBtn" class="review-submit-btn" type="button" th:text="#{review.send}">
                   Send Review
                 </button>
               </div>
@@ -324,7 +323,7 @@
           </div>
 
           <div class="reviews-list-header">
-            <h3><span id="reviewCountTitle">0</span> reviews</h3>
+            <h3><span id="reviewCountTitle">0</span> <span id="reviewCountSuffix" th:text="#{review.countSuffix}">reviews</span></h3>
             <div class="reviews-filter-group">
               <div class="reviews-filter reviews-dropdown" data-dropdown="sort">
                 <i class="fas fa-sliders-h"></i>
@@ -336,11 +335,11 @@
                   aria-haspopup="listbox"
                   aria-expanded="false"
                 >
-                  <span class="reviews-dropdown-label">Newest first</span>
+                  <span class="reviews-dropdown-label" th:text="#{review.sort.newest}">Newest first</span>
                 </button>
                 <div class="reviews-dropdown-menu" id="reviewSortMenu" role="listbox">
-                  <button type="button" class="reviews-dropdown-option active" data-dropdown-option data-target="reviewSortTrigger" data-value="newest">Newest first</button>
-                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewSortTrigger" data-value="oldest">Oldest first</button>
+                  <button type="button" class="reviews-dropdown-option active" data-dropdown-option data-target="reviewSortTrigger" data-value="newest" th:text="#{review.sort.newest}">Newest first</button>
+                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewSortTrigger" data-value="oldest" th:text="#{review.sort.oldest}">Oldest first</button>
                 </div>
               </div>
               <div class="reviews-filter reviews-dropdown" data-dropdown="rating">
@@ -353,22 +352,22 @@
                   aria-haspopup="listbox"
                   aria-expanded="false"
                 >
-                  <span class="reviews-dropdown-label">All ratings</span>
+                  <span class="reviews-dropdown-label" th:text="#{review.filter.all}">All ratings</span>
                 </button>
                 <div class="reviews-dropdown-menu" id="reviewRatingMenu" role="listbox">
-                  <button type="button" class="reviews-dropdown-option active" data-dropdown-option data-target="reviewRatingTrigger" data-value="all">All ratings</button>
-                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="5">5 stars</button>
-                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="4">4 stars</button>
-                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="3">3 stars</button>
-                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="2">2 stars</button>
-                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="1">1 star</button>
+                  <button type="button" class="reviews-dropdown-option active" data-dropdown-option data-target="reviewRatingTrigger" data-value="all" th:text="#{review.filter.all}">All ratings</button>
+                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="5" th:text="#{review.filter.5}">5 stars</button>
+                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="4" th:text="#{review.filter.4}">4 stars</button>
+                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="3" th:text="#{review.filter.3}">3 stars</button>
+                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="2" th:text="#{review.filter.2}">2 stars</button>
+                  <button type="button" class="reviews-dropdown-option" data-dropdown-option data-target="reviewRatingTrigger" data-value="1" th:text="#{review.filter.1}">1 star</button>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="reviews-list-card">
-            <div id="reviewsEmptyState" class="reviews-empty-state">
+            <div id="reviewsEmptyState" class="reviews-empty-state" th:text="#{review.empty.none}">
               No reviews yet. Be the first to comment on this room.
             </div>
             <div id="reviewsList" class="reviews-list"></div>
@@ -390,9 +389,9 @@
                 "
               ></div>
               <div class="similar-info">
-                <h3>Superior Twin</h3>
-                <p>2 Twin Beds | 30 m²</p>
-                <span class="price" id="price-superior-twin">Loading...</span>
+                <h3 th:text="#{room.similar.superiorTwin.name}">Superior Twin</h3>
+                <p th:text="#{room.similar.superiorTwin.meta}">2 Twin Beds | 30 m²</p>
+                <span class="price" id="price-superior-twin" th:text="#{common.loading}">Loading...</span>
               </div>
             </div>
             <div class="similar-card">
@@ -403,9 +402,9 @@
                 "
               ></div>
               <div class="similar-info">
-                <h3>Executive Suite</h3>
-                <p>King Bed | 50 m²</p>
-                <span class="price" id="price-executive-double">Loading...</span>
+                <h3 th:text="#{room.similar.executiveSuite.name}">Executive Suite</h3>
+                <p th:text="#{room.similar.executiveSuite.meta}">King Bed | 50 m²</p>
+                <span class="price" id="price-executive-double" th:text="#{common.loading}">Loading...</span>
               </div>
             </div>
             <div class="similar-card">
@@ -416,9 +415,9 @@
                 "
               ></div>
               <div class="similar-info">
-                <h3>Presidential Suite</h3>
-                <p>King + Living | 80 m²</p>
-                <span class="price" id="price-suite-family">Loading...</span>
+                <h3 th:text="#{room.similar.presidentialSuite.name}">Presidential Suite</h3>
+                <p th:text="#{room.similar.presidentialSuite.meta}">King + Living | 80 m²</p>
+                <span class="price" id="price-suite-family" th:text="#{common.loading}">Loading...</span>
               </div>
             </div>
           </div>
@@ -539,6 +538,38 @@
         "booking.chooseDates": /*[[#{booking.chooseDates}]]*/ "Choose Dates",
         "booking.saved": /*[[#{booking.saved}]]*/ "",
         "booking.added": /*[[#{booking.added}]]*/ "",
+        "booking.remove": /*[[#{booking.remove}]]*/ "Remove",
+        "booking.guestCount": /*[[#{room.guest}]]*/ "Guests",
+        "room.add": /*[[#{room.add}]]*/ "Add Room",
+        "room.night": /*[[#{room.night}]]*/ "/night",
+        "room.availability.selectTitle": /*[[#{room.availability.selectTitle}]]*/ "",
+        "room.availability.selectText": /*[[#{room.availability.selectText}]]*/ "",
+        "room.availability.invalidCheckinTitle": /*[[#{room.availability.invalidCheckinTitle}]]*/ "",
+        "room.availability.invalidCheckinText": /*[[#{room.availability.invalidCheckinText}]]*/ "",
+        "room.availability.invalidRangeTitle": /*[[#{room.availability.invalidRangeTitle}]]*/ "",
+        "room.availability.invalidRangeText": /*[[#{room.availability.invalidRangeText}]]*/ "",
+        "room.availability.availableSuffix": /*[[#{room.availability.availableSuffix}]]*/ "",
+        "room.availability.availableText": /*[[#{room.availability.availableText}]]*/ "",
+        "room.availability.unavailableTitle": /*[[#{room.availability.unavailableTitle}]]*/ "",
+        "room.availability.unavailableText": /*[[#{room.availability.unavailableText}]]*/ "",
+        "room.availability.errorTitle": /*[[#{room.availability.errorTitle}]]*/ "",
+        "room.availability.errorText": /*[[#{room.availability.errorText}]]*/ "",
+        "review.countSuffix": /*[[#{review.countSuffix}]]*/ "reviews",
+        "review.guest": /*[[#{review.guest}]]*/ "Guest",
+        "review.noRatings": /*[[#{review.noRatings}]]*/ "No ratings yet",
+        "review.empty.none": /*[[#{review.empty.none}]]*/ "",
+        "review.empty.filtered": /*[[#{review.empty.filtered}]]*/ "",
+        "review.form.login": /*[[#{review.form.login}]]*/ "",
+        "review.form.chooseRating": /*[[#{review.form.chooseRating}]]*/ "",
+        "review.form.writeComment": /*[[#{review.form.writeComment}]]*/ "",
+        "review.form.sending": /*[[#{review.form.sending}]]*/ "",
+        "review.form.sent": /*[[#{review.form.sent}]]*/ "",
+        "review.form.error": /*[[#{review.form.error}]]*/ "",
+        "review.starSuffix.one": /*[[#{review.starSuffix.one}]]*/ "star",
+        "review.starSuffix.other": /*[[#{review.starSuffix.other}]]*/ "stars",
+        "room.similar.superiorTwin.meta": /*[[#{room.similar.superiorTwin.meta}]]*/ "",
+        "room.similar.executiveSuite.meta": /*[[#{room.similar.executiveSuite.meta}]]*/ "",
+        "room.similar.presidentialSuite.meta": /*[[#{room.similar.presidentialSuite.meta}]]*/ "",
       };
     </script>
     <div th:replace="~{homepage/customer-footer :: customerFooter}"></div>
@@ -560,4 +591,7 @@
     </script>
   </body>
 </html>
+
+
+
 

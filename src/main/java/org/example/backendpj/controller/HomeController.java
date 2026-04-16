@@ -2,6 +2,7 @@ package org.example.backendpj.controller;
 
 import org.example.backendpj.Entity.Room;
 import org.example.backendpj.Repository.RoomRepository;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -20,9 +22,11 @@ import java.util.Map;
 public class HomeController {
 
     private final RoomRepository roomRepository;
+    private final MessageSource messageSource;
 
-    public HomeController(RoomRepository roomRepository) {
+    public HomeController(RoomRepository roomRepository, MessageSource messageSource) {
         this.roomRepository = roomRepository;
+        this.messageSource = messageSource;
     }
 
     @GetMapping({"/", "/homepage"})
@@ -61,15 +65,15 @@ public class HomeController {
 
 
     @GetMapping("/services")
-    public String services(Model model) {
-        List<Map<String, Object>> services = buildServices();
+    public String services(Model model, Locale locale) {
+        List<Map<String, Object>> services = buildServices(locale);
         model.addAttribute("services", services);
         return "homepage/services";
     }
 
     @GetMapping("/services/{slug}")
-    public String serviceDetail(@PathVariable String slug, Model model) {
-        List<Map<String, Object>> services = buildServices();
+    public String serviceDetail(@PathVariable String slug, Model model, Locale locale) {
+        List<Map<String, Object>> services = buildServices(locale);
 
         Map<String, Object> currentService = services.stream()
                 .filter(service -> slug.equals(service.get("slug")))
@@ -87,14 +91,14 @@ public class HomeController {
     }
 
     @GetMapping("/gravity-news")
-    public String gravityNews(Model model) {
-        model.addAttribute("articles", buildNewsArticles());
+    public String gravityNews(Model model, Locale locale) {
+        model.addAttribute("articles", buildNewsArticles(locale));
         return "homepage/gravity-news";
     }
 
     @GetMapping("/gravity-news/{slug}")
-    public String gravityNewsDetail(@PathVariable String slug, Model model) {
-        List<Map<String, Object>> articles = buildNewsArticles();
+    public String gravityNewsDetail(@PathVariable String slug, Model model, Locale locale) {
+        List<Map<String, Object>> articles = buildNewsArticles(locale);
 
         Map<String, Object> article = articles.stream()
                 .filter(item -> slug.equals(item.get("slug")))
@@ -116,29 +120,29 @@ public class HomeController {
         return "homepage/contact";
     }
 
-    private List<Map<String, Object>> buildServices() {
+    private List<Map<String, Object>> buildServices(Locale locale) {
         List<Map<String, Object>> services = new ArrayList<>();
 
         services.add(service(
                 "spa",
-                "Spa",
-                "Luxury Spa & Wellness",
-                "Wellness Ritual",
-                "Restore your balance with signature massages, herbal rituals, facial treatments, and a private wellness lounge designed for calm, comfort, and deep relaxation.",
-                "An elegant retreat for guests who want a slower, more restorative stay.",
+                message("service.spa.menu", locale),
+                message("service.spa.title", locale),
+                message("service.spa.eyebrow", locale),
+                message("service.spa.description", locale),
+                message("service.spa.highlight", locale),
                 "/images/slide1.jpg",
-                "08:00 - 22:00 daily",
-                "Level 2, Wellness Wing",
+                message("service.spa.hours", locale),
+                message("service.spa.location", locale),
                 List.of(
-                        "Our spa experience blends modern comfort with a peaceful atmosphere for guests seeking recovery, calm, and quiet time away from the pace of travel. Signature therapies, herbal compress rituals, facial care, and private relaxation areas are arranged to make each visit feel unhurried and premium.",
-                        "From solo recovery sessions to couples treatments, every appointment is designed around soft lighting, gentle aromas, and attentive service. The setting works equally well for post-flight relaxation, weekend wellness routines, or a restorative evening after a full day in the city."
+                        message("service.spa.paragraph1", locale),
+                        message("service.spa.paragraph2", locale)
                 ),
                 List.of(
-                        "Private treatment suites",
-                        "Signature massage therapies, facial care, and herbal rituals",
-                        "Relaxation lounge with tea service before and after treatment"
+                        message("service.spa.feature1", locale),
+                        message("service.spa.feature2", locale),
+                        message("service.spa.feature3", locale)
                 ),
-                "Advance reservation is recommended for couples therapy, hot stone sessions, and peak evening hours.",
+                message("service.spa.footnote", locale),
                 List.of(
                         "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1200&q=80",
                         "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1200&q=80",
@@ -148,24 +152,24 @@ public class HomeController {
 
         services.add(service(
                 "pool",
-                "Pool",
-                "Swimming Pool",
-                "Leisure Escape",
-                "Enjoy a refreshing swim in a bright pool environment with sun loungers, calm water, and a resort-like atmosphere that works for both active mornings and relaxed afternoons.",
-                "Perfect for a quiet dip, poolside reading, or family leisure time.",
+                message("service.pool.menu", locale),
+                message("service.pool.title", locale),
+                message("service.pool.eyebrow", locale),
+                message("service.pool.description", locale),
+                message("service.pool.highlight", locale),
                 "/images/slide2.jpg",
-                "06:00 - 21:00 daily",
-                "Garden Deck, Ground Floor",
+                message("service.pool.hours", locale),
+                message("service.pool.location", locale),
                 List.of(
-                        "The swimming pool is designed as an open-air retreat where guests can move between light exercise and slow leisure throughout the day. A clear waterline, wide deck, and comfortable seating create an easy rhythm for morning laps, midday breaks, or a calm sunset swim.",
-                        "Poolside service keeps the space convenient for longer stays, while surrounding greenery softens the atmosphere and gives the area a more private resort character. It is an ideal choice for guests who want both movement and relaxation without leaving the hotel grounds."
+                        message("service.pool.paragraph1", locale),
+                        message("service.pool.paragraph2", locale)
                 ),
                 List.of(
-                        "Temperature-controlled water",
-                        "Relaxing poolside lounge chairs",
-                        "Poolside towels and light refreshment service"
+                        message("service.pool.feature1", locale),
+                        message("service.pool.feature2", locale),
+                        message("service.pool.feature3", locale)
                 ),
-                "Children should be accompanied during busy hours, and guests are encouraged to arrive earlier for the quietest morning experience.",
+                message("service.pool.footnote", locale),
                 List.of(
                         "https://images.unsplash.com/photo-1572331165267-854da2b10ccc?auto=format&fit=crop&w=1200&q=80",
                         "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=80",
@@ -175,24 +179,24 @@ public class HomeController {
 
         services.add(service(
                 "gym",
-                "Fitness",
-                "Fitness Center",
-                "Active Stay",
-                "Train with modern cardio machines, free weights, strength equipment, and a well-lit workout floor created to support both quick routines and structured exercise sessions.",
-                "A practical, polished space that keeps guests active during their stay.",
+                message("service.gym.menu", locale),
+                message("service.gym.title", locale),
+                message("service.gym.eyebrow", locale),
+                message("service.gym.description", locale),
+                message("service.gym.highlight", locale),
                 "/images/slide6.jpg",
-                "24/7 access",
-                "Level 3, Sports Wing",
+                message("service.gym.hours", locale),
+                message("service.gym.location", locale),
                 List.of(
-                        "The fitness center combines essential strength and cardio equipment in a clean, well-organized environment that supports both short workouts and full training sessions. Whether guests prefer treadmill intervals, resistance training, or a simple mobility routine, the space remains functional and comfortable throughout the day.",
-                        "Large windows, mirrored walls, and a balanced equipment layout help the room feel open rather than crowded. It is especially suited for business travelers and long-stay guests who want a dependable place to maintain daily exercise habits without interruption."
+                        message("service.gym.paragraph1", locale),
+                        message("service.gym.paragraph2", locale)
                 ),
                 List.of(
-                        "Modern cardio and resistance equipment",
-                        "Spacious workout area with natural light",
-                        "Open-access layout for quick solo routines any time"
+                        message("service.gym.feature1", locale),
+                        message("service.gym.feature2", locale),
+                        message("service.gym.feature3", locale)
                 ),
-                "For the most open floor space, early mornings and mid-afternoons are typically the quietest training periods.",
+                message("service.gym.footnote", locale),
                 List.of(
                         "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80",
                         "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1200&q=80",
@@ -202,24 +206,24 @@ public class HomeController {
 
         services.add(service(
                 "restaurant",
-                "Restaurant",
-                "Fine Dining Restaurant",
-                "Dining Experience",
-                "Discover a curated menu of Vietnamese favorites and international classics served in an intimate dining room with attentive service, refined presentation, and a warm evening ambiance.",
-                "Ideal for breakfast meetings, romantic dinners, or small celebrations.",
+                message("service.restaurant.menu", locale),
+                message("service.restaurant.title", locale),
+                message("service.restaurant.eyebrow", locale),
+                message("service.restaurant.description", locale),
+                message("service.restaurant.highlight", locale),
                 "/images/slide4.jpg",
-                "06:30 - 22:30 daily",
-                "Lobby Level, Main Dining Hall",
+                message("service.restaurant.hours", locale),
+                message("service.restaurant.location", locale),
                 List.of(
-                        "Our restaurant presents a dining experience built around polished service, balanced menus, and a setting that feels inviting from morning to late evening. Guests can enjoy a relaxed breakfast, a business lunch, or a more intimate dinner with dishes that combine familiar comfort and refined presentation.",
-                        "Seasonal ingredients, chef-led specials, and a carefully arranged dining room help the space suit many occasions without feeling overly formal. The atmosphere is ideal for couples, small groups, and travelers who want a memorable meal close to their room."
+                        message("service.restaurant.paragraph1", locale),
+                        message("service.restaurant.paragraph2", locale)
                 ),
                 List.of(
-                        "International and local cuisine",
-                        "Chef-curated signature dishes",
-                        "Private dining available on request"
+                        message("service.restaurant.feature1", locale),
+                        message("service.restaurant.feature2", locale),
+                        message("service.restaurant.feature3", locale)
                 ),
-                "Dinner reservations are recommended on weekends, especially for window seating and private dining requests.",
+                message("service.restaurant.footnote", locale),
                 List.of(
                         "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
                         "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80",
@@ -228,6 +232,10 @@ public class HomeController {
         ));
 
         return services;
+    }
+
+    private String message(String key, Locale locale) {
+        return messageSource.getMessage(key, null, locale);
     }
 
     private Map<String, Object> service(String slug,
@@ -258,190 +266,190 @@ public class HomeController {
         service.put("footnote", footnote);
         service.put("gallery", gallery);
         service.put("heroImage", gallery.get(0));
-        service.put("thumbnailImages", Arrays.asList(coverImage, gallery.get(1), gallery.get(2)));
+        service.put("thumbnailImages", Arrays.asList(gallery.get(0), coverImage, gallery.get(1), gallery.get(2)));
         return service;
     }
 
-    private List<Map<String, Object>> buildNewsArticles() {
+    private List<Map<String, Object>> buildNewsArticles(Locale locale) {
         List<Map<String, Object>> articles = new ArrayList<>();
 
         articles.add(newsArticle(
                 "luxury-hospitality-award-2025",
-                "Gravity Hotel Earns Luxury Hospitality Award 2025",
-                "Gravity Hotel has been recognized for its refined guest journey, curated design language, and service consistency across every touchpoint.",
+                message("news.luxury-hospitality-award-2025.title", locale),
+                message("news.luxury-hospitality-award-2025.excerpt", locale),
                 "achievement",
                 "2025-06-12",
-                "12 June 2025",
-                "8 min read",
+                message("news.luxury-hospitality-award-2025.dateDisplay", locale),
+                message("news.luxury-hospitality-award-2025.readTime", locale),
                 "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1600&q=80",
                 "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1400&q=80",
-                "This article is part of the Gravity Hotel journal, where updates focus on hospitality design, guest experience, and property milestones.",
+                message("news.luxury-hospitality-award-2025.snapshot", locale),
                 List.of(
-                        "An international hospitality review panel has named Gravity Hotel one of the year's most distinctive luxury stays, citing the property's calm atmosphere, attentive team, and thoughtful guest experience.",
-                        "The award followed a six-month review covering guest satisfaction, design quality, sustainability practices, and service delivery.",
-                        "Reviewers highlighted how the hotel balances a polished premium identity with a welcoming, human tone that still feels relaxed.",
-                        "Leadership teams also received praise for building an operation that stays consistent across check-in, housekeeping, dining, and wellness services."
+                        message("news.luxury-hospitality-award-2025.paragraph1", locale),
+                        message("news.luxury-hospitality-award-2025.paragraph2", locale),
+                        message("news.luxury-hospitality-award-2025.paragraph3", locale),
+                        message("news.luxury-hospitality-award-2025.paragraph4", locale)
                 ),
                 List.of(
-                        "Guest experience consistency was measured across arrival, in-stay support, dining, and departure touchpoints.",
-                        "Judges specifically mentioned the hotel's quiet interior atmosphere, clean detailing, and staff responsiveness.",
-                        "The recognition strengthens the brand's positioning for corporate retreats, leisure escapes, and premium family stays."
+                        message("news.luxury-hospitality-award-2025.highlight1", locale),
+                        message("news.luxury-hospitality-award-2025.highlight2", locale),
+                        message("news.luxury-hospitality-award-2025.highlight3", locale)
                 ),
-                "Gravity Hotel continues shaping a more immersive, design-led guest experience across rooms, wellness, and service touchpoints.",
+                message("news.luxury-hospitality-award-2025.bodyImageCaption", locale),
                 List.of(
-                        "Expand staff training with new recognition-based service coaching.",
-                        "Introduce a seasonal guest-experience program tied to wellness and dining.",
-                        "Use the award campaign to deepen international media visibility."
+                        message("news.luxury-hospitality-award-2025.next1", locale),
+                        message("news.luxury-hospitality-award-2025.next2", locale),
+                        message("news.luxury-hospitality-award-2025.next3", locale)
                 )
         ));
 
         articles.add(newsArticle(
                 "new-skyline-suite-collection-officially-opens",
-                "New Skyline Suite Collection Officially Opens",
-                "A new suite collection introduces elevated interiors, panoramic city views, and a softer residential feel for long-stay guests.",
+                message("news.new-skyline-suite-collection-officially-opens.title", locale),
+                message("news.new-skyline-suite-collection-officially-opens.excerpt", locale),
                 "news",
                 "2025-07-03",
-                "03 July 2025",
-                "6 min read",
+                message("news.new-skyline-suite-collection-officially-opens.dateDisplay", locale),
+                message("news.new-skyline-suite-collection-officially-opens.readTime", locale),
                 "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80",
                 "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=80",
-                "The Skyline collection expands the hotel's premium inventory with room concepts designed for privacy, longer visits, and a stronger sense of place.",
+                message("news.new-skyline-suite-collection-officially-opens.snapshot", locale),
                 List.of(
-                        "Gravity Hotel has officially launched its Skyline Suite Collection, a new category of premium accommodation designed around open layouts, textured materials, and expansive city-facing windows.",
-                        "The suites combine lounge-style seating, flexible work surfaces, and layered lighting to support both business trips and slower leisure stays.",
-                        "Design teams focused on a calmer residential feel, using warmer finishes and more generous circulation space than standard room layouts.",
-                        "The collection is expected to become a key offer for executive travelers, couples celebrating milestone occasions, and guests booking multi-night premium experiences."
+                        message("news.new-skyline-suite-collection-officially-opens.paragraph1", locale),
+                        message("news.new-skyline-suite-collection-officially-opens.paragraph2", locale),
+                        message("news.new-skyline-suite-collection-officially-opens.paragraph3", locale),
+                        message("news.new-skyline-suite-collection-officially-opens.paragraph4", locale)
                 ),
                 List.of(
-                        "Each suite includes a separate living corner and upgraded bath amenities.",
-                        "Panoramic glazing was chosen to frame sunrise and evening skyline views.",
-                        "The opening supports the property's strategy to diversify premium room options."
+                        message("news.new-skyline-suite-collection-officially-opens.highlight1", locale),
+                        message("news.new-skyline-suite-collection-officially-opens.highlight2", locale),
+                        message("news.new-skyline-suite-collection-officially-opens.highlight3", locale)
                 ),
-                "The new suite launch reflects a broader shift toward more flexible, experience-led accommodation at Gravity Hotel.",
+                message("news.new-skyline-suite-collection-officially-opens.bodyImageCaption", locale),
                 List.of(
-                        "Package the suites with dining and airport transfer add-ons.",
-                        "Feature the new room type across direct booking campaigns.",
-                        "Collect early guest feedback to refine in-room amenities."
+                        message("news.new-skyline-suite-collection-officially-opens.next1", locale),
+                        message("news.new-skyline-suite-collection-officially-opens.next2", locale),
+                        message("news.new-skyline-suite-collection-officially-opens.next3", locale)
                 )
         ));
 
         articles.add(newsArticle(
                 "green-operations-milestone-2025",
-                "Gravity Hotel Reaches Green Operations Milestone",
-                "A fresh sustainability milestone recognizes measurable reductions in water waste, energy use, and disposable materials across hotel operations.",
+                message("news.green-operations-milestone-2025.title", locale),
+                message("news.green-operations-milestone-2025.excerpt", locale),
                 "achievement",
                 "2025-05-20",
-                "20 May 2025",
-                "7 min read",
+                message("news.green-operations-milestone-2025.dateDisplay", locale),
+                message("news.green-operations-milestone-2025.readTime", locale),
                 "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=80",
                 "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80",
-                "The update tracks operational improvements that align hospitality comfort with more responsible daily practices behind the scenes.",
+                message("news.green-operations-milestone-2025.snapshot", locale),
                 List.of(
-                        "Gravity Hotel has reached a new green-operations milestone after completing a coordinated sustainability upgrade across housekeeping, laundry, lighting, and water management.",
-                        "The program reduced unnecessary energy use in guest corridors and back-of-house zones while improving the monitoring of water-intensive service areas.",
-                        "Procurement teams also shifted more amenities and packaging toward reusable or lower-waste alternatives without disrupting the guest experience.",
-                        "Internal reporting shows the initiative improved operational efficiency while helping the hotel present a more credible long-term environmental commitment."
+                        message("news.green-operations-milestone-2025.paragraph1", locale),
+                        message("news.green-operations-milestone-2025.paragraph2", locale),
+                        message("news.green-operations-milestone-2025.paragraph3", locale),
+                        message("news.green-operations-milestone-2025.paragraph4", locale)
                 ),
                 List.of(
-                        "Energy-saving controls were expanded in corridors, service stations, and selected guest floors.",
-                        "Water monitoring now supports faster intervention when usage patterns spike unexpectedly.",
-                        "Several disposable touchpoints were replaced with more durable alternatives."
+                        message("news.green-operations-milestone-2025.highlight1", locale),
+                        message("news.green-operations-milestone-2025.highlight2", locale),
+                        message("news.green-operations-milestone-2025.highlight3", locale)
                 ),
-                "The milestone shows how operational discipline can quietly improve both cost control and brand trust at the same time.",
+                message("news.green-operations-milestone-2025.bodyImageCaption", locale),
                 List.of(
-                        "Publish a seasonal sustainability dashboard for guests and partners.",
-                        "Continue supplier reviews for lower-waste amenities.",
-                        "Integrate sustainability highlights into staff onboarding."
+                        message("news.green-operations-milestone-2025.next1", locale),
+                        message("news.green-operations-milestone-2025.next2", locale),
+                        message("news.green-operations-milestone-2025.next3", locale)
                 )
         ));
 
         articles.add(newsArticle(
                 "summer-chefs-table-weekend-announced",
-                "Summer Chef's Table Weekend Announced for Guests",
-                "A limited summer dining event will bring tasting menus, chef interaction, and curated beverage pairings to the hotel's signature restaurant.",
+                message("news.summer-chefs-table-weekend-announced.title", locale),
+                message("news.summer-chefs-table-weekend-announced.excerpt", locale),
                 "event",
                 "2025-06-01",
-                "01 June 2025",
-                "5 min read",
+                message("news.summer-chefs-table-weekend-announced.dateDisplay", locale),
+                message("news.summer-chefs-table-weekend-announced.readTime", locale),
                 "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1600&q=80",
                 "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1400&q=80",
-                "Seasonal event coverage from Gravity Hotel highlights curated moments that bring guests together around food, culture, and atmosphere.",
+                message("news.summer-chefs-table-weekend-announced.snapshot", locale),
                 List.of(
-                        "Gravity Hotel has announced a Summer Chef's Table Weekend that will transform its signature restaurant into an intimate tasting experience across two limited evenings.",
-                        "The event will feature a multi-course menu built around coastal ingredients, contemporary presentation, and direct storytelling from the culinary team.",
-                        "Guests can expect a more social dining format, with chef commentary between courses and pairing suggestions that match the seasonal menu.",
-                        "The weekend is designed to appeal to residents planning a special night out as well as in-house guests looking for a memorable culinary highlight."
+                        message("news.summer-chefs-table-weekend-announced.paragraph1", locale),
+                        message("news.summer-chefs-table-weekend-announced.paragraph2", locale),
+                        message("news.summer-chefs-table-weekend-announced.paragraph3", locale),
+                        message("news.summer-chefs-table-weekend-announced.paragraph4", locale)
                 ),
                 List.of(
-                        "Seating is intentionally limited to preserve an intimate and conversational atmosphere.",
-                        "The tasting menu will spotlight seasonal ingredients and chef-led plating moments.",
-                        "The event adds a stronger experiential layer to the hotel's dining calendar."
+                        message("news.summer-chefs-table-weekend-announced.highlight1", locale),
+                        message("news.summer-chefs-table-weekend-announced.highlight2", locale),
+                        message("news.summer-chefs-table-weekend-announced.highlight3", locale)
                 ),
-                "With special-format dining growing in demand, the Chef's Table weekend gives Gravity Hotel a more distinctive event identity.",
+                message("news.summer-chefs-table-weekend-announced.bodyImageCaption", locale),
                 List.of(
-                        "Open early booking priority for in-house premium guests.",
-                        "Promote the event through short-form social content and partner channels.",
-                        "Evaluate demand for future chef-led seasonal dinners."
+                        message("news.summer-chefs-table-weekend-announced.next1", locale),
+                        message("news.summer-chefs-table-weekend-announced.next2", locale),
+                        message("news.summer-chefs-table-weekend-announced.next3", locale)
                 )
         ));
 
         articles.add(newsArticle(
                 "rooftop-infinity-pool-city-view",
-                "Rooftop Infinity Pool Debuts with Panoramic City View",
-                "Guests can now enjoy a new rooftop pool experience designed for skyline lounging, sunset moments, and light all-day refreshment service.",
+                message("news.rooftop-infinity-pool-city-view.title", locale),
+                message("news.rooftop-infinity-pool-city-view.excerpt", locale),
                 "news",
                 "2025-06-25",
-                "25 June 2025",
-                "6 min read",
+                message("news.rooftop-infinity-pool-city-view.dateDisplay", locale),
+                message("news.rooftop-infinity-pool-city-view.readTime", locale),
                 "https://images.unsplash.com/photo-1572331165267-854da2b10ccc?auto=format&fit=crop&w=1600&q=80",
                 "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1400&q=80",
-                "The rooftop pool story follows how new leisure amenities are expanding the hotel's appeal beyond overnight stays alone.",
+                message("news.rooftop-infinity-pool-city-view.snapshot", locale),
                 List.of(
-                        "Gravity Hotel has introduced a rooftop infinity pool that pairs open skyline views with a quieter, resort-inspired atmosphere above the city.",
-                        "The space combines shallow lounge zones, wider deck seating, and a compact poolside refreshment menu that encourages guests to stay longer throughout the day.",
-                        "Architectural details were kept minimal and clean so the horizon remains the visual focus, especially during golden hour and evening light.",
-                        "Management expects the rooftop to become one of the hotel's most photographed guest spaces and a key part of premium stay packages."
+                        message("news.rooftop-infinity-pool-city-view.paragraph1", locale),
+                        message("news.rooftop-infinity-pool-city-view.paragraph2", locale),
+                        message("news.rooftop-infinity-pool-city-view.paragraph3", locale),
+                        message("news.rooftop-infinity-pool-city-view.paragraph4", locale)
                 ),
                 List.of(
-                        "The pool deck was designed for both active daytime use and softer sunset social moments.",
-                        "A lighter food and beverage concept supports longer leisure visits without crowding the space.",
-                        "The rooftop addition strengthens the hotel's lifestyle appeal for weekend stays."
+                        message("news.rooftop-infinity-pool-city-view.highlight1", locale),
+                        message("news.rooftop-infinity-pool-city-view.highlight2", locale),
+                        message("news.rooftop-infinity-pool-city-view.highlight3", locale)
                 ),
-                "The new amenity positions Gravity Hotel as a more experience-forward destination in the city staycation market.",
+                message("news.rooftop-infinity-pool-city-view.bodyImageCaption", locale),
                 List.of(
-                        "Bundle rooftop access into selected suite and wellness offers.",
-                        "Schedule sunset acoustic sessions during peak travel weekends.",
-                        "Track guest demand to refine service staffing at high-traffic hours."
+                        message("news.rooftop-infinity-pool-city-view.next1", locale),
+                        message("news.rooftop-infinity-pool-city-view.next2", locale),
+                        message("news.rooftop-infinity-pool-city-view.next3", locale)
                 )
         ));
 
         articles.add(newsArticle(
                 "excellent-service-award-2025",
-                "Gravity Hotel Receives Excellent Service Award 2025",
-                "The property earned a service-focused distinction after strong guest feedback on responsiveness, warmth, and overall reliability.",
+                message("news.excellent-service-award-2025.title", locale),
+                message("news.excellent-service-award-2025.excerpt", locale),
                 "achievement",
                 "2025-07-10",
-                "10 July 2025",
-                "7 min read",
+                message("news.excellent-service-award-2025.dateDisplay", locale),
+                message("news.excellent-service-award-2025.readTime", locale),
                 "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1600&q=80",
                 "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1400&q=80",
-                "Service stories at Gravity Hotel focus on the people, standards, and operational habits that shape guest trust over time.",
+                message("news.excellent-service-award-2025.snapshot", locale),
                 List.of(
-                        "Gravity Hotel has received the Excellent Service Award 2025 after an external review consolidated guest feedback from digital travel platforms and post-stay surveys.",
-                        "The distinction reflects consistent praise for fast support, friendly staff interactions, and a dependable experience across multiple departments.",
-                        "Guests repeatedly referenced how service teams stayed attentive without being intrusive, especially during arrivals, dining, and late-evening requests.",
-                        "Management noted that the recognition belongs not only to front-facing staff but also to housekeeping, engineering, and behind-the-scenes teams that keep service delivery smooth."
+                        message("news.excellent-service-award-2025.paragraph1", locale),
+                        message("news.excellent-service-award-2025.paragraph2", locale),
+                        message("news.excellent-service-award-2025.paragraph3", locale),
+                        message("news.excellent-service-award-2025.paragraph4", locale)
                 ),
                 List.of(
-                        "Review data emphasized responsiveness, tone of communication, and issue resolution speed.",
-                        "The award validates recent internal coaching and cross-department service standards.",
-                        "Recognition can help reinforce trust among future direct-booking guests."
+                        message("news.excellent-service-award-2025.highlight1", locale),
+                        message("news.excellent-service-award-2025.highlight2", locale),
+                        message("news.excellent-service-award-2025.highlight3", locale)
                 ),
-                "By investing in consistency instead of isolated premium gestures, Gravity Hotel continues to strengthen its reputation in a durable way.",
+                message("news.excellent-service-award-2025.bodyImageCaption", locale),
                 List.of(
-                        "Roll out recognition-based incentives for service teams.",
-                        "Use recent feedback trends to sharpen arrival and concierge moments.",
-                        "Turn award visibility into stronger loyalty messaging on direct channels."
+                        message("news.excellent-service-award-2025.next1", locale),
+                        message("news.excellent-service-award-2025.next2", locale),
+                        message("news.excellent-service-award-2025.next3", locale)
                 )
         ));
 

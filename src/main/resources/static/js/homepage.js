@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ================== CODE BOOK SHELF ==================
   const shelf = document.getElementById("bookShelf");
   if (shelf) {
-    const services = [
+    const services = window.homepageMessages?.bookShelfServices || [
       {
         title: "Luxury Spa & Wellness",
         desc: "Relax with professional spa treatments and wellness services.",

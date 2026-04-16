@@ -90,10 +90,24 @@
   font-size: 14px;
 }
 
+.sort-order button i {
+  color: inherit;
+  transition: color 0.3s;
+}
+
 .sort-order button.active {
   background: #667eea;
   border-color: #667eea;
   color: white;
+}
+
+.sort-order button:not(.active) {
+  color: #6c757d;
+}
+
+.sort-order button:not(.active):hover {
+  border-color: #cfd6f6;
+  color: #667eea;
 }
 
 /* Status Filter Circles */

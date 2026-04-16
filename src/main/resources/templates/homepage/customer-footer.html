@@ -3,7 +3,7 @@
     <div class="customer-footer-shell">
       <div class="customer-footer-brand">
         <h2>Gravity Hotel</h2>
-        <p>
+        <p th:text="#{footer.tagline}">
           Skyline comfort, polished service, and memorable stays designed for
           modern travelers.
         </p>
@@ -15,25 +15,25 @@
       </div>
 
       <div class="customer-footer-links">
-        <h3>Explore</h3>
-        <a th:href="@{/rooms}">Rooms</a>
-        <a th:href="@{/services}">Services</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/gravity-news}">News</a>
-        <a th:href="@{/contact}">Contact</a>
+        <h3 th:text="#{footer.explore}">Explore</h3>
+        <a th:href="@{/rooms}" th:text="#{navbar.room}">Rooms</a>
+        <a th:href="@{/services}" th:text="#{navbar.services}">Services</a>
+        <a th:href="@{/about}" th:text="#{navbar.about}">About</a>
+        <a th:href="@{/gravity-news}" th:text="#{navbar.news}">News</a>
+        <a th:href="@{/contact}" th:text="#{navbar.contact}">Contact</a>
       </div>
 
       <div class="customer-footer-contact">
-        <h3>Contact</h3>
-        <p><i class="fas fa-map-marker-alt"></i> 123 Luxury Street, Da Nang</p>
+        <h3 th:text="#{footer.contact}">Contact</h3>
+        <p><i class="fas fa-map-marker-alt"></i> <span th:text="#{footer.address}">123 Luxury Street, Da Nang</span></p>
         <p><i class="fas fa-phone-alt"></i> +84 123 456 789</p>
         <p><i class="fas fa-envelope"></i> info@gravityhotel.com</p>
       </div>
     </div>
 
     <div class="customer-footer-bottom">
-      <p>&copy; 2026 Gravity Hotel. Da dang ky ban quyen.</p>
-      <p>Crafted for exceptional guest journeys.</p>
+      <p th:text="#{footer.copy}">&copy; 2026 Gravity Hotel. All rights reserved.</p>
+      <p th:text="#{footer.crafted}">Crafted for exceptional guest journeys.</p>
     </div>
   </footer>
 </div>

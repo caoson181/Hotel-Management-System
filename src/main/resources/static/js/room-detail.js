@@ -162,6 +162,15 @@ function t(key) {
   return i18nRooms?.[key] || i18nAmenities?.[key] || i18n?.[key] || key || "";
 }
 
+function reviewStarsLabel(count) {
+  const suffix = Number(count) === 1 ? t("review.starSuffix.one") : t("review.starSuffix.other");
+  return `${count} ${suffix}`;
+}
+
+function reviewCountLabel(count) {
+  return `${count} ${t("review.countSuffix")}`;
+}
+
 function formatVND(number) {
   return Number(number || 0).toLocaleString("vi-VN") + " d";
 }
@@ -282,7 +291,7 @@ async function loadSimilarPrices() {
       const data = await fetchRepresentativeRoom(item.type, item.rank);
       const priceEl = document.getElementById(`price-${item.rank}-${item.type}`);
       if (priceEl) {
-        priceEl.textContent = `${formatVND(data.price)} /night`;
+        priceEl.textContent = `${formatVND(data.price)} ${t("room.night")}`;
       }
     } catch (error) {
       console.error("Error loading similar price", error);
@@ -309,6 +318,12 @@ function initRoomData() {
   const roomMeta = document.querySelector(".hero-overlay .room-meta");
   const amenitiesGrid = document.querySelector(".amenities-grid");
   const descCard = document.querySelector(".description-card div");
+  const addRoomBtn = document.getElementById("addRoomBtn");
+  const similarMeta = {
+    "price-superior-twin": t("room.similar.superiorTwin.meta"),
+    "price-executive-double": t("room.similar.executiveSuite.meta"),
+    "price-suite-family": t("room.similar.presidentialSuite.meta"),
+  };
 
   if (heroTitle) {
     heroTitle.textContent = `${String(window.roomRank || "").toUpperCase()} ${window.roomType || "Room"}`.trim();
@@ -316,10 +331,14 @@ function initRoomData() {
 
   if (roomMeta) {
     roomMeta.innerHTML = `
-      <span><i class="fas fa-user"></i> ${roomInfo.guests} Guests</span>
+      <span><i class="fas fa-user"></i> ${roomInfo.guests} ${t("booking.guestCount")}</span>
       <span><i class="fas fa-ruler-combined"></i> ${roomInfo.size} m2</span>
       <span><i class="fas fa-star" style="color: #d4af37;"></i> ${Number(reviewState.averageRating || 0).toFixed(1)} (${reviewState.totalReviews || 0})</span>
     `;
+  }
+
+  if (addRoomBtn) {
+    addRoomBtn.textContent = t("room.add");
   }
 
   if (amenitiesGrid) {
@@ -331,6 +350,13 @@ function initRoomData() {
   if (descCard) {
     descCard.innerHTML = `<p>${t(roomInfo.description)}</p>`;
   }
+
+  Object.entries(similarMeta).forEach(([priceId, metaText]) => {
+    const metaEl = document.getElementById(priceId)?.previousElementSibling;
+    if (metaEl && metaText) {
+      metaEl.textContent = metaText;
+    }
+  });
 }
 
 function renderStarsMarkup(rating) {
@@ -374,8 +400,8 @@ function applyReviewSummary(data) {
   if (averageRatingNote) {
     averageRatingNote.textContent =
       reviewState.totalReviews > 0
-        ? `${reviewState.totalReviews} review${reviewState.totalReviews > 1 ? "s" : ""}`
-        : "No ratings yet";
+        ? reviewCountLabel(reviewState.totalReviews)
+        : t("review.noRatings");
   }
   if (reviewCountTitle) {
     reviewCountTitle.textContent = String(reviewState.totalReviews);
@@ -402,7 +428,7 @@ async function loadReviews() {
   try {
     const response = await fetch(`/api/room-comments?type=${encodeURIComponent(pageType)}&rank=${encodeURIComponent(pageRank)}`);
     if (!response.ok) {
-      throw new Error("Could not load reviews.");
+      throw new Error(t("review.form.error"));
     }
     const data = await response.json();
     applyReviewSummary(data);
@@ -430,8 +456,9 @@ function getFilteredReviews() {
 }
 
 function createReviewItemMarkup(review) {
-  const safeAuthorName = escapeHtml(review.authorName || "Guest");
-  const safeAuthorInitial = escapeHtml(review.authorInitial || "G");
+  const fallbackGuest = t("review.guest");
+  const safeAuthorName = escapeHtml(review.authorName || fallbackGuest);
+  const safeAuthorInitial = escapeHtml(review.authorInitial || fallbackGuest.charAt(0) || "G");
   const safeCreatedAtText = escapeHtml(review.createdAtText || "");
   const safeContent = escapeHtml(review.content || "");
   const avatar = review.avatarUrl
@@ -448,7 +475,7 @@ function createReviewItemMarkup(review) {
             <span>${safeCreatedAtText}</span>
           </div>
         </div>
-        <div class="review-rating" aria-label="${review.rating} stars">
+        <div class="review-rating" aria-label="${reviewStarsLabel(review.rating)}">
           ${renderStarsMarkup(review.rating)}
         </div>
       </div>
@@ -469,8 +496,8 @@ function renderReviewsList() {
     list.innerHTML = "";
     empty.style.display = "block";
     empty.textContent = reviewState.totalReviews
-      ? "No reviews match the selected filter."
-      : "No reviews yet. Be the first to comment on this room.";
+      ? t("review.empty.filtered")
+      : t("review.empty.none");
     return;
   }
 
@@ -504,11 +531,11 @@ function setReviewFormMessage(message, mode = "") {
 
 async function submitReview() {
   if (!window.isLoggedIn) {
-    setReviewFormMessage("Please log in with a customer account to send a review.", "error");
+    setReviewFormMessage(t("review.form.login"), "error");
     return;
   }
   if (!selectedReviewRating) {
-    setReviewFormMessage("Please choose a star rating before sending.", "error");
+    setReviewFormMessage(t("review.form.chooseRating"), "error");
     return;
   }
 
@@ -517,7 +544,7 @@ async function submitReview() {
   const content = String(contentEl?.value || "").trim();
 
   if (!content) {
-    setReviewFormMessage("Please write your comment before sending.", "error");
+    setReviewFormMessage(t("review.form.writeComment"), "error");
     return;
   }
 
@@ -525,7 +552,7 @@ async function submitReview() {
     if (submitBtn) {
       submitBtn.disabled = true;
     }
-    setReviewFormMessage("Sending review...");
+    setReviewFormMessage(t("review.form.sending"));
 
     const response = await fetch("/api/room-comments", {
       method: "POST",
@@ -542,7 +569,7 @@ async function submitReview() {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(errorText || "Could not send review.");
+      throw new Error(errorText || t("review.form.error"));
     }
 
     const data = await response.json();
@@ -551,10 +578,10 @@ async function submitReview() {
       contentEl.value = "";
     }
     setSelectedReviewRating(0);
-    setReviewFormMessage("Review sent successfully.", "success");
+    setReviewFormMessage(t("review.form.sent"), "success");
   } catch (error) {
     console.error(error);
-    setReviewFormMessage(error.message || "Could not send review.", "error");
+    setReviewFormMessage(error.message || t("review.form.error"), "error");
   } finally {
     if (submitBtn) {
       submitBtn.disabled = false;
@@ -758,19 +785,19 @@ async function refreshAvailability() {
 
   if (!checkin || !checkout || !pageType || !pageRank) {
     updateAvailabilityBox(
-      "Select dates to check availability",
-      "Availability will be calculated for the exact date range you choose.",
+      t("room.availability.selectTitle"),
+      t("room.availability.selectText"),
     );
     return;
   }
 
   if (checkin < getTodayString()) {
-    updateAvailabilityBox("Invalid check-in date", "Check-in date cannot be in the past.", "unavailable");
+    updateAvailabilityBox(t("room.availability.invalidCheckinTitle"), t("room.availability.invalidCheckinText"), "unavailable");
     return;
   }
 
   if (checkout <= checkin) {
-    updateAvailabilityBox("Invalid date range", "Check-out must be after check-in.", "unavailable");
+    updateAvailabilityBox(t("room.availability.invalidRangeTitle"), t("room.availability.invalidRangeText"), "unavailable");
     return;
   }
 
@@ -789,22 +816,22 @@ async function refreshAvailability() {
 
     if (availabilityState.available) {
       updateAvailabilityBox(
-        `${availabilityState.availableCount} room(s) available`,
-        "This room type is available for the selected dates.",
+        `${availabilityState.availableCount} ${t("room.availability.availableSuffix")}`,
+        t("room.availability.availableText"),
         "available",
       );
     } else {
       updateAvailabilityBox(
-        "No rooms available",
-        "This room type and rank are sold out for the selected dates.",
+        t("room.availability.unavailableTitle"),
+        t("room.availability.unavailableText"),
         "unavailable",
       );
     }
   } catch (error) {
     console.error(error);
     updateAvailabilityBox(
-      "Availability unavailable",
-      "Could not check room availability right now.",
+      t("room.availability.errorTitle"),
+      t("room.availability.errorText"),
       "unavailable",
     );
   }
@@ -877,11 +904,11 @@ function loadCartUI() {
             <div class="cart-item-body">
               <h4>${room.name}</h4>
               <div class="cart-item-meta">
-                <span><i class="fas fa-user"></i> ${room.guests || guestCount} guests</span>
+                <span><i class="fas fa-user"></i> ${room.guests || guestCount} ${t("booking.guestCount")}</span>
                 ${room.size ? `<span><i class="fas fa-ruler-combined"></i> ${room.size} m²</span>` : ""}
               </div>
               <div class="cart-item-price">
-                ${room.draft ? room.priceText || "Select dates to calculate total" : formatVND(room.price)}
+                ${room.draft ? room.priceText || t("room.availability.selectTitle") : formatVND(room.price)}
               </div>
               ${
                 room.draft
@@ -908,7 +935,7 @@ function loadCartUI() {
                     : ""
                 }
                 <button class="btn-remove-cart" data-id="${room.id}">
-                  <i class="fas fa-trash"></i> Remove
+                  <i class="fas fa-trash"></i> ${t("booking.remove")}
                 </button>
               </div>
             </div>
@@ -932,16 +959,16 @@ function buildCartItem() {
   const checkout = document.getElementById("checkout")?.value;
 
   if (!checkin || !checkout) {
-    throw new Error("Please select check-in and check-out dates.");
+    throw new Error(t("room.availability.selectTitle"));
   }
   if (checkin < getTodayString()) {
-    throw new Error("Check-in date cannot be in the past.");
+    throw new Error(t("room.availability.invalidCheckinText"));
   }
   if (checkout <= checkin) {
-    throw new Error("Check-out must be after check-in.");
+    throw new Error(t("room.availability.invalidRangeText"));
   }
   if (!availabilityState.loaded || !availabilityState.available) {
-    throw new Error("No rooms available for the selected dates.");
+    throw new Error(t("room.availability.unavailableTitle"));
   }
 
   const nights = Math.ceil((new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24));
@@ -1014,7 +1041,7 @@ async function checkoutCart(payMode) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(errorText || "Checkout failed");
+    throw new Error(errorText || t("room.availability.errorText"));
   }
 
   const result = await response.json();
@@ -1033,7 +1060,7 @@ async function checkoutCart(payMode) {
 
   localStorage.removeItem("cart");
   loadCartUI();
-  showToast("Booking saved successfully. Staff will assign the room(s) later.");
+  showToast(t("booking.saved"));
 }
 
 function initBookingCard() {
@@ -1086,7 +1113,7 @@ function initBookingCard() {
     try {
       addCurrentRoomToCart();
     } catch (error) {
-      alert(error.message || "Could not add room to cart.");
+      alert(error.message || t("booking.added"));
     }
   });
 
@@ -1099,7 +1126,7 @@ function initBookingCard() {
       const returnUrl = buildRoomDetailUrl(pageRank, pageType);
       window.location.href = `/checkout/payment?returnUrl=${encodeURIComponent(returnUrl)}`;
     } catch (error) {
-      alert(error.message || "Could not start payment.");
+      alert(error.message || t("room.availability.errorText"));
     }
   });
 
@@ -1110,7 +1137,7 @@ function initBookingCard() {
       }
       await checkoutCart("PAY_LATER");
     } catch (error) {
-      alert(error.message || "Checkout failed.");
+      alert(error.message || t("room.availability.errorText"));
     }
   });
 

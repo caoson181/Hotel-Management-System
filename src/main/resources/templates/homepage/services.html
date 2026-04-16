@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Our Services - Gravity Hotel</title>
+    <title th:text="#{services.page.title}">Our Services - Gravity Hotel</title>
 
     <link rel="stylesheet" th:href="@{/css/homepage.css}" />
     <link rel="stylesheet" th:href="@{/css/customer-theme.css}" />
@@ -26,9 +26,9 @@
     <section class="service-page-hero service-page-hero-list">
       <div class="service-page-hero-overlay"></div>
       <div class="service-page-hero-content">
-        <span class="service-page-hero-label">Gravity Hotel</span>
-        <h1>Signature Services & Wellness Spaces</h1>
-        <p>
+        <span class="service-page-hero-label" th:text="#{services.page.label}">Gravity Hotel</span>
+        <h1 th:text="#{services.page.heading}">Signature Services & Wellness Spaces</h1>
+        <p th:text="#{services.page.description}">
           Discover restorative rituals, leisure facilities, fitness experiences,
           and dining moments designed to make every stay feel more complete.
         </p>
@@ -64,7 +64,7 @@
                   <i
                     th:class="${itemStat.index % 2 == 1} ? 'fas fa-arrow-left' : 'fas fa-arrow-right'"
                   ></i>
-                  <span>View Details</span>
+                  <span th:text="#{services.viewDetails}">View Details</span>
                 </div>
               </a>
             </div>

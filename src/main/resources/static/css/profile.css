@@ -671,6 +671,15 @@
 .security-row-card span {
   font-weight: 700;
   color: #35547a;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.security-status-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: fit-content;
 }
 
 .settings-summary-card {

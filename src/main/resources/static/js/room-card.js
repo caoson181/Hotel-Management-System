@@ -1,4 +1,14 @@
 // room-showcase.js - Fixed syntax error
+const currentFlagEl = document.getElementById("currentFlag");
+const currentLang = (
+    new URLSearchParams(window.location.search).get("lang") ||
+    (currentFlagEl?.className.includes("fi-vn") ? "vi" : "") ||
+    document.documentElement.lang ||
+    "en"
+).toLowerCase();
+
+const isVietnamese = currentLang.startsWith("vi");
+
 const roomData = [
     {
         rank: "STANDARD",
@@ -138,6 +148,116 @@ const roomData = [
         ]
     }
 ];
+
+if (isVietnamese) {
+    const viContent = {
+        STANDARD: {
+            name: "Phòng Standard",
+            shortInfo: [
+                { icon: "fas fa-ruler-combined", text: "Diện tích: 30m²" },
+                { icon: "fas fa-bed", text: "1 giường queen hoặc 2 giường đơn" },
+                { icon: "fas fa-wifi", text: "WiFi tốc độ cao miễn phí" }
+            ],
+            longDesc: "Phòng ấm cúng và tiện nghi với thiết kế hiện đại, phù hợp cho khách đi một mình hoặc các cặp đôi. Trang bị bàn làm việc, TV màn hình phẳng và phòng tắm riêng với vòi sen cao cấp.",
+            amenities: [
+                { icon: "fas fa-wifi", text: "WiFi miễn phí" },
+                { icon: "fas fa-tv", text: "TV LED 32 inch" },
+                { icon: "fas fa-snowflake", text: "Điều hòa không khí" },
+                { icon: "fas fa-shower", text: "Vòi sen cao cấp" },
+                { icon: "fas fa-coffee", text: "Máy pha trà/cà phê" },
+                { icon: "fas fa-shield-alt", text: "Két an toàn điện tử" }
+            ]
+        },
+        SUPERIOR: {
+            name: "Phòng Superior",
+            shortInfo: [
+                { icon: "fas fa-ruler-combined", text: "Diện tích: 50m²" },
+                { icon: "fas fa-bed", text: "1 giường king" },
+                { icon: "fas fa-city", text: "Hướng nhìn thành phố" }
+            ],
+            longDesc: "Phòng rộng rãi với cửa sổ lớn và tầm nhìn thành phố ấn tượng. Có khu vực ghế ngồi thoải mái, minibar và tiện nghi phòng tắm được nâng cấp.",
+            amenities: [
+                { icon: "fas fa-wifi", text: "WiFi tốc độ cao" },
+                { icon: "fas fa-tv", text: "Smart TV 4K 43 inch" },
+                { icon: "fas fa-snowflake", text: "Điều hòa kiểm soát nhiệt độ" },
+                { icon: "fas fa-bath", text: "Bồn tắm và vòi sen" },
+                { icon: "fas fa-glass-cheers", text: "Mini bar" },
+                { icon: "fas fa-city", text: "Cửa sổ hướng phố" },
+                { icon: "fas fa-couch", text: "Khu vực ghế ngồi" }
+            ]
+        },
+        DELUXE: {
+            name: "Phòng Deluxe",
+            shortInfo: [
+                { icon: "fas fa-ruler-combined", text: "Diện tích: 60m²" },
+                { icon: "fas fa-bed", text: "1 giường king + sofa bed" },
+                { icon: "fas fa-tree", text: "Ban công hướng vườn" }
+            ],
+            longDesc: "Phòng sang trọng với ban công riêng nhìn ra khu vườn nhiệt đới. Có khu vực tiếp khách riêng, chăn ga cao cấp và phòng tắm deluxe với bồn tắm.",
+            amenities: [
+                { icon: "fas fa-wifi", text: "WiFi cao cấp" },
+                { icon: "fas fa-tv", text: "Smart TV 4K 55 inch" },
+                { icon: "fas fa-snowflake", text: "Điều hòa điều chỉnh riêng" },
+                { icon: "fas fa-bath", text: "Bồn tắm và vòi sen riêng" },
+                { icon: "fas fa-glass-cheers", text: "Minibar miễn phí" },
+                { icon: "fas fa-tree", text: "Ban công hướng vườn" },
+                { icon: "fas fa-couch", text: "Phòng khách có sofa" },
+                { icon: "fas fa-tshirt", text: "Áo choàng và dép đi trong phòng" }
+            ]
+        },
+        EXECUTIVE: {
+            name: "Phòng Executive",
+            shortInfo: [
+                { icon: "fas fa-ruler-combined", text: "Diện tích: 80m²" },
+                { icon: "fas fa-briefcase", text: "Khu làm việc + tiếp khách" },
+                { icon: "fas fa-cocktail", text: "Quyền vào executive lounge" }
+            ],
+            longDesc: "Thiết kế dành cho khách doanh nhân với khu làm việc chuyên biệt và không gian họp nhỏ. Bao gồm quyền sử dụng Executive Lounge cùng đồ uống miễn phí.",
+            amenities: [
+                { icon: "fas fa-wifi", text: "WiFi doanh nhân tốc độ cao" },
+                { icon: "fas fa-tv", text: "Smart TV 4K 65 inch" },
+                { icon: "fas fa-snowflake", text: "Điều hòa cao cấp" },
+                { icon: "fas fa-bath", text: "Vòi sen mưa và bồn tắm" },
+                { icon: "fas fa-glass-cheers", text: "Minibar đầy đủ" },
+                { icon: "fas fa-briefcase", text: "Bàn làm việc executive" },
+                { icon: "fas fa-crown", text: "Quyền vào executive lounge" },
+                { icon: "fas fa-utensils", text: "Bao gồm bữa sáng" },
+                { icon: "fas fa-tshirt", text: "Tiện nghi phòng tắm cao cấp" }
+            ]
+        },
+        SUITE: {
+            name: "Phòng Suite",
+            shortInfo: [
+                { icon: "fas fa-ruler-combined", text: "Diện tích: 100m²" },
+                { icon: "fas fa-bed", text: "1 giường king + phòng khách riêng" },
+                { icon: "fas fa-hot-tub", text: "Jacuzzi + sân hiên riêng" }
+            ],
+            longDesc: "Trải nghiệm nghỉ dưỡng đỉnh cao với khu tiếp khách và phòng ăn riêng, sân hiên riêng có tầm nhìn toàn cảnh thành phố cùng phòng tắm sang trọng với jacuzzi và vòi sen mưa.",
+            amenities: [
+                { icon: "fas fa-wifi", text: "WiFi siêu tốc" },
+                { icon: "fas fa-tv", text: "TV OLED 4K 75 inch + soundbar" },
+                { icon: "fas fa-snowflake", text: "Điều hòa đa vùng" },
+                { icon: "fas fa-hot-tub", text: "Jacuzzi riêng" },
+                { icon: "fas fa-wine-glass-alt", text: "Minibar cao cấp & tủ rượu" },
+                { icon: "fas fa-utensils", text: "Dịch vụ ăn uống tại phòng" },
+                { icon: "fas fa-crown", text: "Dịch vụ quản gia" },
+                { icon: "fas fa-tree", text: "Sân hiên riêng nhìn toàn cảnh" },
+                { icon: "fas fa-couch", text: "Phòng khách & phòng ăn riêng" },
+                { icon: "fas fa-tshirt", text: "Áo choàng và dép thiết kế riêng" },
+                { icon: "fas fa-spa", text: "Bộ sản phẩm phòng tắm cao cấp" }
+            ]
+        }
+    };
+
+    roomData.forEach((room) => {
+        const translated = viContent[room.rank];
+        if (!translated) return;
+        room.name = translated.name;
+        room.shortInfo = translated.shortInfo;
+        room.longDesc = translated.longDesc;
+        room.amenities = translated.amenities;
+    });
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     // Elements

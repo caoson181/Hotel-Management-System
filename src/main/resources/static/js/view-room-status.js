@@ -16,6 +16,7 @@ const itemsPerPage = 10;
 // =======================
 document.addEventListener("DOMContentLoaded", () => {
     loadRooms();
+    updateSortOrderButtons();
 
     document.getElementById("searchInput")?.addEventListener("input", (e) => {
         searchTerm = e.target.value.toLowerCase();
@@ -30,11 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("sortAsc")?.addEventListener("click", () => {
         currentSort.order = "asc";
+        updateSortOrderButtons();
         renderTable();
     });
 
     document.getElementById("sortDesc")?.addEventListener("click", () => {
         currentSort.order = "desc";
+        updateSortOrderButtons();
         renderTable();
     });
 
@@ -76,6 +79,15 @@ function formatCurrency(value) {
         style: "currency",
         currency: "VND"
     }).format(value);
+}
+
+function updateSortOrderButtons() {
+    const sortAscBtn = document.getElementById("sortAsc");
+    const sortDescBtn = document.getElementById("sortDesc");
+    if (!sortAscBtn || !sortDescBtn) return;
+
+    sortAscBtn.classList.toggle("active", currentSort.order === "asc");
+    sortDescBtn.classList.toggle("active", currentSort.order === "desc");
 }
 
 // =======================

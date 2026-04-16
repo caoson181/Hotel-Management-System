@@ -82,7 +82,10 @@
             aria-pressed="false"
           >
             <i class="fa fa-moon" id="themeToggleIcon"></i>
-            <span id="themeToggleText">Dark</span>
+            <span
+              id="themeToggleText"
+              th:text="${#locale.language == 'vi'} ? 'Tối' : 'Dark'"
+            >Dark</span>
           </button>
         </li>
 
@@ -92,20 +95,20 @@
             id="notificationBtn"
             type="button"
             aria-expanded="false"
-            aria-label="Notifications"
+            th:aria-label="#{notification.title}"
           >
             <i class="fa fa-bell"></i>
             <span class="notification-badge hidden" id="notificationBadge">0</span>
           </button>
           <div class="notification-dropdown" id="notificationDropdown">
             <div class="notification-header">
-              <span>Notifications</span>
-              <button type="button" class="notification-clear-btn" id="notificationClearBtn">
+              <span th:text="#{notification.title}">Notifications</span>
+              <button type="button" class="notification-clear-btn" id="notificationClearBtn" th:text="#{notification.clear}">
                 Clear
               </button>
             </div>
             <div class="notification-list" id="notificationList"></div>
-            <div class="notification-empty" id="notificationEmpty">
+            <div class="notification-empty" id="notificationEmpty" th:text="#{notification.empty}">
               No notifications yet.
             </div>
           </div>
@@ -166,6 +169,22 @@
     const notificationList = document.getElementById("notificationList");
     const notificationEmpty = document.getElementById("notificationEmpty");
     const notificationClearBtn = document.getElementById("notificationClearBtn");
+    const notificationMessages = {
+      title: /*[[#{notification.title}]]*/ "Notifications",
+      empty: /*[[#{notification.empty}]]*/ "No notifications yet.",
+      clear: /*[[#{notification.clear}]]*/ "Clear",
+      bookingCreated: /*[[#{notification.booking.created}]]*/ "Booking created successfully",
+      bookingMessage: /*[[#{notification.booking.message}]]*/ "Your booking for {0} from {1} to {2} was recorded successfully.",
+      codeLabel: /*[[#{notification.booking.codeLabel}]]*/ "Code: {0} | {1}",
+      statusPaid: /*[[#{notification.status.paid}]]*/ "PAID",
+      statusUnpaid: /*[[#{notification.status.unpaid}]]*/ "UNPAID",
+      roomSingle: /*[[#{notification.room.single}]]*/ "room",
+      roomPlural: /*[[#{notification.room.plural}]]*/ "rooms",
+      amountSuffix: /*[[#{notification.amount.suffix}]]*/ "VND",
+      na: /*[[#{notification.na}]]*/ "N/A",
+    };
+    const themeToggleLabelDark = /*[[${#locale.language == 'vi'} ? 'Tối' : 'Dark']]*/ "Dark";
+    const themeToggleLabelLight = /*[[${#locale.language == 'vi'} ? 'Sáng' : 'Light']]*/ "Light";
 
     const NOTIFICATION_STORAGE_KEY = "gravity.notifications";
     const NOTIFICATION_AUTO_OPEN_KEY = "gravity.notifications.autoOpen";
@@ -185,7 +204,7 @@
       }
 
       if (themeToggleText) {
-        themeToggleText.textContent = isDark ? "Light" : "Dark";
+        themeToggleText.textContent = isDark ? themeToggleLabelLight : themeToggleLabelDark;
       }
     }
 
@@ -308,7 +327,7 @@
     }
 
     function formatNotificationAmount(amount) {
-      return `${Number(amount || 0).toLocaleString("vi-VN")} VND`;
+      return `${Number(amount || 0).toLocaleString("vi-VN")} ${notificationMessages.amountSuffix}`;
     }
 
     function formatNotificationDateTime(value) {
@@ -325,8 +344,99 @@
     }
 
     function shortenGroupCode(groupCode) {
-      if (!groupCode) return "N/A";
+      if (!groupCode) return notificationMessages.na;
       return String(groupCode).slice(0, 8).toUpperCase();
+    }
+
+    function replacePlaceholders(template, ...values) {
+      return String(template ?? "").replace(/\{(\d+)\}/g, (_, index) => values[Number(index)] ?? "");
+    }
+
+    function normalizeNotificationStatus(status) {
+      const normalizedStatus = String(status || "").toUpperCase();
+      if (normalizedStatus === "PAID") return notificationMessages.statusPaid;
+      if (normalizedStatus === "UNPAID") return notificationMessages.statusUnpaid;
+      return normalizedStatus || notificationMessages.statusUnpaid;
+    }
+
+    function getLocalizedBookingLabel(roomCount) {
+      const count = Math.max(1, Number(roomCount || 0));
+      const roomLabel = count === 1 ? notificationMessages.roomSingle : notificationMessages.roomPlural;
+      return `${count} ${roomLabel}`;
+    }
+
+    function parseLegacyBookingMessage(message) {
+      const normalizedMessage = String(message || "").trim();
+      const englishMatch = normalizedMessage.match(
+        /^Your booking for (\d+) room(?:\(s\))? from (\d{4}-\d{2}-\d{2}) to (\d{4}-\d{2}-\d{2}) was recorded successfully\.$/
+      );
+
+      if (englishMatch) {
+        return {
+          roomCount: Number(englishMatch[1]),
+          checkIn: englishMatch[2],
+          checkOut: englishMatch[3],
+        };
+      }
+
+      const vietnameseMatch = normalizedMessage.match(
+        /^Đặt phòng cho (\d+) phòng từ (\d{4}-\d{2}-\d{2}) đến (\d{4}-\d{2}-\d{2}) đã được ghi nhận thành công\.$/
+      );
+
+      if (vietnameseMatch) {
+        return {
+          roomCount: Number(vietnameseMatch[1]),
+          checkIn: vietnameseMatch[2],
+          checkOut: vietnameseMatch[3],
+        };
+      }
+
+      return null;
+    }
+
+    function resolveNotificationTitle(item) {
+      if (item.type === "booking-success" || item.title === "Booking created successfully") {
+        return notificationMessages.bookingCreated;
+      }
+      return item.title || notificationMessages.bookingCreated;
+    }
+
+    function resolveNotificationMessage(item) {
+      if (item.type === "booking-success") {
+        return replacePlaceholders(
+          notificationMessages.bookingMessage,
+          getLocalizedBookingLabel(item.roomCount),
+          item.checkIn || "",
+          item.checkOut || ""
+        );
+      }
+      const legacyBookingMessage = parseLegacyBookingMessage(item.message);
+      if (legacyBookingMessage) {
+        return replacePlaceholders(
+          notificationMessages.bookingMessage,
+          getLocalizedBookingLabel(legacyBookingMessage.roomCount),
+          legacyBookingMessage.checkIn,
+          legacyBookingMessage.checkOut
+        );
+      }
+      return item.message || "";
+    }
+
+    function resolveNotificationCodeLabel(item) {
+      if (item.type === "booking-success") {
+        return replacePlaceholders(
+          notificationMessages.codeLabel,
+          shortenGroupCode(item.groupCode),
+          normalizeNotificationStatus(item.status)
+        );
+      }
+      if (item.codeLabel) {
+        return String(item.codeLabel)
+          .replace(/^Code:/, notificationMessages.codeLabel.split("{0}")[0].trimEnd())
+          .replace(/\bPAID\b/g, notificationMessages.statusPaid)
+          .replace(/\bUNPAID\b/g, notificationMessages.statusUnpaid);
+      }
+      return item.codeLabel || "";
     }
 
     function renderNotifications() {
@@ -355,10 +465,10 @@
                 <i class="fa fa-bed"></i>
               </div>
               <div class="notification-content">
-                <strong>${escapeHtml(item.title || "Booking created successfully")}</strong>
-                <p>${escapeHtml(item.message || "")}</p>
+                <strong>${escapeHtml(resolveNotificationTitle(item))}</strong>
+                <p>${escapeHtml(resolveNotificationMessage(item))}</p>
                 <div class="notification-meta">
-                  <span>${escapeHtml(item.codeLabel || "")}</span>
+                  <span>${escapeHtml(resolveNotificationCodeLabel(item))}</span>
                   <time>${escapeHtml(formatNotificationDateTime(item.createdAt))}</time>
                 </div>
                 <div class="notification-amount">${escapeHtml(
@@ -381,9 +491,15 @@
       const notifications = readNotifications();
       notifications.unshift({
         id: notification.id || `${Date.now()}`,
-        title: notification.title || "Booking created successfully",
+        type: notification.type || "",
+        title: notification.title || "",
         message: notification.message || "",
         codeLabel: notification.codeLabel || "",
+        status: notification.status || "",
+        roomCount: notification.roomCount || 0,
+        checkIn: notification.checkIn || "",
+        checkOut: notification.checkOut || "",
+        groupCode: notification.groupCode || "",
         amount: notification.amount || 0,
         createdAt: notification.createdAt || new Date().toISOString(),
         read: false,
@@ -412,13 +528,16 @@
       addBookingSuccessNotification(payload) {
         if (!payload) return;
 
-        const roomCount = Number(payload.roomCount || 0);
-        const bookingLabel = roomCount === 1 ? "1 room" : `${roomCount} room(s)`;
-
         addNotification({
-          title: "Booking created successfully",
-          message: `Your booking for ${bookingLabel} from ${payload.checkIn} to ${payload.checkOut} was recorded successfully.`,
-          codeLabel: `Code: ${shortenGroupCode(payload.groupCode)} | ${payload.status || "UNPAID"}`,
+          type: "booking-success",
+          title: "",
+          message: "",
+          codeLabel: "",
+          status: payload.status || "UNPAID",
+          roomCount: payload.roomCount || 0,
+          checkIn: payload.checkIn || "",
+          checkOut: payload.checkOut || "",
+          groupCode: payload.groupCode || "",
           amount: payload.totalAmount || 0,
           createdAt: payload.createdAt,
         });

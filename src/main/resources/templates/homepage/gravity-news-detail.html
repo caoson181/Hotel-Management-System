@@ -19,7 +19,7 @@
         <div class="news-article-topline">
             <a th:href="@{/gravity-news}" class="news-back-link">
                 <i class="fas fa-arrow-left"></i>
-                <span>Back to News</span>
+                <span th:text="#{news.backToNews}">Back to News</span>
             </a>
             <span class="news-pill" th:text="${#strings.toUpperCase(article.category)}">ACHIEVEMENT</span>
         </div>
@@ -42,7 +42,7 @@
                     </section>
 
                     <section class="news-content-card news-section-panel">
-                        <h2>Key Highlights</h2>
+                        <h2 th:text="#{news.keyHighlights}">Key Highlights</h2>
                         <div class="news-section-inner">
                             <ul class="news-bullet-list">
                                 <li th:each="item : ${article.highlights}" th:text="${item}"></li>
@@ -56,7 +56,7 @@
                     </figure>
 
                     <section class="news-content-card news-section-panel news-section-panel-last">
-                        <h2>What Comes Next</h2>
+                        <h2 th:text="#{news.whatComesNext}">What Comes Next</h2>
                         <div class="news-section-inner">
                             <ul class="news-bullet-list">
                                 <li th:each="step : ${article.nextSteps}" th:text="${step}"></li>
@@ -68,12 +68,12 @@
 
             <aside class="news-article-sidebar">
                 <section class="news-sidebar-card">
-                    <h3>Story Snapshot</h3>
+                    <h3 th:text="#{news.storySnapshot}">Story Snapshot</h3>
                     <p th:text="${article.snapshot}"></p>
                 </section>
 
                 <section class="news-sidebar-card">
-                    <h3>More From Gravity</h3>
+                    <h3 th:text="#{news.moreFromGravity}">More From Gravity</h3>
                     <a class="news-related-item" th:each="item : ${relatedArticles}" th:href="@{/gravity-news/{slug}(slug=${item.slug})}">
                         <img th:src="${item.coverImage}" th:alt="${item.title}">
                         <div>

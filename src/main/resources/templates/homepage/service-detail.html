@@ -40,7 +40,7 @@
         <div class="service-detail-content-wrap">
           <a th:href="@{/services}" class="service-back-btn">
             <i class="fas fa-arrow-left"></i>
-            <span>Back</span>
+            <span th:text="#{services.back}">Back</span>
           </a>
 
           <article class="service-banner-card">
@@ -89,11 +89,11 @@
 
               <div class="service-detail-meta">
                 <div class="service-detail-meta-card">
-                  <span>Opening Hours</span>
+                  <span th:text="#{services.openingHours}">Opening Hours</span>
                   <strong th:text="${service.openingHours}"></strong>
                 </div>
                 <div class="service-detail-meta-card">
-                  <span>Location</span>
+                  <span th:text="#{services.location}">Location</span>
                   <strong th:text="${service.location}"></strong>
                 </div>
               </div>
@@ -111,8 +111,8 @@
 
           <section class="service-related service-related-panel">
             <div class="section-heading">
-              <span>Explore More</span>
-              <h2>Other experiences at Gravity Hotel</h2>
+              <span th:text="#{services.exploreMore}">Explore More</span>
+              <h2 th:text="#{services.otherExperiences}">Other experiences at Gravity Hotel</h2>
             </div>
 
             <div class="service-related-grid">

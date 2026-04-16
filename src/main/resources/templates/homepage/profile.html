@@ -1,9 +1,9 @@
 ﻿<!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Profile - Gravity Hotel</title>
+  <title th:text="${#locale.language == 'vi'} ? 'Hồ sơ của tôi - Gravity Hotel' : 'My Profile - Gravity Hotel'">My Profile - Gravity Hotel</title>
   <link rel="stylesheet" th:href="@{/css/homepage.css}" />
   <link rel="stylesheet" th:href="@{/css/customer-theme.css}" />
   <link rel="stylesheet" th:href="@{/css/contact.css}" />
@@ -20,8 +20,8 @@
 <section class="contact-hero profile-hero">
   <div class="overlay"></div>
   <div class="container hero-content">
-    <h1 class="title-anim">My Profile</h1>
-    <p>Manage your account information, wallet, bookings, and preferences.</p>
+    <h1 class="title-anim">Hồ sơ của tôi</h1>
+    <p>Quản lý thông tin tài khoản, ví, đặt phòng và các tùy chọn cá nhân.</p>
   </div>
 </section>
 
@@ -62,81 +62,83 @@
 
           <div th:if="${user == null}">
             <div class="profile-avatar-large">U</div>
-            <div class="profile-name">Guest</div>
+            <div class="profile-name">Khách</div>
           </div>
 
           <div class="member-benefit-box">
             <div class="member-benefit-icon"><i class="fas fa-star"></i></div>
             <div>
-              <strong>Member Benefits</strong>
-              <p>Member benefits are active for your account.</p>
+              <strong id="memberBenefitTitle"
+                      th:text="${#locale.language == 'vi'} ? 'Quyền lợi thành viên' : 'Member Benefits'">Member Benefits</strong>
+              <p id="memberBenefitText"
+                 th:text="${#locale.language == 'vi'} ? 'Các quyền lợi thành viên đang được áp dụng cho tài khoản của bạn.' : 'Member benefits are active for your account.'">Member benefits are active for your account.</p>
             </div>
           </div>
 
           <div class="profile-stats">
             <div class="tier-stat-card level-card">
               <span th:text="${memberLevel}"></span>
-              <small>Level</small>
+              <small id="memberLevelLabel" th:text="${#locale.language == 'vi'} ? 'Cấp độ' : 'Level'">Level</small>
             </div>
             <div class="tier-stat-card rank-card">
               <span th:text="${customerRank}"></span>
-              <small>Rank</small>
+              <small id="memberRankLabel" th:text="${#locale.language == 'vi'} ? 'Hạng' : 'Rank'">Rank</small>
             </div>
           </div>
 
           <div class="profile-summary-actions">
-            <button class="btn-primary" type="button" id="upgradePlanBtn">Upgrade Plan</button>
+            <button class="btn-primary" type="button" id="upgradePlanBtn">Nâng hạng thành viên</button>
           </div>
         </aside>
 
         <div class="profile-details-card">
-          <button type="button" class="profile-breadcrumb" id="profileBreadcrumb">Account</button>
+          <button type="button" class="profile-breadcrumb" id="profileBreadcrumb">Tài khoản</button>
 
           <section class="profile-panel is-active" data-panel="overview">
             <div class="profile-overview-list">
               <button type="button" class="account-nav-card" data-tab-target="profile">
                 <div class="account-nav-card__icon icon-profile"><i class="fas fa-id-badge"></i></div>
                 <div class="account-nav-card__content">
-                  <h3>Profile</h3>
-                  <p>Open your personal details, membership, and account overview.</p>
+                  <h3>Hồ sơ</h3>
+                  <p>Mở thông tin cá nhân, thành viên và tổng quan tài khoản của bạn.</p>
                 </div>
-                <div class="account-nav-card__meta">Open</div>
+                <div class="account-nav-card__meta">Mở</div>
               </button>
 
               <button type="button" class="account-nav-card" data-tab-target="wallet">
                 <div class="account-nav-card__icon icon-wallet"><i class="fas fa-wallet"></i></div>
                 <div class="account-nav-card__content">
-                  <h3>Wallet &amp; Transactions</h3>
-                  <p th:text="${wallet != null ? #numbers.formatDecimal(wallet.balance != null ? wallet.balance.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND available' : '0 VND available'}"></p>
+                  <h3>Ví &amp; giao dịch</h3>
+                  <p th:text="${wallet != null ? #numbers.formatDecimal(wallet.balance != null ? wallet.balance.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND khả dụng' : '0 VND khả dụng'}"></p>
                 </div>
-                <div class="account-nav-card__meta" th:text="${bookingCount + ' txns'}"></div>
+                <div class="account-nav-card__meta" th:text="${bookingCount + ' giao dịch'}"></div>
               </button>
 
               <button type="button" class="account-nav-card" data-tab-target="bookings">
                 <div class="account-nav-card__icon icon-booking"><i class="fas fa-receipt"></i></div>
                 <div class="account-nav-card__content">
-                  <h3>Booking &amp; Refunds</h3>
-                  <p th:text="${pendingBookingCount + ' pending · ' + cancelledBookingCount + ' cancelled'}"></p>
+                  <h3>Đặt phòng &amp; hoàn tiền</h3>
+                  <p th:text="${pendingBookingCount + ' đang chờ · ' + cancelledBookingCount + ' đã hủy'}"></p>
                 </div>
-                <div class="account-nav-card__meta" th:text="${bookingCount + ' bookings'}"></div>
+                <div class="account-nav-card__meta" th:text="${bookingCount + ' đơn đặt phòng'}"></div>
               </button>
 
               <button type="button" class="account-nav-card" data-tab-target="membership">
                 <div class="account-nav-card__icon icon-membership"><i class="fas fa-crown"></i></div>
                 <div class="account-nav-card__content">
-                  <h3>Membership Center</h3>
-                  <p>View your level, rank, progress, and current service privileges.</p>
+                  <h3>Trung tâm thành viên</h3>
+                  <p>Xem cấp độ, hạng, tiến trình và các quyền lợi dịch vụ hiện tại của bạn.</p>
                 </div>
-                <div class="account-nav-card__meta">Open</div>
+                <div class="account-nav-card__meta">Mở</div>
               </button>
 
               <button type="button" class="account-nav-card" data-tab-target="coupons">
                 <div class="account-nav-card__icon icon-privileges"><i class="fas fa-ticket-alt"></i></div>
                 <div class="account-nav-card__content">
-                  <h3>My Coupons</h3>
-                  <p>Browse frontend coupon perks currently unlocked by your rank.</p>
+                  <h3>Mã ưu đãi của tôi</h3>
+                  <p>Xem các ưu đãi hiện đang được mở khóa theo hạng thành viên của bạn.</p>
                 </div>
-                <div class="account-nav-card__meta">Open</div>
+                <div class="account-nav-card__meta">Mở</div>
               </button>
             </div>
 
@@ -144,21 +146,21 @@
               <div class="settings-summary-head">
                 <div class="settings-summary-icon"><i class="fas fa-sliders-h"></i></div>
                 <div class="settings-summary-copy">
-                  <h3>Security &amp; Settings</h3>
-                  <p>Email, password, and profile preferences</p>
+                  <h3>Bảo mật &amp; cài đặt</h3>
+                  <p>Email, mật khẩu và tùy chọn hồ sơ</p>
                 </div>
               </div>
 
               <div class="settings-summary-actions">
                 <button type="button" class="settings-link-card" data-tab-target="settings">
                   <div class="settings-link-card__icon"><i class="fas fa-sliders-h"></i></div>
-                  <span>General Settings</span>
+                  <span>Cài đặt chung</span>
                   <i class="fas fa-chevron-right"></i>
                 </button>
 
                 <button type="button" class="settings-link-card" data-tab-target="security">
                   <div class="settings-link-card__icon settings-link-card__icon--security"><i class="fas fa-shield-alt"></i></div>
-                  <span>Security</span>
+                  <span>Bảo mật</span>
                   <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
@@ -168,16 +170,16 @@
           <section class="profile-panel" data-panel="profile">
             <div class="panel-header">
               <div>
-                <h3>Account Details</h3>
-                <p>Manage personal info &amp; security</p>
+                <h3>Chi tiết tài khoản</h3>
+                <p>Quản lý thông tin cá nhân &amp; bảo mật</p>
               </div>
-              <button type="button" class="btn-secondary" id="editBtn">Edit</button>
+              <button type="button" class="btn-secondary" id="editBtn">Chỉnh sửa</button>
             </div>
 
             <form th:action="@{/profile/update}" method="post" id="profileEditForm">
               <div class="profile-table">
                 <div class="row">
-                  <div>Name</div>
+                  <div>Họ tên</div>
                   <div>
                     <span class="view-mode" th:text="${user.fullName}"></span>
                     <input class="edit-mode" type="text" name="fullName" th:value="${user.fullName}" hidden />
@@ -193,7 +195,7 @@
                 </div>
 
                 <div class="row">
-                  <div>Phone</div>
+                  <div>Số điện thoại</div>
                   <div>
                     <span class="view-mode" th:text="${user.phoneNumber}"></span>
                     <input class="edit-mode" type="text" name="phoneNumber" th:value="${user.phoneNumber}" hidden />
@@ -201,29 +203,29 @@
                 </div>
 
                 <div class="row">
-                  <div>Gender</div>
-                  <div th:text="${user.gender != null and !#strings.isEmpty(user.gender) ? user.gender : 'Not set'}"></div>
+                  <div>Giới tính</div>
+                  <div th:text="${user.gender != null and !#strings.isEmpty(user.gender) ? user.gender : 'Chưa cập nhật'}"></div>
                 </div>
 
                 <div class="row">
-                  <div>Username</div>
+                  <div>Tên đăng nhập</div>
                   <div th:text="${user.username}"></div>
                 </div>
 
                 <div class="row">
-                  <div>Role</div>
+                  <div>Vai trò</div>
                   <div th:text="${user.role}"></div>
                 </div>
 
                 <div class="row">
-                  <div>Membership</div>
+                  <div>Thành viên</div>
                   <div th:text="${memberLevel + ' / ' + customerRank}"></div>
                 </div>
               </div>
 
               <div class="action-row">
-                <button type="submit" class="cta-button" id="saveBtn" hidden>Save Changes</button>
-                <button type="button" class="btn-secondary" id="cancelEditBtn" hidden>Cancel</button>
+                <button type="submit" class="cta-button" id="saveBtn" hidden>Lưu thay đổi</button>
+                <button type="button" class="btn-secondary" id="cancelEditBtn" hidden>Hủy</button>
               </div>
             </form>
           </section>
@@ -231,42 +233,42 @@
           <section class="profile-panel" data-panel="wallet">
             <div class="panel-header">
               <div>
-                <h3>Wallet &amp; Transactions</h3>
-                <p>View your wallet balance, payment codes, and recent activity.</p>
+                <h3>Ví &amp; giao dịch</h3>
+                <p>Xem số dư ví, mã thanh toán và hoạt động gần đây.</p>
               </div>
             </div>
 
             <div class="wallet-grid">
               <article class="info-stat-card info-stat-card--wide">
-                <span class="info-stat-card__label">Wallet Balance</span>
+                <span class="info-stat-card__label">Số dư ví</span>
                 <strong th:text="${wallet != null ? #numbers.formatDecimal(wallet.balance != null ? wallet.balance.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND' : '0 VND'}"></strong>
-                <p>Tracked only for online payments and refunds in the system.</p>
+                <p>Chỉ ghi nhận cho thanh toán trực tuyến và hoàn tiền trong hệ thống.</p>
               </article>
 
               <article class="info-stat-card">
-                <span class="info-stat-card__label">VNPay Code</span>
-                <strong th:text="${wallet != null and wallet.vnpayCode != null and !#strings.isEmpty(wallet.vnpayCode) ? wallet.vnpayCode : 'N/A'}"></strong>
-                <span class="info-stat-card__label secondary-label">MoMo Code</span>
-                <strong th:text="${wallet != null and wallet.momoCode != null and !#strings.isEmpty(wallet.momoCode) ? wallet.momoCode : 'N/A'}"></strong>
+                <span class="info-stat-card__label">Mã VNPay</span>
+                <strong th:text="${wallet != null and wallet.vnpayCode != null and !#strings.isEmpty(wallet.vnpayCode) ? wallet.vnpayCode : 'Chưa có'}"></strong>
+                <span class="info-stat-card__label secondary-label">Mã MoMo</span>
+                <strong th:text="${wallet != null and wallet.momoCode != null and !#strings.isEmpty(wallet.momoCode) ? wallet.momoCode : 'Chưa có'}"></strong>
               </article>
 
               <article class="info-stat-card info-stat-card--compact">
-                <span class="info-stat-card__label">Total Transactions</span>
+                <span class="info-stat-card__label">Tổng giao dịch</span>
                 <strong th:text="${bookingCount}"></strong>
               </article>
 
               <article class="info-stat-card info-stat-card--compact">
-                <span class="info-stat-card__label">Refund Records</span>
+                <span class="info-stat-card__label">Lượt hoàn tiền</span>
                 <strong th:text="${refundRecordCount}"></strong>
               </article>
             </div>
 
-            <div class="empty-state-box" th:if="${#lists.isEmpty(bookingHistory)}">No transaction history yet.</div>
+            <div class="empty-state-box" th:if="${#lists.isEmpty(bookingHistory)}">Chưa có lịch sử giao dịch.</div>
             <div class="compact-history-list" th:if="${!#lists.isEmpty(bookingHistory)}">
               <article class="compact-history-item" th:each="b, iter : ${bookingHistory}" th:if="${iter.index < 3}">
                 <div>
-                  <h4 th:text="${'Booking #' + b.id}"></h4>
-                  <p th:text="${b.groupCode != null ? b.groupCode : 'No group code'}"></p>
+                  <h4 th:text="${'Đơn đặt #' + b.id}"></h4>
+                  <p th:text="${b.groupCode != null ? b.groupCode : 'Không có mã nhóm'}"></p>
                 </div>
                 <div class="compact-history-summary">
                   <strong th:text="${#numbers.formatDecimal(b.totalAmount != null ? b.totalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></strong>
@@ -279,17 +281,17 @@
           <section class="profile-panel" data-panel="membership">
             <div class="panel-header">
               <div>
-                <h3>Membership Center</h3>
-                <p>Frontend preview of your membership level, rank progress, and service privileges.</p>
+                <h3>Trung tâm thành viên</h3>
+                <p>Xem trước cấp độ thành viên, tiến trình thăng hạng và quyền lợi dịch vụ của bạn.</p>
               </div>
             </div>
 
             <section class="profile-membership-center" id="profileMembershipCenter">
               <div class="membership-hero-card">
                 <div>
-                  <span class="profile-privileges-label">Frontend Preview</span>
-                  <h3 id="membershipHeroTitle">Membership Overview</h3>
-                  <p id="membershipHeroText">Preview your current level, rank, and upcoming benefits.</p>
+                  <span class="profile-privileges-label">Bản xem trước</span>
+                  <h3 id="membershipHeroTitle">Tổng quan thành viên</h3>
+                  <p id="membershipHeroText">Xem trước cấp độ hiện tại, hạng và các quyền lợi sắp mở khóa.</p>
                 </div>
                 <div class="membership-hero-badge" id="membershipHeroBadge">Bronze / Normal</div>
               </div>
@@ -297,8 +299,8 @@
               <div class="membership-center-grid">
                 <article class="membership-progress-card">
                   <div class="privilege-title-row">
-                    <span class="privilege-kicker">Upgrade Progress</span>
-                    <strong id="membershipProgressTitle">Progress to next tier</strong>
+                    <span class="privilege-kicker">Tiến trình nâng hạng</span>
+                    <strong id="membershipProgressTitle">Tiến độ đến mốc tiếp theo</strong>
                   </div>
                   <p class="membership-progress-copy" id="membershipProgressCopy"></p>
                   <div class="membership-progress-track">
@@ -312,24 +314,24 @@
 
                 <article class="membership-summary-card">
                   <div class="privilege-title-row">
-                    <span class="privilege-kicker">Current Status</span>
-                    <strong>Membership Snapshot</strong>
+                    <span class="privilege-kicker">Trạng thái hiện tại</span>
+                    <strong>Tóm tắt thành viên</strong>
                   </div>
                   <div class="membership-summary-grid">
                     <div class="membership-stat-box">
-                      <label>Level</label>
+                      <label>Cấp độ</label>
                       <strong id="membershipLevelValue">Bronze</strong>
                     </div>
                     <div class="membership-stat-box">
-                      <label>Rank</label>
+                      <label>Hạng</label>
                       <strong id="membershipRankValue">Normal</strong>
                     </div>
                     <div class="membership-stat-box">
-                      <label>Total Spent</label>
+                      <label>Tổng chi tiêu</label>
                       <strong id="membershipSpentValue">0 VND</strong>
                     </div>
                     <div class="membership-stat-box">
-                      <label>Unlocked Coupons</label>
+                      <label>Mã ưu đãi đã mở</label>
                       <strong id="membershipCouponCount">0</strong>
                     </div>
                   </div>
@@ -339,8 +341,8 @@
               <div class="profile-privileges-card profile-privileges-card--panel">
                 <div class="profile-privileges-head">
                   <div>
-                    <span class="profile-privileges-label">Level Services</span>
-                    <h3 id="levelPrivilegeTitle">Service policies by level</h3>
+                    <span class="profile-privileges-label">Dịch vụ theo cấp độ</span>
+                    <h3 id="levelPrivilegeTitle">Chính sách dịch vụ theo cấp độ</h3>
                   </div>
                   <i class="fas fa-concierge-bell"></i>
                 </div>
@@ -350,8 +352,8 @@
 
               <div class="membership-next-card">
                 <div>
-                  <span class="privilege-kicker">Next Unlock</span>
-                  <strong id="membershipNextTitle">Next membership milestone</strong>
+                  <span class="privilege-kicker">Mốc kế tiếp</span>
+                  <strong id="membershipNextTitle">Mốc thành viên tiếp theo</strong>
                   <p id="membershipNextCopy"></p>
                 </div>
                 <div class="membership-next-pills" id="membershipNextPills"></div>
@@ -362,16 +364,16 @@
           <section class="profile-panel" data-panel="coupons">
             <div class="panel-header">
               <div>
-                <h3>My Coupons</h3>
-                <p>Frontend preview of coupon perks unlocked based on your current rank.</p>
+                <h3>Mã ưu đãi của tôi</h3>
+                <p>Xem trước các mã ưu đãi được mở khóa theo hạng hiện tại của bạn.</p>
               </div>
             </div>
 
             <section class="profile-privileges-card profile-privileges-card--panel" id="profileCouponsPanel">
               <div class="profile-privileges-head">
                 <div>
-                  <span class="profile-privileges-label">Rank Coupons</span>
-                  <h3 id="rankPrivilegeTitle">Coupons by rank</h3>
+                  <span class="profile-privileges-label">Ưu đãi theo hạng</span>
+                  <h3 id="rankPrivilegeTitle">Mã ưu đãi theo hạng</h3>
                 </div>
                 <i class="fas fa-ticket-alt"></i>
               </div>
@@ -383,8 +385,8 @@
           <section class="profile-panel" data-panel="bookings">
             <div class="panel-header">
               <div>
-                <h3>Booking History</h3>
-                <p>Review reservations, refunds, and cancellation actions.</p>
+                <h3>Lịch sử đặt phòng</h3>
+                <p>Xem lại các đơn đặt, khoản hoàn tiền và thao tác hủy.</p>
               </div>
             </div>
 
@@ -392,8 +394,8 @@
               <div class="history-booking-card" th:each="b : ${bookingHistory}">
                 <div class="history-booking-header">
                   <div>
-                    <h4 th:text="${'Booking #' + b.id}"></h4>
-                    <p th:text="${'Group: ' + (b.groupCode != null ? b.groupCode : 'N/A')}"></p>
+                    <h4 th:text="${'Đơn đặt #' + b.id}"></h4>
+                    <p th:text="${'Nhóm: ' + (b.groupCode != null ? b.groupCode : 'Chưa có')}"></p>
                   </div>
                 <div class="history-booking-summary">
                   <span class="history-status" th:text="${b.status}"></span>
@@ -412,13 +414,13 @@
                                  data-payment-mode=${b.paymentMode},
                                  data-refund-amount=${b.previewRefundAmount},
                                  data-cancellation-fee=${b.previewCancellationFee}">
-                  Cancel Booking
+                  Hủy đơn đặt
                 </button>
                 <div class="history-booking-finance" th:if="${(b.refundAmount != null and b.refundAmount.doubleValue() > 0) or (b.cancellationFee != null and b.cancellationFee.doubleValue() > 0)}">
                   <span th:if="${b.refundAmount != null and b.refundAmount.doubleValue() > 0}"
-                        th:text="${'Refunded: ' + #numbers.formatDecimal(b.refundAmount.doubleValue(),0,'COMMA',0,'POINT') + ' VND'}"></span>
+                        th:text="${'Đã hoàn: ' + #numbers.formatDecimal(b.refundAmount.doubleValue(),0,'COMMA',0,'POINT') + ' VND'}"></span>
                   <span th:if="${b.cancellationFee != null and b.cancellationFee.doubleValue() > 0}"
-                        th:text="${'Cancellation fee: ' + #numbers.formatDecimal(b.cancellationFee.doubleValue(),0,'COMMA',0,'POINT') + ' VND'}"></span>
+                        th:text="${'Phí hủy: ' + #numbers.formatDecimal(b.cancellationFee.doubleValue(),0,'COMMA',0,'POINT') + ' VND'}"></span>
                 </div>
               </div>
 
@@ -427,32 +429,32 @@
                     <div class="history-detail-image">
                       <img
                         src="https://via.placeholder.com/320x180?text=Room"
-                        alt="Room image"
+                        alt="Ảnh phòng"
                         th:attr="data-rank=${detail.roomRank},data-type=${detail.roomType}" />
                     </div>
                     <div class="history-detail-body">
                       <div class="history-detail-title-row">
                         <h5 th:text="${detail.roomRank + ' ' + detail.roomType}"></h5>
-                        <span class="history-detail-room" th:text="${'Room ' + detail.roomNumber}"></span>
+                        <span class="history-detail-room" th:text="${'Phòng ' + detail.roomNumber}"></span>
                       </div>
 
                       <div class="history-detail-meta">
-                        <span th:text="${'Price/night: ' + #numbers.formatDecimal(detail.price != null ? detail.price.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
-                        <span th:text="${'Final: ' + #numbers.formatDecimal(detail.finalAmount != null ? detail.finalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
+                        <span th:text="${'Giá/đêm: ' + #numbers.formatDecimal(detail.price != null ? detail.price.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
+                        <span th:text="${'Thành tiền: ' + #numbers.formatDecimal(detail.finalAmount != null ? detail.finalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
                       </div>
 
                       <div class="history-detail-dates">
                         <div>
-                          <label>Stay</label>
+                          <label>Thời gian lưu trú</label>
                           <strong th:text="${detail.checkIn + ' -> ' + detail.checkOut}"></strong>
                         </div>
                         <div>
-                          <label>Actual Check-out</label>
+                          <label>Ngày trả phòng thực tế</label>
                           <strong th:text="${detail.actualCheckOut != null ? detail.actualCheckOut : '--'}"></strong>
                         </div>
                         <div>
-                          <label>Status</label>
-                          <strong th:text="${detail.status != null && !#strings.isEmpty(detail.status) ? detail.status : 'ASSIGNED'}"></strong>
+                          <label>Trạng thái</label>
+                          <strong th:text="${detail.status != null && !#strings.isEmpty(detail.status) ? detail.status : 'ĐÃ XẾP PHÒNG'}"></strong>
                         </div>
                       </div>
 
@@ -465,7 +467,7 @@
                                          data-payment-mode=${b.paymentMode},
                                          data-refund-amount=${detail.previewRefundAmount},
                                          data-cancellation-fee=${detail.previewCancellationFee}">
-                          Cancel This Room
+                          Hủy phòng này
                         </button>
                       </div>
                     </div>
@@ -474,29 +476,29 @@
               </div>
             </div>
 
-            <div class="empty-state-box" th:if="${#lists.isEmpty(bookingHistory)}">No booking history yet.</div>
+            <div class="empty-state-box" th:if="${#lists.isEmpty(bookingHistory)}">Chưa có lịch sử đặt phòng.</div>
           </section>
 
           <section class="profile-panel" data-panel="settings">
             <div class="panel-header">
               <div>
-                <h3>Security &amp; Settings</h3>
-                <p>Manage account protection and personalize how this profile page looks and behaves.</p>
+                <h3>Bảo mật &amp; cài đặt</h3>
+                <p>Quản lý bảo mật tài khoản và cá nhân hóa cách hiển thị của trang hồ sơ.</p>
               </div>
             </div>
 
             <div class="settings-detail-card settings-detail-card--plain">
-              <div class="settings-badge">Settings</div>
-              <h4>Customize your experience</h4>
-              <p>Adjust language and choose between light mode or dark mode.</p>
+              <div class="settings-badge">Cài đặt</div>
+              <h4>Tùy chỉnh trải nghiệm của bạn</h4>
+              <p>Điều chỉnh ngôn ngữ và chọn giữa chế độ sáng hoặc tối.</p>
 
               <div class="settings-option-box">
-                <h5>Language</h5>
-                <p>Choose the display language for your current session.</p>
+                <h5>Ngôn ngữ</h5>
+                <p>Chọn ngôn ngữ hiển thị cho phiên hiện tại.</p>
                 <div class="settings-pill-group">
                   <button type="button" class="settings-pill settings-pill--lang" th:classappend="${#locale.language == 'en'} ? ' is-active'" onclick="profileChangeLang('en')">
                     <span class="fi fi-gb"></span>
-                    <span>English</span>
+                    <span>Tiếng Anh</span>
                   </button>
                   <button type="button" class="settings-pill settings-pill--lang" th:classappend="${#locale.language == 'vi'} ? ' is-active'" onclick="profileChangeLang('vi')">
                     <span class="fi fi-vn"></span>
@@ -506,11 +508,11 @@
               </div>
 
               <div class="settings-option-box">
-                <h5>Appearance</h5>
-                <p>Switch between a bright interface and a dark profile workspace.</p>
+                <h5>Giao diện</h5>
+                <p>Chuyển đổi giữa giao diện sáng và không gian hồ sơ tối.</p>
                 <div class="settings-pill-group">
-                  <button type="button" class="settings-pill settings-pill--theme" data-theme-value="light">Light</button>
-                  <button type="button" class="settings-pill settings-pill--theme" data-theme-value="dark">Dark</button>
+                  <button type="button" class="settings-pill settings-pill--theme" data-theme-value="light">Sáng</button>
+                  <button type="button" class="settings-pill settings-pill--theme" data-theme-value="dark">Tối</button>
                 </div>
               </div>
             </div>
@@ -519,38 +521,38 @@
           <section class="profile-panel" data-panel="security">
             <div class="panel-header">
               <div>
-                <h3>Security &amp; Settings</h3>
-                <p>Manage account protection and personalize how this profile page looks and behaves.</p>
+                <h3>Bảo mật &amp; cài đặt</h3>
+                <p>Quản lý bảo mật tài khoản và cá nhân hóa cách hiển thị của trang hồ sơ.</p>
               </div>
             </div>
 
             <div class="settings-detail-card settings-detail-card--plain">
-              <div class="settings-badge">Security</div>
-              <h4>Protect your account</h4>
-              <p>Password actions and important account-related preferences.</p>
+              <div class="settings-badge">Bảo mật</div>
+              <h4>Bảo vệ tài khoản của bạn</h4>
+              <p>Các thao tác về mật khẩu và tùy chọn quan trọng liên quan đến tài khoản.</p>
 
               <button type="button" class="security-row-card" id="securityPasswordBtn">
                 <div>
-                  <h5>Password &amp; Security</h5>
-                  <p>Change your current password and keep your account protected.</p>
+                  <h5>Mật khẩu &amp; bảo mật</h5>
+                  <p>Đổi mật khẩu hiện tại và giữ an toàn cho tài khoản của bạn.</p>
                 </div>
-                <span>Open</span>
+                <span>Mở</span>
               </button>
 
               <div class="security-row-card static-card">
                 <div>
-                  <h5>Email Preferences</h5>
-                  <p>Booking confirmations, refund updates, and membership notices are enabled.</p>
+                  <h5>Tùy chọn email</h5>
+                  <p>Thông báo xác nhận đặt phòng, cập nhật hoàn tiền và thông tin thành viên đang được bật.</p>
                 </div>
-                <span>Enabled</span>
+                <span class="security-status-text">Đã bật</span>
               </div>
 
               <div class="security-row-card static-card">
                 <div>
-                  <h5>Contact Preferences</h5>
-                  <p>Your current phone number is used for payment verification and booking support.</p>
+                  <h5>Tùy chọn liên hệ</h5>
+                  <p>Số điện thoại hiện tại của bạn được dùng để xác thực thanh toán và hỗ trợ đặt phòng.</p>
                 </div>
-                <span th:text="${user.phoneNumber != null ? user.phoneNumber : 'Not set'}"></span>
+                <span th:text="${user.phoneNumber != null ? user.phoneNumber : 'Chưa cập nhật'}"></span>
               </div>
             </div>
           </section>
@@ -564,45 +566,45 @@
   <div class="modals-content profile-password-content">
     <button type="button" class="profile-password-close" id="closeModal">&times;</button>
     <div class="profile-password-head">
-      <span class="profile-password-badge">Security</span>
-      <h3>Change Password</h3>
-      <p>Use a strong password with letters and numbers to keep your account protected.</p>
+      <span class="profile-password-badge">Bảo mật</span>
+      <h3>Đổi mật khẩu</h3>
+      <p>Sử dụng mật khẩu mạnh gồm chữ cái và số để bảo vệ tài khoản của bạn.</p>
     </div>
 
     <div class="password-field">
-      <input type="password" id="currentPassword" placeholder="Current Password">
+      <input type="password" id="currentPassword" placeholder="Mật khẩu hiện tại">
       <i class="fa fa-eye toggle-password" data-target="currentPassword"></i>
     </div>
 
     <div class="password-field">
-      <input type="password" id="newPassword" placeholder="New Password">
+      <input type="password" id="newPassword" placeholder="Mật khẩu mới">
       <i class="fa fa-eye toggle-password" data-target="newPassword"></i>
     </div>
 
     <div id="passwordHint" class="hint"></div>
 
     <div class="password-field">
-      <input type="password" id="confirmPassword" placeholder="Confirm New Password">
+      <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu mới">
       <i class="fa fa-eye toggle-password" data-target="confirmPassword"></i>
     </div>
 
     <div id="confirmHint" class="hint"></div>
 
-    <button class="profile-password-submit" onclick="submitChangePassword()">Update Password</button>
+    <button class="profile-password-submit" onclick="submitChangePassword()">Cập nhật mật khẩu</button>
   </div>
 </div>
 
 <div id="historyModal" class="booking-history-modal">
   <div class="booking-history-content">
     <span class="close-btn" id="closeHistory">&times;</span>
-    <h3>Booking History</h3>
+    <h3>Lịch sử đặt phòng</h3>
 
     <div class="history-booking-list" th:if="${!#lists.isEmpty(bookingHistory)}">
       <div class="history-booking-card" th:each="b : ${bookingHistory}">
         <div class="history-booking-header">
           <div>
-            <h4 th:text="${'Booking #' + b.id}"></h4>
-            <p th:text="${'Group: ' + (b.groupCode != null ? b.groupCode : 'N/A')}"></p>
+            <h4 th:text="${'Đơn đặt #' + b.id}"></h4>
+            <p th:text="${'Nhóm: ' + (b.groupCode != null ? b.groupCode : 'Chưa có')}"></p>
           </div>
           <div class="history-booking-summary">
             <span class="history-status" th:text="${b.status}"></span>
@@ -616,32 +618,32 @@
             <div class="history-detail-image">
               <img
                 src="https://via.placeholder.com/320x180?text=Room"
-                alt="Room image"
+                alt="Ảnh phòng"
                 th:attr="data-rank=${detail.roomRank},data-type=${detail.roomType}" />
             </div>
             <div class="history-detail-body">
               <div class="history-detail-title-row">
                 <h5 th:text="${detail.roomRank + ' ' + detail.roomType}"></h5>
-                <span class="history-detail-room" th:text="${'Room ' + detail.roomNumber}"></span>
+                <span class="history-detail-room" th:text="${'Phòng ' + detail.roomNumber}"></span>
               </div>
 
               <div class="history-detail-meta">
-                <span th:text="${'Price/night: ' + #numbers.formatDecimal(detail.price != null ? detail.price.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
-                <span th:text="${'Final: ' + #numbers.formatDecimal(detail.finalAmount != null ? detail.finalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
+                <span th:text="${'Giá/đêm: ' + #numbers.formatDecimal(detail.price != null ? detail.price.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
+                <span th:text="${'Thành tiền: ' + #numbers.formatDecimal(detail.finalAmount != null ? detail.finalAmount.doubleValue() : 0,0,'COMMA',0,'POINT') + ' VND'}"></span>
               </div>
 
               <div class="history-detail-dates">
                 <div>
-                  <label>Stay</label>
+                  <label>Thời gian lưu trú</label>
                   <strong th:text="${detail.checkIn + ' -> ' + detail.checkOut}"></strong>
                 </div>
                 <div>
-                  <label>Actual Check-out</label>
+                  <label>Ngày trả phòng thực tế</label>
                   <strong th:text="${detail.actualCheckOut != null ? detail.actualCheckOut : '--'}"></strong>
                 </div>
                 <div>
-                  <label>Status</label>
-                  <strong th:text="${detail.status != null && !#strings.isEmpty(detail.status) ? detail.status : 'ASSIGNED'}"></strong>
+                  <label>Trạng thái</label>
+                  <strong th:text="${detail.status != null && !#strings.isEmpty(detail.status) ? detail.status : 'ĐÃ XẾP PHÒNG'}"></strong>
                 </div>
               </div>
             </div>
@@ -651,7 +653,7 @@
     </div>
 
     <div class="history-empty-state" th:if="${#lists.isEmpty(bookingHistory)}">
-      No booking history yet.
+      Chưa có lịch sử đặt phòng.
     </div>
   </div>
 </div>
@@ -659,13 +661,13 @@
 <div id="upgradePlanModal" class="booking-history-modal">
   <div class="booking-history-content upgrade-plan-content">
     <span class="close-btn" id="closeUpgradePlan">&times;</span>
-    <h3>Upgrade Progress</h3>
+    <h3>Tiến trình nâng hạng</h3>
     <div class="upgrade-plan-summary"
          th:attr="data-total-spent=${totalSpent != null ? totalSpent.doubleValue() : 0},data-member-level=${memberLevel},data-customer-rank=${customerRank}">
       <div class="upgrade-tier-badge" th:text="${memberLevel + ' / ' + customerRank}"></div>
-      <p class="upgrade-plan-text" id="upgradePlanText">Your spending progress toward the next membership tier.</p>
+      <p class="upgrade-plan-text" id="upgradePlanText">Tiến độ chi tiêu của bạn để đạt mốc thành viên tiếp theo.</p>
       <div class="upgrade-amount-row">
-        <span>Total spent</span>
+        <span>Tổng chi tiêu</span>
         <strong th:text="${totalSpent != null ? #numbers.formatDecimal(totalSpent.doubleValue(),0,'COMMA',0,'POINT') + ' VND' : '0 VND'}"></strong>
       </div>
       <div class="upgrade-progress-track">
@@ -682,43 +684,43 @@
 <div id="cancelBookingModal" class="booking-history-modal">
   <div class="booking-history-content cancel-booking-content">
     <span class="close-btn" id="closeCancelBooking">&times;</span>
-    <h3 id="cancelBookingTitle">Booking Cancellation Policy</h3>
+    <h3 id="cancelBookingTitle">Chính sách hủy đặt phòng</h3>
     <div class="cancel-policy-list">
       <div class="cancel-policy-item">
-        <span>Cancel 3 days before check-in</span>
-        <strong>100% refund</strong>
+        <span>Hủy trước ngày nhận phòng 3 ngày</span>
+        <strong>Hoàn 100%</strong>
       </div>
       <div class="cancel-policy-item">
-        <span>Cancel 2 days before check-in</span>
-        <strong>50% refund</strong>
+        <span>Hủy trước ngày nhận phòng 2 ngày</span>
+        <strong>Hoàn 50%</strong>
       </div>
       <div class="cancel-policy-item">
-        <span>Cancel 1 day before check-in</span>
-        <strong>0% refund</strong>
+        <span>Hủy trước ngày nhận phòng 1 ngày</span>
+        <strong>Hoàn 0%</strong>
       </div>
     </div>
     <div class="cancel-booking-preview">
       <div class="cancel-preview-row">
-        <span id="cancelBookingAmountLabel">Booking total</span>
+        <span id="cancelBookingAmountLabel">Tổng đơn đặt</span>
         <strong id="cancelBookingTotal">0 VND</strong>
       </div>
       <div class="cancel-preview-row">
-        <span>Refund</span>
+        <span>Hoàn tiền</span>
         <strong id="cancelBookingRefund">0 VND</strong>
       </div>
       <div class="cancel-preview-row">
-        <span>Cancellation fee</span>
+        <span>Phí hủy</span>
         <strong id="cancelBookingFee">0 VND</strong>
       </div>
       <p id="cancelBookingNote" class="cancel-booking-note"></p>
     </div>
     <label class="cancel-confirm-box">
       <input type="checkbox" id="cancelPolicyConfirm" />
-      <span>I have read and agree with the cancellation policy.</span>
+      <span>Tôi đã đọc và đồng ý với chính sách hủy.</span>
     </label>
     <div class="action-row">
-      <button type="button" class="btn-secondary" id="cancelBookingDismiss">Close</button>
-      <button type="button" class="cta-button" id="confirmCancelBooking">Confirm Cancel</button>
+      <button type="button" class="btn-secondary" id="cancelBookingDismiss">Đóng</button>
+      <button type="button" class="cta-button" id="confirmCancelBooking">Xác nhận hủy</button>
     </div>
   </div>
 </div>

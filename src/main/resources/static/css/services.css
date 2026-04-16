@@ -411,7 +411,7 @@ html {
 .service-detail-content-wrap {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
   width: min(100%, 1260px);
   margin: 0 auto;
   position: relative;
@@ -421,6 +421,7 @@ html {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  align-self: flex-start;
   width: fit-content;
   padding: 12px 20px;
   border-radius: 999px;
@@ -432,7 +433,8 @@ html {
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
   position: sticky;
   top: 106px;
-  margin-left: -110px;
+  margin-left: -140px;
+  margin-bottom: 4px;
   z-index: 6;
 }
 
@@ -446,6 +448,7 @@ html {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.95fr);
   gap: 16px;
+  align-items: start;
   padding: 12px;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(222, 228, 236, 0.9);
@@ -518,7 +521,8 @@ html {
 .service-detail-main {
   overflow: hidden;
   border-radius: 18px;
-  min-height: 372px;
+  min-height: 304px;
+  aspect-ratio: 16 / 9.4;
   background: #eaf0f5;
 }
 
@@ -531,25 +535,25 @@ html {
 
 .service-detail-thumbs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 10px;
 }
 
 .service-thumb {
   padding: 0;
-  border: 0;
+  border: 1px solid rgba(220, 228, 236, 0.95);
   border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  background: transparent;
+  background: #fff;
   opacity: 0.72;
   transition: transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
 }
 
 .service-thumb img {
   width: 100%;
-  height: 72px;
+  height: 78px;
   object-fit: cover;
   display: block;
 }
@@ -561,11 +565,15 @@ html {
   box-shadow: 0 12px 24px rgba(20, 42, 61, 0.18);
 }
 
+.service-thumb.active {
+  border-color: rgba(70, 132, 207, 0.55);
+}
+
 .service-detail-content {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-height: 100%;
+  align-self: start;
   padding: 18px 16px 10px 10px;
 }
 
@@ -643,7 +651,7 @@ html {
   display: grid;
   gap: 8px;
   margin-top: 16px;
-  padding: 12px 0 14px;
+  padding: 12px 0 10px;
   border-bottom: 1px solid #edf1f5;
 }
 
@@ -663,7 +671,7 @@ html {
 }
 
 .service-detail-footnote {
-  margin-top: 12px;
+  margin-top: 10px;
   color: #7b8692;
   font-size: 10px;
   line-height: 1.8;
@@ -750,6 +758,7 @@ html {
   .service-back-btn {
     top: 96px;
     margin-left: 0;
+    margin-bottom: 0;
   }
 }
 
@@ -784,6 +793,7 @@ html {
 
   .service-detail-main {
     min-height: 260px;
+    aspect-ratio: auto;
   }
 
   .service-detail-thumbs {
