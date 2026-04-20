@@ -334,15 +334,23 @@ public class RoomService {
     private void validateStatusChange(Room room, String newStatus) {
         LocalDate today = LocalDate.now();
         List<BookingDetail> activeDetails = bookingDetailRepository.findActiveDetailsByDate(room, today);
+        List<BookingDetail> checkoutDetails = bookingDetailRepository.findCheckOutDetailsByDate(room, today).stream()
+                .filter(detail -> !isCancelledDetail(detail))
+                .filter(detail -> !"NO_SHOW".equalsIgnoreCase(detail.getStatus()))
+                .toList();
         String currentStatus = room.getStatus() == null ? "" : room.getStatus().trim().toUpperCase();
 
         if ("AVAILABLE".equals(newStatus) && "HOUSEKEEPING".equals(currentStatus)) {
             return;
         }
 
-        if (("OCCUPIED".equals(newStatus) || "CHECKED-OUT".equals(newStatus) || "RESERVED".equals(newStatus))
+        if (("OCCUPIED".equals(newStatus) || "RESERVED".equals(newStatus))
                 && activeDetails.isEmpty()) {
             throw new RuntimeException("This room has no active booking for today");
+        }
+
+        if ("CHECKED-OUT".equals(newStatus) && activeDetails.isEmpty() && checkoutDetails.isEmpty()) {
+            throw new RuntimeException("This room has no booking due for checkout today");
         }
 
         if ("AVAILABLE".equals(newStatus) && !activeDetails.isEmpty()) {
@@ -351,7 +359,8 @@ public class RoomService {
     }
 
     private void applyActualCheckoutDate(Room room, LocalDate checkoutDate) {
-        bookingDetailRepository.findActiveDetailsByDate(room, checkoutDate).stream()
+        findCheckoutCandidate(room, checkoutDate)
+                .stream()
                 .findFirst()
                 .ifPresent(detail -> {
                     BigDecimal previousAmount = detail.getFinalAmount() != null
@@ -363,6 +372,21 @@ public class RoomService {
                     bookingLifecycleService.handleEarlyCheckout(detail, previousAmount, checkoutDate);
                     dailyRevenueService.ensureRevenueForDate(checkoutDate);
                 });
+    }
+
+    private List<BookingDetail> findCheckoutCandidate(Room room, LocalDate checkoutDate) {
+        List<BookingDetail> activeDetails = bookingDetailRepository.findActiveDetailsByDate(room, checkoutDate).stream()
+                .filter(detail -> !isCancelledDetail(detail))
+                .filter(detail -> !"NO_SHOW".equalsIgnoreCase(detail.getStatus()))
+                .toList();
+        if (!activeDetails.isEmpty()) {
+            return activeDetails;
+        }
+
+        return bookingDetailRepository.findCheckOutDetailsByDate(room, checkoutDate).stream()
+                .filter(detail -> !isCancelledDetail(detail))
+                .filter(detail -> !"NO_SHOW".equalsIgnoreCase(detail.getStatus()))
+                .toList();
     }
 
     private void syncBookingsForRoom(Room room) {

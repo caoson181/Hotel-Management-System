@@ -1,8 +1,12 @@
-let currentRole = "Manager";
+let currentRole = "";
 
 function applyRolePermissions() {
   const allFeatures = document.querySelectorAll(".menu-dropdown a");
   const allMenus = document.querySelectorAll(".menu-item");
+
+  if (!allFeatures.length || !allMenus.length) {
+    return;
+  }
 
   allFeatures.forEach((item) => {
     item.style.display = "none";

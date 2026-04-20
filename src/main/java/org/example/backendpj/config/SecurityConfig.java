@@ -87,6 +87,8 @@ public class SecurityConfig {
                                 "/staff/manage",
                                 "/staff/manage/**",
                                 "/staff/manage-staff",
+                                "/staff/tasks/manage",
+                                "/staff/tasks/create",
                                 "/staff/create",
                                 "/staff/update",
                                 "/staff/edit/**",

@@ -1,0 +1,221 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Tasks</title>
+
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/modal.css}" />
+    <link rel="stylesheet" th:href="@{/css/staff-tasks.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div th:replace="~{components/navbar :: navbar}"></div>
+
+    <main class="task-page">
+      <section class="task-hero">
+        <div>
+          <p class="eyebrow">Operations</p>
+          <h1>Task Assignment Board</h1>
+          <p class="hero-text">
+            Create and assign work for receptionists and housekeepers based on the rooms and guests that need attention.
+          </p>
+        </div>
+      </section>
+
+      <div th:if="${success}" class="alert-success" th:text="${success}"></div>
+      <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+
+      <section class="task-summary-grid">
+        <article class="summary-card">
+          <span>Total</span>
+          <strong th:text="${summary.total}">0</strong>
+        </article>
+        <article class="summary-card pending">
+          <span>Pending</span>
+          <strong th:text="${summary.pending}">0</strong>
+        </article>
+        <article class="summary-card progress">
+          <span>In Progress</span>
+          <strong th:text="${summary.inProgress}">0</strong>
+        </article>
+        <article class="summary-card done">
+          <span>Completed</span>
+          <strong th:text="${summary.completed}">0</strong>
+        </article>
+        <article class="summary-card overdue">
+          <span>Overdue</span>
+          <strong th:text="${summary.overdue}">0</strong>
+        </article>
+      </section>
+
+      <section class="task-layout">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Create Task</h2>
+            <p>Assign work to the staff already stored in your database.</p>
+          </div>
+
+          <form th:action="@{/staff/tasks/create}" method="post" class="task-form">
+            <div class="form-grid">
+              <div>
+                <label>Title</label>
+                <input type="text" name="title" required placeholder="Ex: Clean room after checkout" />
+              </div>
+
+              <div>
+                <label>Task Type</label>
+                <select name="taskType" id="taskTypeSelect" required>
+                  <option value="HOUSEKEEPING">Housekeeping</option>
+                  <option value="EQUIPMENT_CHECK">Equipment Check</option>
+                  <option value="CUSTOMER_SUPPORT">Customer Support</option>
+                  <option value="MAINTENANCE">Maintenance</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Assign To</label>
+                <select name="assignedUserId" required>
+                  <option value="">Select staff</option>
+                  <option
+                    th:each="user : ${assignableUsers}"
+                    th:value="${user.id}"
+                    th:text="${user.fullName + ' - ' + user.role}"
+                  ></option>
+                </select>
+              </div>
+
+              <div>
+                <label>Priority</label>
+                <select name="priority">
+                  <option value="LOW">Low</option>
+                  <option value="MEDIUM" selected>Medium</option>
+                  <option value="HIGH">High</option>
+                  <option value="URGENT">Urgent</option>
+                </select>
+              </div>
+
+              <div>
+                <label>Room</label>
+                <select name="roomId" id="taskRoomSelect">
+                  <option value="">No specific room</option>
+                  <option
+                    th:each="room : ${rooms}"
+                    th:value="${room.id}"
+                    th:attr="data-room-status=${room.status},
+                             data-housekeeping-eligible=${@staffTaskService.isHousekeepingEligibleRoom(room)}"
+                    th:text="${room.roomNumber + ' - ' + room.roomType + ' ' + room.roomRank + ' [' + room.status + ']'}"
+                  ></option>
+                </select>
+                <small class="field-hint" id="taskRoomHint">
+                  Housekeeping tasks only show rooms that are Checked-out or Housekeeping.
+                </small>
+              </div>
+
+              <div>
+                <label>Due At</label>
+                <input type="datetime-local" name="dueAt" />
+              </div>
+            </div>
+
+            <div>
+              <label>Description</label>
+              <textarea
+                name="description"
+                rows="4"
+                placeholder="Add task details, guest notes, or follow-up instructions."
+              ></textarea>
+            </div>
+
+            <button class="primary-btn" type="submit">Assign Task</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Current Tasks</h2>
+            <p>Filter by type, status, or assigned user.</p>
+          </div>
+
+          <form class="filter-bar" th:action="@{/staff/tasks/manage}" method="get">
+            <select name="status">
+              <option value="">All Statuses</option>
+              <option value="PENDING" th:selected="${selectedStatus == 'PENDING'}">Pending</option>
+              <option value="IN_PROGRESS" th:selected="${selectedStatus == 'IN_PROGRESS'}">In Progress</option>
+              <option value="COMPLETED" th:selected="${selectedStatus == 'COMPLETED'}">Completed</option>
+              <option value="CANCELLED" th:selected="${selectedStatus == 'CANCELLED'}">Cancelled</option>
+            </select>
+
+            <select name="type">
+              <option value="">All Types</option>
+              <option value="HOUSEKEEPING" th:selected="${selectedType == 'HOUSEKEEPING'}">Housekeeping</option>
+              <option value="EQUIPMENT_CHECK" th:selected="${selectedType == 'EQUIPMENT_CHECK'}">Equipment Check</option>
+              <option value="CUSTOMER_SUPPORT" th:selected="${selectedType == 'CUSTOMER_SUPPORT'}">Customer Support</option>
+              <option value="MAINTENANCE" th:selected="${selectedType == 'MAINTENANCE'}">Maintenance</option>
+            </select>
+
+            <select name="assignedUserId">
+              <option value="">All Staff</option>
+              <option
+                th:each="user : ${assignableUsers}"
+                th:value="${user.id}"
+                th:selected="${selectedAssignedUserId != null and selectedAssignedUserId == user.id}"
+                th:text="${user.fullName}"
+              ></option>
+            </select>
+
+            <button type="submit" class="secondary-btn">Filter</button>
+          </form>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Assigned To</th>
+                  <th>Room</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Due</th>
+                  <th>Completed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${#lists.isEmpty(tasks)}">
+                  <td colspan="7" class="empty-state">No task found for this filter.</td>
+                </tr>
+                <tr th:each="task : ${tasks}">
+                  <td>
+                    <div class="task-title" th:text="${task.title}"></div>
+                    <div class="task-meta-line">
+                      <span class="pill neutral" th:text="${task.taskType}"></span>
+                      <span th:text="${task.description ?: 'No extra note'}"></span>
+                    </div>
+                  </td>
+                  <td th:text="${task.assignedStaff != null ? task.assignedStaff.user.fullName : 'Unassigned'}"></td>
+                  <td th:text="${task.room != null ? task.room.roomNumber : '-'}"></td>
+                  <td><span class="pill" th:classappend="${' ' + #strings.toLowerCase(task.priority)}" th:text="${task.priority}"></span></td>
+                  <td><span class="pill status" th:classappend="${' ' + #strings.toLowerCase(task.status)}" th:text="${task.status}"></span></td>
+                  <td th:text="${task.dueAt != null ? #temporals.format(task.dueAt, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                  <td th:text="${task.completedAt != null ? #temporals.format(task.completedAt, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div th:replace="~{components/modals :: modals}"></div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/account.js}"></script>
+    <script th:src="@{/js/dropdown.js}"></script>
+    <script th:src="@{/js/role.js}"></script>
+    <script th:src="@{/js/staff-tasks.js}"></script>
+  </body>
+</html>

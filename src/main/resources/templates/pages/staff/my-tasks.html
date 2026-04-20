@@ -1,0 +1,128 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Tasks</title>
+
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <link rel="stylesheet" th:href="@{/css/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/modal.css}" />
+    <link rel="stylesheet" th:href="@{/css/staff-tasks.css}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div th:replace="~{components/navbar :: navbar}"></div>
+
+    <main class="task-page">
+      <section class="task-hero compact">
+        <div>
+          <p class="eyebrow">Staff Workspace</p>
+          <h1>My Assigned Tasks</h1>
+          <p class="hero-text">Move your work from pending to in-progress to completed with a quick update.</p>
+        </div>
+      </section>
+
+      <div th:if="${success}" class="alert-success" th:text="${success}"></div>
+      <div th:if="${error}" class="alert-error" th:text="${error}"></div>
+
+      <section class="task-summary-grid compact">
+        <article class="summary-card">
+          <span>Total</span>
+          <strong th:text="${summary.total}">0</strong>
+        </article>
+        <article class="summary-card pending">
+          <span>Pending</span>
+          <strong th:text="${summary.pending}">0</strong>
+        </article>
+        <article class="summary-card progress">
+          <span>In Progress</span>
+          <strong th:text="${summary.inProgress}">0</strong>
+        </article>
+        <article class="summary-card done">
+          <span>Completed</span>
+          <strong th:text="${summary.completed}">0</strong>
+        </article>
+      </section>
+
+      <section class="task-card-grid">
+        <article class="task-card" th:if="${#lists.isEmpty(tasks)}">
+          <div class="task-card-header">
+            <h3>No tasks yet</h3>
+          </div>
+          <p>Your manager has not assigned any task yet.</p>
+        </article>
+
+        <article class="task-card" th:each="task : ${tasks}">
+          <div class="task-card-header">
+            <div>
+              <h3 th:text="${task.title}"></h3>
+              <p th:text="${task.description ?: 'No detail provided.'}"></p>
+            </div>
+            <span class="pill status" th:classappend="${' ' + #strings.toLowerCase(task.status)}" th:text="${task.status}"></span>
+          </div>
+
+          <div class="task-card-meta">
+            <span><i class="fas fa-layer-group"></i> <strong th:text="${task.taskType}"></strong></span>
+            <span><i class="fas fa-flag"></i> <strong th:text="${task.priority}"></strong></span>
+            <span><i class="fas fa-door-open"></i> <strong th:text="${task.room != null ? task.room.roomNumber : 'General'}"></strong></span>
+            <span><i class="fas fa-clock"></i> <strong th:text="${task.dueAt != null ? #temporals.format(task.dueAt, 'dd/MM/yyyy HH:mm') : 'No deadline'}"></strong></span>
+          </div>
+
+          <form th:action="@{/staff/tasks/{id}/status(id=${task.id})}" method="post" class="task-action-form">
+            <input type="hidden" name="returnTo" value="my" />
+            <label class="task-note-label">Update note</label>
+            <textarea
+              name="note"
+              rows="2"
+              placeholder="Add a short note about what you did or what blocks the task."
+              th:text="${task.resolutionNote}"
+            ></textarea>
+
+            <div class="task-actions">
+              <button
+                type="submit"
+                name="status"
+                value="IN_PROGRESS"
+                class="secondary-btn"
+                th:if="${task.status == 'PENDING'}"
+              >
+                Start Task
+              </button>
+
+              <button
+                type="submit"
+                name="status"
+                value="COMPLETED"
+                class="primary-btn"
+                th:if="${task.status == 'IN_PROGRESS' or task.status == 'PENDING'}"
+              >
+                Mark Completed
+              </button>
+
+              <button
+                type="submit"
+                name="status"
+                value="PENDING"
+                class="ghost-btn"
+                th:if="${task.status == 'IN_PROGRESS'}"
+              >
+                Move Back To Pending
+              </button>
+            </div>
+          </form>
+        </article>
+      </section>
+    </main>
+
+    <div th:replace="~{components/modals :: modals}"></div>
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/account.js}"></script>
+    <script th:src="@{/js/dropdown.js}"></script>
+    <script th:src="@{/js/role.js}"></script>
+    <script th:src="@{/js/staff-tasks.js}"></script>
+  </body>
+</html>

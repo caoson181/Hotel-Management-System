@@ -10,6 +10,10 @@
   <link rel="stylesheet" th:href="@{/css/modal.css}" />
   <link rel="stylesheet" th:href="@{/css/navbar.css}" />
   <link rel="stylesheet" th:href="@{/css/profile.css}" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
 </head>
 
 <body>
@@ -18,18 +22,39 @@
 
 <!-- WELCOME -->
 <section class="hero">
-  <div id="main-content" class="welcome-box">
+  <div id="main-content" class="welcome-box dashboard-box">
+    <div class="dashboard-intro">
+      <h1>
+        Welcome, <span th:text="${currentUser.fullName}">User</span>!
+      </h1>
 
-    <h1>
-      Welcome, <span th:text="${currentUser.fullName}">User</span>!
-    </h1>
+      <p>
+        You are logged in as:
+        <span th:text="${currentUser.role}">Role</span>
+      </p>
+    </div>
 
-    <p>
-      You are logged in as:
-      <span th:text="${currentUser.role}">Role</span>
+    <section class="quick-links">
+      <div class="quick-links-header">
+        <h2>Task Workspace</h2>
+        <p>Open the staff task pages directly from the dashboard.</p>
+      </div>
 
-    </p>
+      <div class="quick-links-grid">
+        <a th:href="@{/staff/tasks/my}" class="quick-link-card">
+          <span class="quick-link-kicker">Staff</span>
+          <strong>My Tasks</strong>
+          <p>See the tasks assigned to your account and update progress.</p>
+        </a>
 
+        <a th:href="@{/staff/tasks/manage}" class="quick-link-card manager-card"
+           sec:authorize="hasAnyRole('ADMIN','MANAGER')">
+          <span class="quick-link-kicker">Manager</span>
+          <strong>Manage Tasks</strong>
+          <p>Create, assign, and monitor work for receptionists and housekeepers.</p>
+        </a>
+      </div>
+    </section>
   </div>
 </section>
 

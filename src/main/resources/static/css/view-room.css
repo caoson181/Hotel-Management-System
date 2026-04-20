@@ -8,23 +8,21 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 }
 
 .room-view-container {
-  max-width: 1600px; /* Tăng từ 1400px lên 1600px */
+  width: 100%;
+  max-width: 1180px;
   margin: 30px auto;
   padding: 0 20px;
   overflow-y: hidden;
-  display: flex;
-  gap: 30px; /* Tăng gap */
-  align-items: flex-start; 
+  display: block;
 }
 
 .left-section {
-  flex: 2.5;
   min-width: 0;
 }
 
 .right-section {
-  flex: 1.4;
   min-width: 0;
+  max-width: none;
 }
 
 .room-view-container, .table-container, .dropdown-menu {
@@ -78,6 +76,8 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 .filter-row-secondary {
   margin-bottom: 0;
   align-items: center;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .filter-group {
@@ -139,9 +139,15 @@ input.filter-select {
   align-items: center;
   gap: 8px;
   box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
-  margin-left: auto;
+  margin-left: 0;
   margin-top: 0;
   align-self: center;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.bookings-section {
+  margin-top: 24px;
 }
 
 .role-indicator i {
@@ -296,16 +302,17 @@ input.filter-select {
   display: none;
 }
 
-table {
+#roomTable {
   width: 100%;
   border-collapse: collapse;
   background: white;
   border-radius: 15px;
   overflow: visible;
-  table-layout: fixed;
+  table-layout: auto;
+  min-width: 760px;
 }
 
-td, th {
+#roomTable td, #roomTable th {
   overflow: visible;
 }
 
@@ -342,11 +349,16 @@ tr:hover td {
 }
 
 /* Set column widths */
-#roomTable th:nth-child(1), #roomTable td:nth-child(1) { width: 15%; }
-#roomTable th:nth-child(2), #roomTable td:nth-child(2) { width: 20%; }
-#roomTable th:nth-child(3), #roomTable td:nth-child(3) { width: 20%; }
-#roomTable th:nth-child(4), #roomTable td:nth-child(4) { width: 20%; }
-#roomTable th:nth-child(5), #roomTable td:nth-child(5) { width: 25%; }
+#roomTable th:nth-child(1), #roomTable td:nth-child(1) { width: 14%; }
+#roomTable th:nth-child(2), #roomTable td:nth-child(2) { width: 18%; }
+#roomTable th:nth-child(3), #roomTable td:nth-child(3) { width: 30%; }
+#roomTable th:nth-child(4), #roomTable td:nth-child(4) { width: 18%; }
+#roomTable th:nth-child(5), #roomTable td:nth-child(5) { width: 20%; }
+
+#roomTable td:nth-child(3),
+#roomTable td:nth-child(4) {
+  white-space: normal;
+}
 
 .room-number-cell {
   white-space: normal;
@@ -720,8 +732,11 @@ tr:hover td {
   border-radius: 30px;
   font-size: 12px;
   font-weight: 600;
-  display: inline-block;
-  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.45;
 }
 
 .status-available {
@@ -899,10 +914,11 @@ tr:hover td {
   border-radius: 15px;
   padding: 20px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-  height: auto; /* Sửa từ fit-content thành auto */
+  height: auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: static;
 }
 
 .bookings-container h3 {
@@ -1181,36 +1197,20 @@ tr:hover td {
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .room-view-container {
-    gap: 20px;
-  }
-  
-  .left-section {
-    flex: 2;
-  }
-  
-  .right-section {
-    flex: 1;
-  }
-  
   .filter-row {
     flex-direction: column;
   }
-  
+
+  .filter-row-secondary {
+    width: 100%;
+  }
+
   .role-indicator {
     margin-left: 0;
-    margin-top: 0;
   }
 }
 
 @media (max-width: 768px) {
-  .room-view-container {
-    flex-direction: column;
-  }
-
-  .left-section, .right-section {
-    flex: none;
-  }
 
   .controls {
     padding: 20px;
@@ -1294,3 +1294,5 @@ tr:hover td {
     min-height: auto;
   }
 }
+
+
