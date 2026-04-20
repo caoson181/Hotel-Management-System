@@ -178,6 +178,11 @@ animateFloatingElements();
 
 // Dynamic Background Gradient
 function updateBackgroundGradient() {
+  if (document.body.classList.contains("customer-theme-dark")) {
+    document.body.style.background = "";
+    return;
+  }
+
   const hour = new Date().getHours();
   let gradient;
 
@@ -196,6 +201,7 @@ function updateBackgroundGradient() {
 
 updateBackgroundGradient();
 setInterval(updateBackgroundGradient, 60000); // Update every minute
+window.addEventListener("customer-theme-change", updateBackgroundGradient);
 
 // Particle Effect (Simple)
 function createParticles() {

@@ -71,8 +71,16 @@
   color: #5d4aa0;
 }
 
+.profile-avatar-stack {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+}
+
 .profile-avatar-trigger {
   cursor: pointer;
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .profile-avatar-large {
@@ -98,6 +106,7 @@
 }
 
 .profile-name {
+  margin-top: 12px;
   font-size: 22px;
   font-weight: 800;
   text-align: center;
@@ -105,7 +114,46 @@
 }
 
 .avatar-popup {
-  position: relative;
+  position: static;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  display: none;
+  align-items: center;
+  justify-content: flex-start;
+  align-content: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: min(250px, calc(100% - 24px));
+  min-width: 220px;
+  max-width: min(250px, calc(100% - 24px));
+  margin: 14px auto 4px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: auto;
+  box-sizing: border-box;
+}
+
+.avatar-popup.active {
+  display: flex;
+}
+
+.avatar-popup form,
+.avatar-item {
+  display: flex;
+}
+
+.avatar-item {
+  padding: 0;
+}
+
+.avatar-popup .avatar-upload {
+  background: #ffffff;
 }
 
 .member-benefit-box,
@@ -1346,6 +1394,12 @@ body.profile-theme-dark .cancel-preview-row strong {
   .profile-wrapper {
     padding: 18px;
     border-radius: 24px;
+  }
+
+  .avatar-popup {
+    width: min(250px, calc(100% - 32px));
+    min-width: 0;
+    max-width: calc(100% - 32px);
   }
 
   .profile-summary-card,

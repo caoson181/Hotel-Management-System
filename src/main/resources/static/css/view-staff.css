@@ -150,6 +150,10 @@ button:hover {
     align-items: center;
 }
 
+#staffModal.modal.show {
+    display: flex;
+}
+
 /* ===================== MODAL CONTENT ===================== */
 #staffModal .modal-content {
     width: 500px;

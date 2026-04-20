@@ -4,7 +4,6 @@ import org.example.backendpj.Entity.Booking;
 import org.example.backendpj.Entity.BookingDetail;
 import org.example.backendpj.Entity.Customer;
 import org.example.backendpj.Entity.CustomerBooking;
-import org.example.backendpj.Entity.Payment;
 import org.example.backendpj.Entity.User;
 import org.example.backendpj.Repository.BookingDetailRepository;
 import org.example.backendpj.Repository.BookingRepository;

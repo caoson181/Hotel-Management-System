@@ -940,6 +940,9 @@ function removeCartItem(id) {
 }
 
 function validateBookingItems(cart) {
+  if (!Array.isArray(cart) || !cart.length) {
+    throw new Error(t("booking.empty"));
+  }
   const incompleteItem = cart.find((item) => !item.checkin || !item.checkout || item.draft);
   if (incompleteItem) {
     throw new Error(t("booking.completeDates"));
@@ -1108,7 +1111,8 @@ function initCart() {
 
   payNowBtn?.addEventListener("click", () => {
     try {
-      validateBookingItems(readCart());
+      const cart = readCart();
+      validateBookingItems(cart);
       const returnUrl = getPaymentReturnUrl();
       window.location.href = `/checkout/payment?returnUrl=${encodeURIComponent(returnUrl)}`;
     } catch (error) {

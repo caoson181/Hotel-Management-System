@@ -273,7 +273,7 @@ const PROFILE_TEXT = {
       open: "Open",
       walletTransactions: "Wallet & Transactions",
       walletAvailableSuffix: "VND available",
-      transactions: "txns",
+      transactions: "transactions",
       bookingsRefunds: "Booking & Refunds",
       pending: "pending",
       cancelled: "cancelled",
@@ -1301,6 +1301,10 @@ if (avatarBtn && avatarModal) {
     e.stopPropagation();
     avatarModal.classList.toggle("active");
   };
+
+  avatarModal.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
 
   document.addEventListener("click", () => {
     avatarModal.classList.remove("active");

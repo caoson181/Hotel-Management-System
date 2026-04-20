@@ -1,6 +1,5 @@
 package org.example.backendpj.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.example.backendpj.Entity.Booking;
 import org.example.backendpj.Entity.BookingDetail;
 import org.example.backendpj.Entity.CustomerBooking;
@@ -28,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
