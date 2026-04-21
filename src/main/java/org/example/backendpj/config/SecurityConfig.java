@@ -59,7 +59,8 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/components/**",
                                 "/*.html",
-                                "/api/rooms/**"
+                                "/api/rooms/**",
+                                "/api/vnpay/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/room-comments/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/room-comments/**")

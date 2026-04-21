@@ -13,6 +13,7 @@ import org.example.backendpj.Repository.CustomerRepository;
 import org.example.backendpj.Repository.PaymentRepository;
 import org.example.backendpj.Repository.UserRepository;
 import org.example.backendpj.Service.BookingLifecycleService;
+import org.example.backendpj.Service.VnPayService;
 import org.example.backendpj.Service.RoomService;
 import org.example.backendpj.Service.WalletService;
 import org.example.backendpj.dto.CustomerCheckoutRequest;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -46,6 +48,7 @@ public class CustomerBookingController {
     private final RoomService roomService;
     private final WalletService walletService;
     private final BookingLifecycleService bookingLifecycleService;
+    private final VnPayService vnPayService;
 
     public CustomerBookingController(
             CustomerBookingRepository customerBookingRepository,
@@ -56,7 +59,8 @@ public class CustomerBookingController {
             PaymentRepository paymentRepository,
             RoomService roomService,
             WalletService walletService,
-            BookingLifecycleService bookingLifecycleService) {
+            BookingLifecycleService bookingLifecycleService,
+            VnPayService vnPayService) {
         this.customerBookingRepository = customerBookingRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
@@ -66,6 +70,7 @@ public class CustomerBookingController {
         this.roomService = roomService;
         this.walletService = walletService;
         this.bookingLifecycleService = bookingLifecycleService;
+        this.vnPayService = vnPayService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -78,13 +83,18 @@ public class CustomerBookingController {
     }
 
     @PostMapping("/checkout")
-    public Map<String, Object> checkout(@RequestBody CustomerCheckoutRequest req, Authentication authentication) {
+    public Map<String, Object> checkout(@RequestBody CustomerCheckoutRequest req,
+                                        Authentication authentication,
+                                        HttpServletRequest request) {
         if (req == null || req.getItems() == null || req.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
         String payMode = req.getPayMode() == null ? "PAY_LATER" : req.getPayMode().trim().toUpperCase();
-        String paymentStatus = "PAY_NOW".equals(payMode) ? "PAID" : "UNPAID";
+        String paymentMethod = req.getPaymentMethod() == null || req.getPaymentMethod().isBlank()
+                ? "VNPAY"
+                : req.getPaymentMethod().trim().toUpperCase();
+        String paymentStatus = "PAY_NOW".equals(payMode) && !"VNPAY".equals(paymentMethod) ? "PAID" : "UNPAID";
 
         User user = getCurrentUser(authentication);
         Customer customer = customerRepository.findByUser_Id(user.getId());
@@ -163,9 +173,17 @@ public class CustomerBookingController {
         customerBookingRepository.saveAll(createdBookings);
 
         if ("PAY_NOW".equals(payMode)) {
-            String paymentMethod = req.getPaymentMethod() == null || req.getPaymentMethod().isBlank()
-                    ? "VNPAY"
-                    : req.getPaymentMethod().trim().toUpperCase();
+            if ("VNPAY".equals(paymentMethod)) {
+                String paymentUrl = vnPayService.buildPaymentUrl(booking, request);
+                return Map.of(
+                        "groupCode", groupCode,
+                        "status", paymentStatus,
+                        "totalAmount", total,
+                        "paymentMethod", paymentMethod,
+                        "paymentUrl", paymentUrl
+                );
+            }
+
             walletService.validateAndDebit(
                     user,
                     paymentMethod,
@@ -175,12 +193,17 @@ public class CustomerBookingController {
                     total
             );
             bookingLifecycleService.recordPayment(booking, total, paymentMethod, now);
+            for (CustomerBooking customerBooking : createdBookings) {
+                customerBooking.setStatus("PAID");
+            }
+            customerBookingRepository.saveAll(createdBookings);
         }
 
         return Map.of(
                 "groupCode", groupCode,
                 "status", paymentStatus,
-                "totalAmount", total
+                "totalAmount", total,
+                "paymentMethod", paymentMethod
         );
     }
 

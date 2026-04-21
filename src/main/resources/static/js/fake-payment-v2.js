@@ -74,6 +74,15 @@ function readCart() {
   return JSON.parse(localStorage.getItem("cart")) || [];
 }
 
+function readQueryResult() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    paymentStatus: params.get("paymentStatus"),
+    message: params.get("message"),
+    groupCode: params.get("groupCode"),
+  };
+}
+
 function buildRoomDetailUrl(rank, type) {
   return `/room-detail?rank=${encodeURIComponent(rank || "")}&type=${encodeURIComponent(type || "")}`;
 }
@@ -107,6 +116,18 @@ function parseTypeRank(name) {
 }
 
 function renderSummary(cart) {
+  const queryResult = readQueryResult();
+  if (queryResult.paymentStatus === "success") {
+    summaryItems.innerHTML = `
+      <div class="summary-item">
+        <strong>VNPay payment completed</strong>
+        <p>Booking code: ${queryResult.groupCode || "N/A"}</p>
+      </div>
+    `;
+    summaryTotal.textContent = "Paid via VNPay";
+    return;
+  }
+
   if (!cart.length) {
     window.location.href = "/rooms";
     return;
@@ -141,11 +162,33 @@ function syncGatewayUI() {
     paymentCode.placeholder = "MOMO-998877";
     gatewayHint.textContent =
       "Enter your account holder, phone number, and MoMo code. The system will verify your user info and wallet before charging.";
+    accountName.disabled = false;
+    phoneNumber.disabled = false;
+    paymentCode.disabled = false;
+    document.getElementById("otpCode").disabled = false;
+    accountName.required = true;
+    phoneNumber.required = true;
+    paymentCode.required = true;
+    document.getElementById("otpCode").required = true;
+    confirmPaymentBtn.textContent = "Confirm Payment";
   } else {
     codeLabel.textContent = "VNPay Code";
-    paymentCode.placeholder = "VNPAY-998877";
+    paymentCode.placeholder = "Redirected on VNPay page";
     gatewayHint.textContent =
-      "Enter your account holder, phone number, and VNPay code. The system will verify your user info and wallet before charging.";
+      "VNPay Sandbox real flow: after pressing confirm, the system will redirect you to VNPay to complete payment and then return to this website.";
+    accountName.disabled = true;
+    phoneNumber.disabled = true;
+    paymentCode.disabled = true;
+    document.getElementById("otpCode").disabled = true;
+    accountName.required = false;
+    phoneNumber.required = false;
+    paymentCode.required = false;
+    document.getElementById("otpCode").required = false;
+    accountName.value = "";
+    phoneNumber.value = "";
+    paymentCode.value = "";
+    document.getElementById("otpCode").value = "";
+    confirmPaymentBtn.textContent = "Continue To VNPay";
   }
 }
 
@@ -195,6 +238,11 @@ async function submitFakePayment() {
     const result = await response.json();
     const checkInDates = cart.map((item) => item.checkin).filter(Boolean).sort();
     const checkOutDates = cart.map((item) => item.checkout).filter(Boolean).sort();
+
+    if (selectedMethod === "VNPAY" && result.paymentUrl) {
+      window.location.href = result.paymentUrl;
+      return;
+    }
 
     persistBookingNotification({
       groupCode: result.groupCode,
@@ -262,6 +310,10 @@ paymentForm.addEventListener("submit", async (event) => {
   hidePaymentAlert();
 
   if (!accountName.value.trim()) {
+    if (selectedMethod === "VNPAY") {
+      await submitFakePayment();
+      return;
+    }
     showPaymentAlert("Enter account holder.");
     return;
   }
@@ -284,6 +336,31 @@ paymentForm.addEventListener("submit", async (event) => {
 
   await submitFakePayment();
 });
+
+const queryResult = readQueryResult();
+if (queryResult.paymentStatus === "success") {
+  const cart = readCart();
+  const checkInDates = cart.map((item) => item.checkin).filter(Boolean).sort();
+  const checkOutDates = cart.map((item) => item.checkout).filter(Boolean).sort();
+
+  persistBookingNotification({
+    groupCode: queryResult.groupCode,
+    status: "PAID",
+    totalAmount: cart.reduce((sum, item) => sum + Number(item.price || 0), 0),
+    roomCount: cart.length,
+    checkIn: checkInDates[0] || "",
+    checkOut: checkOutDates[checkOutDates.length - 1] || "",
+    createdAt: new Date().toISOString(),
+  });
+
+  localStorage.removeItem("cart");
+  showPaymentAlert(queryResult.message || "VNPay payment success.", "success");
+  window.setTimeout(() => {
+    window.location.href = "/homepage";
+  }, 800);
+} else if (queryResult.paymentStatus) {
+  showPaymentAlert(queryResult.message || "VNPay payment failed.");
+}
 
 renderSummary(readCart());
 syncGatewayUI();
